@@ -1,0 +1,200 @@
+import { Meta } from '@storybook/addon-docs/blocks'
+
+<Meta title='Translation/Usage' />
+
+# Translation Feature Guide for wefa
+
+This guide explains how to use the translation feature in the `wefa` project, leveraging `vue-i18n` for internationalization (i18n). The setup allows dynamic loading of translation files, fallback handling, and flexible usage in Vue components.
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Setting Up Translation Files](#setting-up-translation-files)
+- [Using Translations in Components](#using-translations-in-components)
+  - [Using `$t` in Templates](#using-t-in-templates)
+  - [Using `t()` with `useI18nLib` in Script Setup](#using-t-with-usei18nlib-in-script-setup)
+  - [Using Translation Keys in Props](#using-translation-keys-in-props)
+- [Dynamic Translation Registration](#dynamic-translation-registration)
+- [Testing Translations](#testing-translations)
+- [Configuration Details](#configuration-details)
+- [Troubleshooting](#troubleshooting)
+
+## Overview
+
+The translation feature is powered by `vue-i18n@11.1.11` and configured in `src/locales/index.ts`. It dynamically loads JSON translation files from `src/locales/*/*.json`, supports multiple locales (e.g., `en`, `fr`), and provides fallback behavior for missing keys. The setup is globally integrated into tests via `vitestPlugins.setup.ts` and Storybook via `.storybook/vitest.setup.ts`.
+
+## Setting Up Translation Files
+
+Translation files are stored in `src/locales/<locale>/<category>.json`, where `<locale>` is the language code (e.g., `en`, `fr`) and `<category>` groups related keys (e.g., `breadcrumb`, `network_button`).
+
+### Example Structure
+
+```
+src/locales/
+├── en/
+│   ├── breadcrumb.json
+│   ├── network_button.json
+│   ├── validation.json
+├── fr/
+│   ├── breadcrumb.json
+│   ├── network_button.json
+│   ├── validation.json
+```
+
+### Example Translation File
+
+**src/locales/en/breadcrumb.json**
+
+```json
+{
+  "home": "Home",
+  "products": "Products",
+  "category": "Category",
+  "item": "Product Item",
+  "profile": "Profile"
+}
+```
+
+**src/locales/fr/breadcrumb.json**
+
+```json
+{
+  "home": "Accueil",
+  "products": "Produits",
+  "category": "Catégorie",
+  "item": "Article",
+  "profile": "Profil"
+}
+```
+
+### Guidelines
+
+- **File Naming**: Use `<locale>/<category>.json` (e.g., `en/breadcrumb.json`).
+- **Key Structure**: Keys are accessed as `<category>.<key>` (e.g., `breadcrumb.home` for `"Home"`).
+- **Supported Locales**: Add new locales by creating a folder (e.g., `es`) with corresponding JSON files.
+- **Fallbacks**: Missing keys fall back to the key name (e.g., `breadcrumb.unknown` → `"unknown"`) due to `formatFallbackMessages: true`.
+
+## Using Translations in Components
+
+Translations can be used in Vue components via `$t` in templates, `t()` in script setup with `useI18nLib`, or by passing translation keys as props.
+
+### Using `$t` in Templates
+
+Use the `$t` function directly in `<template>` to access translations by key.
+
+**Example: AutoroutedBreadcrumb.vue**
+
+```vue
+<template>
+  <nav>
+    <a v-for="route in routes" :key="route.name" :href="route.path">
+      {{ $t(route.meta.title) }}
+    </a>
+  </nav>
+</template>
+
+<script setup lang="ts">
+import { useRoute } from 'vue-router'
+const route = useRoute()
+const routes = route.matched
+</script>
+```
+
+- **Key**: Use `<category>.<key>` (e.g., `breadcrumb.home`).
+- **Example Output**: For `en`, `$t('breadcrumb.home')` renders `"Home"`; for `fr`, it renders `"Accueil"`.
+- **Note**: Ensure `route.meta.title` contains valid keys (e.g., `breadcrumb.home`) from your translation files.
+
+### Using `t()` with `useI18nLib` in Script Setup
+
+Use the `useI18nLib` composable to access the `t` function in `<script setup>` for programmatic translations.
+
+**Example: NetworkButton.vue**
+
+```vue
+<template>
+  <Button :label="t(currentButtonConfig.text as string)" />
+</template>
+
+<script setup lang="ts">
+import Button from 'primevue/button'
+import { useI18nLib } from '@/locales'
+import { computed } from 'vue'
+
+interface ButtonProps {
+  text?: string
+}
+const props = defineProps<{ defaultButton: ButtonProps }>()
+const { t } = useI18nLib()
+const currentButtonConfig = computed(() => ({
+  text: props.defaultButton.text ?? 'network_button.submit',
+}))
+</script>
+```
+
+- **Key**: Use `t(<category>.<key>)` (e.g., `t('network_button.submit')`).
+- **Example Output**: For `en`, `t('network_button.submit')` returns `"Submit"`; for `fr`, it returns `"Envoyer"`.
+- **Note**: Ensure `text` is a valid string key to avoid `SyntaxError: Invalid arguments` from `vue-i18n`.
+
+### Using Translation Keys in Props
+
+Pass translation keys as props to components that internally use `$t` or `t()`.
+
+**Example: RoutedTabsComponent.vue**
+
+```vue
+<template>
+  <Tabs :value="activeTabIndex">
+    <Tab v-for="tab in tabs" :key="tab">{{ $t(`tabs.${tab.toLowerCase()}`) }}</Tab>
+  </Tabs>
+</template>
+
+<script setup lang="ts">
+import Tabs from 'primevue/tabs'
+import Tab from 'primevue/tab'
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+
+const props = defineProps<{ tabs: string[] }>()
+const route = useRoute()
+const activeTabIndex = computed(() => props.tabs.findIndex((tab) => tab === route.name))
+</script>
+```
+
+**Usage in Parent Component**
+
+```vue
+<RoutedTabsComponent :tabs="['Tab1', 'Tab2']" />
+```
+
+**Corresponding Translation File (src/locales/en/tabs.json)**
+
+```json
+{
+  "tab1": "First Tab",
+  "tab2": "Second Tab"
+}
+```
+
+- **Key**: Use `<category>.<key>` in props (e.g., `tabs.tab1`).
+- **Example Output**: For `en`, `Tab1` renders as `"First Tab"`; for `fr`, it might render as `"Premier Onglet"`.
+- **Note**: Ensure props reference valid keys defined in `src/locales/*/tabs.json`.
+
+## Dynamic Translation Registration
+
+Add or override translations at runtime using the `registerTranslations` function.
+
+**Example**
+
+```typescript
+import { registerTranslations } from '@/locales'
+
+registerTranslations('en', {
+  custom: {
+    greeting: 'Hello, World!',
+  },
+})
+```
+
+- **Usage**: Call `registerTranslations(locale, messages)` to add new keys (e.g., `custom.greeting`).
+- **Example Output**: After registration, `$t('custom.greeting')` returns `"Hello, World!"` in `en`.
+- **Note**: `messages` should match the `LocaleMessages<Record<string, LocaleMessageValue>>` type, e.g., `{ category: { key: string } }`.

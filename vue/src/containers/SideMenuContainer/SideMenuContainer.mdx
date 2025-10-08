@@ -1,0 +1,77 @@
+import { Meta, Story, Canvas, ArgTypes } from '@storybook/addon-docs/blocks'
+
+<Meta title='Router containers/SideMenuContainer' />
+
+# SideMenuContainer
+
+`SideMenuContainer` is a flexible container that renders a sidebar menu alongside a main content area (via `<RouterView />`).  
+It is typically used to provide persistent navigation links while rendering child routes on the right-hand side.  
+Use this container if you need a layout with a collapsible or fixed-width side menu.
+
+## Props
+
+SideMenuContainer offers the following props to customize its layout and behavior:
+
+- `depth`: 1 | 2  
+  If your children routes have themselves children routes, controls how deep they are checked for and displayed on the NavBar.
+  Default is `1`.
+
+- `width`: number  
+  Controls the width of the sidebar in `var(--spacing)` units, which by default is `.25rem` or `4px`.
+  Default is `50`.
+
+- `start`: object  
+  Controls content at the top of the sidebar.
+  - `logo`?: string — URL or path to the logo image.
+  - `appName`?: string — Name of the application.
+
+- `end`: object  
+  Controls content at the bottom of the sidebar.
+  - `showUser`: boolean — Show current user name. Default: `false`.
+  - `showSettings`: boolean — Show settings button. Default: `false`.
+  - `showLogout`: boolean — Show logout button. Default: `false`.
+  - `settingsRoute`: string | RouteLocation — Route for the settings button. Default: `{ path: '/' }`.
+  - `logoutRoute`: string | RouteLocation — Route for the logout button. Default: `{ path: '/' }`.
+
+---
+
+## Usage
+
+```ts
+/** router.ts */
+
+import { SideMenuContainer } from '@nside/wefa/containers'
+
+routes: [
+  {
+    path: '/my-route-path',
+    name: 'my-route-name',
+    meta: { title: 'My Route Title' },
+    component: SideMenuContainer,
+    props: {
+      depth: 1,
+      width: 50,
+      start: {
+        logo: '/WEFA_notext_logo.svg',
+        appName: 'My Energy Dashboard'
+      },
+      end: {
+        showUser: true,
+        showSettings: true,
+        showLogout: true,
+        settingsRoute: { path: '/settings' },
+        logoutRoute: { path: '/logout' }
+      }
+    },
+    children: [
+      ...
+    ]
+  }
+]
+```
+
+---
+
+## Examples
+
+Examples are available in the Overview subsection.

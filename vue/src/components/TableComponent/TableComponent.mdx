@@ -1,0 +1,155 @@
+import { Meta, Canvas, ArgTypes } from '@storybook/addon-docs/blocks'
+import * as TableComponentStories from './TableComponent.stories'
+
+<Meta of={TableComponentStories} />
+
+# Table
+
+A flexible, editable data table component built on PrimeVue's DataTable and Column, with full TypeScript support and Tailwind CSS styling. Supports custom editors, body renderers, and passthrough props for advanced use cases.
+
+## Overview
+
+The Table component provides a powerful abstraction over PrimeVue's DataTable, making it easy to define columns, editors, and custom cell rendering. It is designed for both simple and advanced data grid scenarios, including inline editing and custom cell content.
+
+### Key Features
+
+- **PrimeVue Foundation**: Uses DataTable and Column for robust data grid features
+- **Editable**: Supports both row and cell editing modes
+- **Custom Editors & Body**: Easily plug in custom editor and body components per column
+- **Passthrough Props**: Pass any DataTable or Column prop for advanced configuration
+- **TypeScript Support**: Strongly typed columns and props
+- **Tailwind Styling**: All layout and spacing use Tailwind CSS classes
+
+## Basic Usage
+
+<Canvas of={TableComponentStories.Default} />
+
+```vue
+<template>
+  <TableComponent v-model="rows" :columns="columns" />
+</template>
+
+<script setup>
+import { ref } from 'vue'
+import TableComponent from '@/components/TableComponent/TableComponent.vue'
+
+const rows = ref([
+  { id: 1, name: 'John Doe', age: 30 },
+  { id: 2, name: 'Jane Smith', age: 25 },
+])
+const columns = [
+  { field: 'name', header: 'Name', editor: 'InputText' },
+  { field: 'age', header: 'Age', editor: 'InputNumber', editorProps: { min: 0 } },
+]
+</script>
+```
+
+## Editing Modes
+
+### Row Edit Mode
+
+<Canvas of={TableComponentStories.RowEditMode} />
+
+```vue
+<TableComponent v-model="rows" :columns="columns" editMode="row" />
+```
+
+### Cell Edit Mode
+
+<Canvas of={TableComponentStories.CellEditMode} />
+
+```vue
+<TableComponent v-model="rows" :columns="columns" editMode="cell" />
+```
+
+## Custom Body and Editors
+
+<Canvas of={TableComponentStories.WithCustomBody} />
+
+```vue
+<TableComponent
+  v-model="rows"
+  :columns="[
+    { field: 'name', header: 'Name', editor: 'InputText' },
+    { field: 'age', header: 'Age', editor: 'InputNumber', editorProps: { min: 0 } },
+    {
+      field: 'status',
+      header: 'Status',
+      body: 'Chip',
+      bodyProps: { removable: false },
+      editor: 'Select',
+      editorProps: { options: ['Active', 'Inactive'] },
+    },
+  ]"
+  editMode="cell"
+/>
+```
+
+## Passthrough Props
+
+<Canvas of={TableComponentStories.WithPassthroughProps} />
+
+```vue
+<TableComponent
+  v-model="rows"
+  :columns="columns"
+  editMode="cell"
+  :tableProps="{ stripedRows: true, paginator: true, rows: 5, removableSort: true }"
+/>
+```
+
+## Row Editing Interaction
+
+<Canvas of={TableComponentStories.RowEditingInteraction} />
+
+```vue
+<TableComponent v-model="rows" :columns="columns" editMode="row" />
+```
+
+## API Reference
+
+### Props
+
+<ArgTypes of={TableComponentStories} />
+
+```typescript
+export interface TableColumn {
+  field: string
+  header: string
+  editor?: string
+  body?: string
+  bodyProps?: Record<string, any>
+  editorProps?: Record<string, any>
+  columnProps?: Record<string, any>
+}
+
+export interface TableProps {
+  columns: TableColumn[]
+  editMode?: 'row' | 'cell'
+  tableProps?: Record<string, any>
+}
+```
+
+- **v-model**: The data array for the table (required)
+- **columns**: Array of column definitions (required)
+- **editMode**: 'row' | 'cell' (optional)
+- **tableProps**: Passthrough props for DataTable (optional)
+
+## Events
+
+- **row-edit-save**: Emitted when a row is saved in row edit mode
+- **cell-edit-save**: Emitted when a cell is saved in cell edit mode
+
+## Best Practices
+
+1. **Use strong types** for your data and columns for maximum safety
+2. **Leverage custom editors and body renderers** for advanced cell content
+3. **Use passthrough props** to enable features like pagination, sorting, and filtering
+4. **Test editing flows** with Storybook interaction stories
+
+## Related Components
+
+- **PrimeVue DataTable**: Underlying data grid
+- **PrimeVue Column**: Column definition and features
+- **PrimeVue InputText, InputNumber, Select, Chip**: Example editors and body components
+- **Tailwind CSS**: For layout and spacing

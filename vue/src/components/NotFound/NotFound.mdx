@@ -1,0 +1,117 @@
+import { Meta, Story, Canvas, Controls, ArgTypes } from '@storybook/addon-docs/blocks'
+import * as NotFoundStories from './NotFound.stories'
+
+<Meta of={NotFoundStories} />
+
+# NotFound
+
+A user-friendly not found (404) page component built with PrimeVue and Tailwind CSS. It provides a clear error code, message, and navigation actions for users to recover from navigation errors.
+
+## Overview
+
+The NotFound component is designed to be used as a fallback for unknown routes or missing resources. It leverages PrimeVue's Card, Button, and Divider components, styled with Tailwind CSS, and offers customizable props for code, title, message, and navigation buttons.
+
+### Key Features
+
+- **PrimeVue Integration**: Uses Card, Button, and Divider for structure and style
+- **Tailwind Styling**: All layout and colors use Tailwind CSS classes
+- **Customizable**: Props for error code, title, message, button labels, icons, and routes
+- **Slot Support**: Add custom content via default slot
+- **Navigation Actions**: "Go Home" and "Go Back" buttons for user recovery
+- **Accessibility**: Buttons and layout follow accessibility best practices
+
+## Basic Usage
+
+<Canvas of={NotFoundStories.Default} />
+
+```vue
+<template>
+  <NotFound msg="Sorry, the page you are looking for does not exist." />
+</template>
+```
+
+## Customization
+
+### Custom Message
+
+<Canvas of={NotFoundStories.CustomMessage} />
+
+```vue
+<NotFound msg="Custom not found message for this story." />
+```
+
+### Slot Content
+
+<Canvas of={NotFoundStories.WithSlot} />
+
+```vue
+<NotFound>
+  <template #default>
+    <div class="text-blue-500 font-semibold">Custom slot content</div>
+  </template>
+</NotFound>
+```
+
+### Custom Home Button
+
+<Canvas of={NotFoundStories.CustomHomeButton} />
+
+```vue
+<NotFound
+  buttonLabel="Return to Dashboard"
+  buttonIcon="pi pi-arrow-left"
+  buttonRoute="/dashboard"
+/>
+```
+
+### Custom Go Back Button
+
+<Canvas of={NotFoundStories.CustomGoBackButton} />
+
+```vue
+<NotFound goBackLabel="Previous Page" />
+```
+
+## Navigation Interaction
+
+<Canvas of={NotFoundStories.Navigation} />
+
+The navigation buttons use Vue Router's `$router.push` and `$router.back` for navigation. You can customize the routes and labels as needed.
+
+## API Reference
+
+### Props
+
+<ArgTypes of={NotFoundStories} />
+
+```typescript
+export interface NotFoundProps {
+  code?: string // Error code to display (default: "404")
+  title?: string // Title for the not found page (default: "Page Not Found")
+  msg?: string // Message to display for not found
+  buttonLabel?: string // Label for the home button (default: "Go Home")
+  buttonIcon?: string // PrimeIcon for the home button (default: "pi pi-home")
+  buttonRoute?: string // Route to navigate to when home button is clicked (default: "/")
+  goBackLabel?: string // Label for the go back button (default: "Go Back")
+}
+```
+
+## Accessibility
+
+- All buttons are accessible and use PrimeVue's built-in ARIA attributes
+- Layout is responsive and readable
+- Slot content can be used for additional instructions or links
+
+## Best Practices
+
+1. **Use clear error messages**: Help users understand what went wrong
+2. **Provide navigation options**: Always offer a way to recover (home/back)
+3. **Customize for your app**: Adjust code, title, and button labels to fit your domain
+4. **Test with Storybook**: Use the provided stories to validate all props and interactions
+
+## Related Components
+
+- **PrimeVue Card**: Used for the main layout
+- **PrimeVue Button**: Used for navigation actions
+- **PrimeVue Divider**: Used for visual separation
+- **Vue Router**: For navigation logic

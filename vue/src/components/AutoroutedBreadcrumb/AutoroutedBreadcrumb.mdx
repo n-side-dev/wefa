@@ -1,0 +1,135 @@
+import { Meta, Story, Canvas, ArgTypes } from '@storybook/addon-docs/blocks'
+import AutoroutedBreadcrumb from './AutoroutedBreadcrumb.vue'
+import * as AutoroutedBreadcrumbStories from './AutoroutedBreadcrumb.stories'
+
+<Meta
+  title='Components/AutoroutedBreadcrumb/Documentation'
+  component={AutoroutedBreadcrumb}
+  of={AutoroutedBreadcrumbStories}
+/>
+
+# AutoroutedBreadcrumb
+
+## Overview
+
+The `AutoroutedBreadcrumb` is a navigation component that automatically generates breadcrumb items based on the current route. It leverages Vue Router's matched routes to create a hierarchical navigation path, making it easy for users to understand their current location within the application and navigate back to previous levels.
+
+This component is built on top of PrimeVue's Breadcrumb component and integrates seamlessly with Vue Router.
+
+## Features
+
+- **Automatic Route Detection**: Automatically generates breadcrumb items based on the current route hierarchy
+- **Route Metadata Support**: Uses route metadata for labels and icons
+- **Home Route Option**: Optional home icon at the beginning of the breadcrumb
+- **Parameter Handling**: Intelligently handles route parameters
+
+## Example
+
+### Default Breadcrumb
+
+This example shows the breadcrumb for a nested route:
+
+<Canvas>
+  <Story id='components-autoroutedbreadcrumb--default' />
+</Canvas>
+
+## Props
+
+<ArgTypes of={AutoroutedBreadcrumb} />
+
+## Usage
+
+### Basic Usage
+
+The component will automatically generate breadcrumb items based on the current route:
+
+```vue
+<template>
+  <AutoroutedBreadcrumb />
+</template>
+
+<script setup>
+import AutoroutedBreadcrumb from '@/components/AutoroutedBreadcrumb/AutoroutedBreadcrumb.vue'
+</script>
+```
+
+### With Home Route
+
+You can specify a home route to add a home icon at the beginning of the breadcrumb:
+
+```vue
+<template>
+  <AutoroutedBreadcrumb homeRoute="/" />
+</template>
+
+<script setup>
+import AutoroutedBreadcrumb from '@/components/AutoroutedBreadcrumb/AutoroutedBreadcrumb.vue'
+</script>
+```
+
+## Route Configuration
+
+For the breadcrumb to display meaningful information, your routes should include metadata with title and optionally icon properties:
+
+```javascript
+const routes = [
+  {
+    path: '/',
+    name: 'home',
+    meta: { title: 'Home', icon: 'pi pi-home' },
+    component: HomeComponent,
+  },
+  {
+    path: '/products',
+    name: 'products',
+    meta: { title: 'Products', icon: 'pi pi-box' },
+    component: ProductsComponent,
+    children: [
+      {
+        path: 'category/:id',
+        name: 'category',
+        meta: { title: 'Category', icon: 'pi pi-tag' },
+        component: CategoryComponent,
+        children: [
+          {
+            path: 'item/:itemId',
+            name: 'item',
+            meta: { title: 'Product Item', icon: 'pi pi-shopping-cart' },
+            component: ItemComponent,
+          },
+        ],
+      },
+    ],
+  },
+]
+```
+
+## How It Works
+
+The component works by:
+
+1. Accessing the current route using Vue Router's `useRoute()` composable
+2. Extracting the matched routes from the current route
+3. Transforming each matched route into a breadcrumb item with:
+   - Label: Uses the route's meta.title, or falls back to the route name
+   - Icon: Uses the route's meta.icon if available
+   - Route: Creates a route object with name, params, query, and hash for navigation
+
+## Special Handling
+
+### Root Path
+
+When navigating to the root path ('/'), the component strips out params to prevent Vue Router warnings about params being ignored for the root path.
+
+## Accessibility
+
+The component leverages PrimeVue's Breadcrumb component, which follows accessibility best practices. The breadcrumb items are rendered as links, making them keyboard navigable and screen reader friendly.
+
+## Customization
+
+The component uses PrimeVue's Breadcrumb component, so you can customize its appearance using PrimeVue's theming capabilities and CSS variables.
+
+## Edge Cases
+
+- If a route doesn't have a meta.title property, the component will fall back to using the route name
+- If the current route is the same as the homeRoute, the home icon won't be displayed to avoid redundancy

@@ -1,0 +1,13 @@
+{
+  "required": "{field} is required.",
+  "minLength": "{field} must be at least {minLength} characters.",
+  "email": "{field} must be a valid email address.",
+  "url": "{field} must be a valid URL.",
+  "passwordMin": "{field} must be at least {minLength} characters.",
+  "passwordStrongMin": "{field} must be at least {minLength} characters.",
+  "passwordAscii": "{field} must contain only ASCII-standard characters (no accents or accented characters).",
+  "passwordUpper": "{field} should include at least one uppercase letter.",
+  "passwordLower": "{field} should include at least one lowercase letter.",
+  "passwordNumber": "{field} should include at least one number.",
+  "passwordSpecial": "{field} should include at least one special character."
+}

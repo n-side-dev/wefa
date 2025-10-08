@@ -1,0 +1,401 @@
+// tests/api.spec.ts
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+import AxiosMockAdapter from 'axios-mock-adapter'
+import { ref } from 'vue'
+import { flushPromises } from '@vue/test-utils'
+import ApiClient from '../../network/apiClient'
+import type { AxiosResponse } from 'axios'
+
+describe('ApiClient', () => {
+  let axiosMock: AxiosMockAdapter
+  let apiClient: ApiClient
+
+  beforeEach(() => {
+    apiClient = new ApiClient('http://localhost')
+    axiosMock = new AxiosMockAdapter(apiClient.axiosInstance)
+  })
+
+  afterEach(() => {
+    axiosMock.reset()
+    axiosMock.restore()
+  })
+
+  describe('get', () => {
+    it('should fetch data on initial call and react to URL changes', async () => {
+      const url = ref('/test-endpoint')
+      const mockData = { data: 'mockData' }
+      axiosMock.onGet(url.value).reply(200, mockData)
+      const { loading, result, error } = apiClient.get(url)
+      expect(loading.value).toBe(true)
+      expect(result.value).toBeUndefined()
+      expect(error.value).toBeUndefined()
+      await flushPromises()
+      expect(axiosMock.history.get.length).toBe(1)
+      expect(loading.value).toBe(false)
+      expect(result.value).toEqual(mockData)
+      expect(error.value).toBeUndefined()
+
+      const newMockData = { data: 'newMockData' }
+      axiosMock.onGet('/new-endpoint').reply(200, newMockData)
+      url.value = '/new-endpoint'
+      await flushPromises()
+      expect(loading.value).toBe(false)
+      expect(result.value).toEqual(newMockData)
+      expect(error.value).toBeUndefined()
+    })
+
+    it('should call onSuccess and onError correctly', async () => {
+      const url = ref('/success-endpoint')
+      const mockData = { data: 'mockData' }
+      const onSuccessMock = vi.fn()
+      const onErrorMock = vi.fn()
+      axiosMock.onGet(url.value).reply(200, mockData)
+      const { action, result, onSuccess, onError } = apiClient.get(url, undefined, true)
+      onSuccess(onSuccessMock)
+      onError(onErrorMock)
+      action()
+      await flushPromises()
+
+      expect(onSuccessMock).toHaveBeenCalledWith(mockData)
+      expect(onErrorMock).not.toHaveBeenCalled()
+      expect(result.value).toEqual(mockData)
+
+      // Test the onError callback
+      url.value = '/error-endpoint'
+      axiosMock.onGet(url.value).reply(500)
+      action()
+      await flushPromises()
+      expect(onSuccessMock).toHaveBeenCalledTimes(1)
+      expect(onErrorMock).toHaveBeenCalled()
+    })
+  })
+
+  describe('post', () => {
+    it('should post data and manage state correctly', async () => {
+      const url = ref('/test-endpoint')
+      const postData = ref({ key: 'value' })
+      const mockData = { data: 'mockData' }
+      axiosMock.onPost(url.value).reply(200, mockData)
+      const { action, loading, result, error } = apiClient.post(url, postData)
+      action()
+      expect(loading.value).toBe(true)
+      expect(result.value).toBeUndefined()
+      expect(error.value).toBeUndefined()
+      await flushPromises()
+      expect(loading.value).toBe(false)
+      expect(result.value).toEqual(mockData)
+      expect(error.value).toBeUndefined()
+    })
+
+    it('should call onSuccess and onError correctly', async () => {
+      const url = ref('/success-endpoint')
+      const postData = ref({ key: 'value' })
+      const mockData = { data: 'mockData' }
+      const onSuccessMock = vi.fn()
+      const onErrorMock = vi.fn()
+      axiosMock.onPost(url.value).reply(200, mockData)
+      const { action, result, onSuccess, onError } = apiClient.post(url, postData)
+      onSuccess(onSuccessMock)
+      onError(onErrorMock)
+      action()
+      expect(result.value).toBeUndefined()
+      await flushPromises()
+      expect(onSuccessMock).toHaveBeenCalledWith(mockData)
+      expect(onErrorMock).not.toHaveBeenCalled()
+      expect(result.value).toEqual(mockData)
+
+      // Test the onError callback
+      url.value = '/error-endpoint'
+      axiosMock.onPost(url.value).reply(500)
+      action()
+      await flushPromises()
+      expect(onSuccessMock).toHaveBeenCalledTimes(1)
+      expect(onErrorMock).toHaveBeenCalled()
+    })
+  })
+
+  describe('patch', () => {
+    it('should patch data and manage state correctly', async () => {
+      const url = ref('/test-endpoint')
+      const patchData = ref({ key: 'value' })
+      const mockData = { data: 'mockData' }
+      axiosMock.onPatch(url.value).reply(200, mockData)
+      const { action, loading, result, error } = apiClient.patch(url, patchData)
+      action()
+      expect(loading.value).toBe(true)
+      expect(result.value).toBeUndefined()
+      expect(error.value).toBeUndefined()
+      await flushPromises()
+      expect(loading.value).toBe(false)
+      expect(result.value).toEqual(mockData)
+      expect(error.value).toBeUndefined()
+    })
+
+    it('should call onSuccess and onError correctly', async () => {
+      const url = ref('/success-endpoint')
+      const patchData = ref({ key: 'value' })
+      const mockData = { data: 'mockData' }
+      const onSuccessMock = vi.fn()
+      const onErrorMock = vi.fn()
+      axiosMock.onPatch(url.value).reply(200, mockData)
+      const { action, result, onSuccess, onError } = apiClient.patch(url, patchData)
+      onSuccess(onSuccessMock)
+      onError(onErrorMock)
+      action()
+      expect(result.value).toBeUndefined()
+      await flushPromises()
+      expect(onSuccessMock).toHaveBeenCalledWith(mockData)
+      expect(onErrorMock).not.toHaveBeenCalled()
+      expect(result.value).toEqual(mockData)
+
+      // Test the onError callback
+      url.value = '/error-endpoint'
+      axiosMock.onPatch(url.value).reply(500)
+      action()
+      await flushPromises()
+      expect(onSuccessMock).toHaveBeenCalledTimes(1)
+      expect(onErrorMock).toHaveBeenCalled()
+    })
+  })
+
+  describe('put', () => {
+    it('should put data and manage state correctly', async () => {
+      const url = ref('/test-endpoint')
+      const putData = ref({ key: 'value' })
+      const mockData = { data: 'mockData' }
+      axiosMock.onPut(url.value).reply(200, mockData)
+      const { action, loading, result, error } = apiClient.put(url, putData)
+      action()
+      expect(loading.value).toBe(true)
+      expect(result.value).toBeUndefined()
+      expect(error.value).toBeUndefined()
+      await flushPromises()
+      expect(loading.value).toBe(false)
+      expect(result.value).toEqual(mockData)
+      expect(error.value).toBeUndefined()
+    })
+
+    it('should call onSuccess and onError correctly', async () => {
+      const url = ref('/success-endpoint')
+      const putData = ref({ key: 'value' })
+      const mockData = { data: 'mockData' }
+      const onSuccessMock = vi.fn()
+      const onErrorMock = vi.fn()
+      axiosMock.onPut(url.value).reply(200, mockData)
+      const { action, result, onSuccess, onError } = apiClient.put(url, putData)
+      onSuccess(onSuccessMock)
+      onError(onErrorMock)
+      action()
+      expect(result.value).toBeUndefined()
+      await flushPromises()
+      expect(onSuccessMock).toHaveBeenCalledWith(mockData)
+      expect(onErrorMock).not.toHaveBeenCalled()
+      expect(result.value).toEqual(mockData)
+
+      // Test the onError callback
+      url.value = '/error-endpoint'
+      axiosMock.onPut(url.value).reply(500)
+      action()
+      await flushPromises()
+      expect(onSuccessMock).toHaveBeenCalledTimes(1)
+      expect(onErrorMock).toHaveBeenCalled()
+    })
+  })
+
+  describe('delete', () => {
+    it('should delete data and manage state correctly', async () => {
+      const url = ref('/test-endpoint')
+      const mockData = { data: 'mockData' }
+      axiosMock.onDelete(url.value).reply(200, mockData)
+      const { action, loading, result, error } = apiClient.delete(url)
+      action()
+      expect(loading.value).toBe(true)
+      expect(result.value).toBeUndefined()
+      expect(error.value).toBeUndefined()
+      await flushPromises()
+      expect(loading.value).toBe(false)
+      expect(result.value).toEqual(mockData)
+      expect(error.value).toBeUndefined()
+    })
+
+    it('should call onSuccess and onError correctly', async () => {
+      const url = ref('/success-endpoint')
+      const mockData = { data: 'mockData' }
+      const onSuccessMock = vi.fn()
+      const onErrorMock = vi.fn()
+      axiosMock.onDelete(url.value).reply(200, mockData)
+      const { action, result, onSuccess, onError } = apiClient.delete(url)
+      onSuccess(onSuccessMock)
+      onError(onErrorMock)
+      action()
+      await flushPromises()
+
+      expect(onSuccessMock).toHaveBeenCalledWith(mockData)
+      expect(onErrorMock).not.toHaveBeenCalled()
+      expect(result.value).toEqual(mockData)
+
+      // Test the onError callback
+      url.value = '/error-endpoint'
+      axiosMock.onDelete(url.value).reply(500)
+      action()
+      await flushPromises()
+      expect(onSuccessMock).toHaveBeenCalledTimes(1)
+      expect(onErrorMock).toHaveBeenCalled()
+    })
+  })
+})
+
+describe('ApiClient with CSRF Token', () => {
+  let axiosMock: AxiosMockAdapter
+  let apiClient: ApiClient
+  const CSRF_TOKEN_ENDPOINT = '/api/get-csrf-token/'
+  const CSRF_INTERCEPTED_METHODS = ['post', 'put', 'patch', 'delete', 'get']
+  const CSRF_HEADER = 'X-CSRFToken'
+
+  beforeEach(() => {
+    apiClient = new ApiClient('http://localhost')
+
+    apiClient.axiosInstance.interceptors.request.use(
+      async (config) => {
+        const method = config.method?.toLowerCase()
+        if (config.url == CSRF_TOKEN_ENDPOINT) return config
+        if (method && CSRF_INTERCEPTED_METHODS.includes(method)) {
+          try {
+            // Use Object.hasOwn to check if the header exists
+            if (!Object.hasOwn(config.headers || {}, CSRF_HEADER)) {
+              const response = await apiClient.axiosInstance.get(CSRF_TOKEN_ENDPOINT)
+              // Use Object.defineProperty to set the header
+              Object.defineProperty(config.headers || {}, CSRF_HEADER, {
+                value: response.data.csrfToken,
+                enumerable: true,
+                writable: true,
+                configurable: true,
+              })
+            }
+          } catch (error) {
+            console.error('Failed to fetch CSRF token:', error)
+          }
+        }
+        return config
+      },
+      (error) => {
+        return Promise.reject(error)
+      }
+    )
+    axiosMock = new AxiosMockAdapter(apiClient.axiosInstance)
+    axiosMock.onGet(CSRF_TOKEN_ENDPOINT).reply(200, { csrfToken: 'csrf-token' })
+  })
+
+  afterEach(() => {
+    axiosMock.reset()
+    axiosMock.restore()
+  })
+
+  describe('get', () => {
+    it('should fetch a CSRF token before anything', async () => {
+      const url = ref('/test-endpoint')
+      const mockData = { data: 'mockData' }
+      axiosMock.onGet(url.value).reply(200, mockData)
+      apiClient.get(url)
+
+      await flushPromises()
+      expect(axiosMock.history.get.length).toBe(2)
+    })
+  })
+
+  CSRF_INTERCEPTED_METHODS.forEach((method) => {
+    it(`includes CSRF token for ${method.toUpperCase()} requests`, async () => {
+      const config = {
+        url: ref('/test-endpoint'),
+        method,
+      }
+
+      axiosMock.onAny(config.url.value).reply((req) => {
+        // Use Object.hasOwn to safely check the header
+        const headerValue =
+          req.headers && Object.hasOwn(req.headers, CSRF_HEADER)
+            ? Object.getOwnPropertyDescriptor(req.headers, CSRF_HEADER)?.value
+            : undefined
+        expect(headerValue).toBe('test-csrf-token')
+        return [200, {}]
+      })
+
+      let request
+      switch (method) {
+        case 'post':
+          request = apiClient.post(config.url)
+          break
+        case 'put':
+          request = apiClient.put(config.url)
+          break
+        case 'patch':
+          request = apiClient.patch(config.url)
+          break
+        case 'delete':
+          request = apiClient.delete(config.url)
+          break
+        case 'get':
+          request = apiClient.get(config.url)
+          break
+      }
+
+      await request
+    })
+  })
+
+  it('does not include CSRF token for OPTIONS requests', async () => {
+    const config = {
+      url: '/test-get-endpoint',
+      method: 'options',
+    }
+
+    axiosMock.onOptions(config.url).reply((req) => {
+      // Use Object.hasOwn to safely check the header
+      const headerExists = req.headers && Object.hasOwn(req.headers, CSRF_HEADER)
+      expect(headerExists).toBe(false)
+      return [200, {}]
+    })
+
+    await apiClient.axiosInstance.options(config.url)
+  })
+})
+
+describe('ApiClient with custom interceptor', () => {
+  let axiosMock: AxiosMockAdapter
+  let apiClient: ApiClient
+  const CSRF_TOKEN_ENDPOINT = '/api/get-csrf-token/'
+
+  let responseChecker: AxiosResponse
+
+  beforeEach(() => {
+    apiClient = new ApiClient('http://localhost')
+    axiosMock = new AxiosMockAdapter(apiClient.axiosInstance)
+    axiosMock.onGet(CSRF_TOKEN_ENDPOINT).reply(200, { csrfToken: 'csrf-token' })
+
+    // Add an interceptor to set a custom header
+    apiClient.axiosInstance.interceptors.response.use((response) => {
+      response.headers['X-Custom-Header'] = 'CustomHeaderValue'
+      responseChecker = response
+      return response
+    })
+  })
+
+  afterEach(() => {
+    axiosMock.reset()
+    axiosMock.restore()
+  })
+
+  describe('get', () => {
+    it('should fetch a CSRF token before anything and set custom header', async () => {
+      const url = ref('/test-endpoint')
+      const mockData = { data: 'mockData' }
+      axiosMock.onGet(url.value).reply(200, mockData)
+
+      apiClient.get(url)
+      await flushPromises()
+
+      // Assert that the custom header is set in the response
+      expect(responseChecker.headers['X-Custom-Header']).toBe('CustomHeaderValue')
+    })
+  })
+})

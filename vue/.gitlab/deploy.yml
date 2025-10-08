@@ -1,0 +1,12 @@
+PublishNPM:
+  stage: deploy
+  when: manual
+  image: $NODE_IMAGE
+  script:
+    - cd vue
+    - npm ci
+    - echo "@nside:registry=https://${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/" > .npmrc
+    - echo "//${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/:_authToken=${CI_JOB_TOKEN}" >> .npmrc
+    - export NODE_OPTIONS="--max-old-space-size=4096"
+    - npm run build
+    - npm publish --access=restricted

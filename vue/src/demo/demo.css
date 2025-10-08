@@ -1,0 +1,15 @@
+html,
+body,
+#app {
+  height: 100%;
+  width: 100%;
+
+  margin: 0;
+  padding: 0;
+}
+
+#app {
+  background-color: var(--p-primary-200);
+  background-image: radial-gradient(var(--p-primary-700) 1px, var(--p-primary-50) 1px);
+  background-size: 20px 20px;
+}

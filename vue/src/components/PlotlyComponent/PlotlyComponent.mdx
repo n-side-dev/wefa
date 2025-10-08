@@ -1,0 +1,273 @@
+import { Meta, Story, Canvas, ArgTypes } from '@storybook/addon-docs/blocks'
+import PlotlyComponent from './PlotlyComponent.vue'
+import * as PlotlyComponentStories from './PlotlyComponent.stories'
+
+<Meta
+  title='Components/PlotlyComponent/Documentation'
+  component={PlotlyComponent}
+  of={PlotlyComponentStories}
+/>
+
+# PlotlyComponent
+
+## Overview
+
+The `PlotlyComponent` is a Vue wrapper for Plotly.js that provides an easy-to-use interface for creating interactive charts and graphs. The component handles the integration between Vue's reactivity system and Plotly.js, automatically updating charts when data or configuration changes.
+
+This component wraps the powerful Plotly.js library while providing Vue-specific optimizations and a clean, reactive API that follows Vue 3 best practices.
+
+## Features
+
+- **Full Plotly.js Support**: Supports all chart types and features available in Plotly.js
+- **Reactive Updates**: Automatically updates charts when props change using Plotly.react for optimal performance
+- **Sensible Defaults**: Provides reasonable default configurations that can be easily overridden
+- **Responsive Design**: Charts automatically resize to fit their container
+- **TypeScript Support**: Full TypeScript support with proper type definitions from Plotly.js
+- **Vue 3 Optimized**: Built with Vue 3 Composition API for optimal performance and developer experience
+
+## Example
+
+### Basic Line Chart
+
+This example shows a simple line chart with default settings:
+
+<Canvas>
+  <Story id='components-plotlycomponent--line-chart' />
+</Canvas>
+
+## Props
+
+<ArgTypes of={PlotlyComponent} />
+
+## Usage
+
+### Basic Usage
+
+The component requires at minimum a `data` array containing the traces to plot:
+
+```vue
+<template>
+  <PlotlyComponent :data="chartData" />
+</template>
+
+<script setup>
+import PlotlyComponent from '@/components/PlotlyComponent/PlotlyComponent.vue'
+
+const chartData = [
+  {
+    x: [1, 2, 3, 4],
+    y: [10, 11, 12, 13],
+    type: 'scatter',
+    mode: 'lines+markers',
+    name: 'Sample Data',
+  },
+]
+</script>
+```
+
+### With Custom Layout
+
+You can customize the chart appearance using the layout prop:
+
+```vue
+<template>
+  <PlotlyComponent :data="chartData" :layout="chartLayout" />
+</template>
+
+<script setup>
+import PlotlyComponent from '@/components/PlotlyComponent/PlotlyComponent.vue'
+
+const chartData = [
+  {
+    x: [1, 2, 3, 4],
+    y: [10, 11, 12, 13],
+    type: 'scatter',
+    mode: 'lines+markers',
+    name: 'Sample Data',
+  },
+]
+
+const chartLayout = {
+  title: 'My Custom Chart',
+  xaxis: { title: 'X Axis' },
+  yaxis: { title: 'Y Axis' },
+  height: 500,
+}
+</script>
+```
+
+### With Custom Configuration
+
+The config prop allows you to control chart interactions and display options:
+
+```vue
+<template>
+  <PlotlyComponent :data="chartData" :layout="chartLayout" :config="chartConfig" />
+</template>
+
+<script setup>
+import PlotlyComponent from '@/components/PlotlyComponent/PlotlyComponent.vue'
+
+const chartData = [
+  {
+    x: [1, 2, 3, 4],
+    y: [10, 11, 12, 13],
+    type: 'scatter',
+    mode: 'lines+markers',
+    name: 'Sample Data',
+  },
+]
+
+const chartLayout = {
+  title: 'Interactive Chart',
+}
+
+const chartConfig = {
+  displayModeBar: true,
+  displaylogo: false,
+  modeBarButtonsToRemove: ['pan2d', 'lasso2d'],
+}
+</script>
+```
+
+## Chart Types
+
+The component supports all Plotly.js chart types. Here are some common examples:
+
+### Bar Chart
+
+```javascript
+const barData = [
+  {
+    x: ['Jan', 'Feb', 'Mar', 'Apr'],
+    y: [20, 14, 23, 25],
+    type: 'bar',
+  },
+]
+```
+
+### Scatter Plot
+
+```javascript
+const scatterData = [
+  {
+    x: [1, 2, 3, 4],
+    y: [10, 11, 12, 13],
+    mode: 'markers',
+    type: 'scatter',
+  },
+]
+```
+
+### Pie Chart
+
+```javascript
+const pieData = [
+  {
+    values: [19, 26, 55],
+    labels: ['Residential', 'Non-Residential', 'Utility'],
+    type: 'pie',
+  },
+]
+```
+
+## How It Works
+
+The component works by:
+
+1. **Initialization**: When mounted, creates a new Plotly plot using `Plotly.newPlot()`
+2. **Reactive Updates**: Uses Vue's `onUpdated` lifecycle hook to detect prop changes
+3. **Efficient Updates**: Uses `Plotly.react()` for optimal performance when updating existing plots
+4. **Unique Identification**: Generates unique DOM element IDs using Vue's instance UID
+5. **Prop Merging**: Merges user-provided layout and config with sensible defaults
+
+## Default Configuration
+
+### Base Layout
+
+The component provides these default layout settings:
+
+```javascript
+const baseLayout = {
+  height: 400,
+}
+```
+
+### Base Config
+
+The component provides these default config settings:
+
+```javascript
+const baseConfig = {
+  responsive: true,
+}
+```
+
+These defaults ensure that charts are responsive and have a reasonable height, but can be overridden by passing custom values in the respective props.
+
+## Reactivity
+
+The component automatically updates when:
+
+- **Data Changes**: New data points, modified traces, or data structure changes
+- **Layout Changes**: Title updates, axis modifications, styling changes
+- **Config Changes**: Interaction mode changes, toolbar modifications
+
+Updates use Plotly's efficient `react()` method rather than recreating the entire plot, ensuring smooth performance even with large datasets.
+
+## Performance Considerations
+
+- **Large Datasets**: For very large datasets, consider using Plotly's built-in sampling or aggregation features
+- **Animation**: Be mindful of animation settings when frequently updating data
+- **Memory Management**: The component automatically handles Plotly instance cleanup
+
+## Styling
+
+The component uses scoped CSS and provides a clean container structure:
+
+```css
+.plotly-component {
+  /* Wrapper section for the entire component */
+}
+
+.plotly-container {
+  /* Container that holds the actual Plotly chart */
+  /* Height is automatically bound to the layout height */
+}
+```
+
+You can customize the appearance by:
+
+- Using Plotly's built-in theming and styling options
+- Overriding CSS classes (though this is rarely needed)
+- Configuring layout properties for chart-specific styling
+
+## Accessibility
+
+The component leverages Plotly.js's built-in accessibility features:
+
+- Keyboard navigation support
+- Screen reader compatibility
+- High contrast mode support
+- Configurable color schemes for color-blind users
+
+## Integration with Web Applications
+
+This component is particularly well-suited for data visualization:
+
+- **Time Series**: Perfect for displaying data evolving over time
+- **Comparative Analysis**: Multiple traces for comparing data sources
+- **Geographic Data**: Support for map-based visualizations
+- **Real-time Updates**: Reactive updates ideal for live monitoring dashboards
+
+## Troubleshooting
+
+### Common Issues
+
+- **Chart Not Displaying**: Ensure the container has a defined height
+- **Updates Not Working**: Check that data objects are being replaced, not mutated
+- **Performance Issues**: Consider using Plotly's built-in optimization features for large datasets
+
+### Browser Compatibility
+
+The component supports all modern browsers that are compatible with both Vue 3 and Plotly.js.

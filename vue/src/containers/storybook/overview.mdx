@@ -1,0 +1,118 @@
+import { Meta, Story, Canvas, ArgTypes } from '@storybook/addon-docs/blocks'
+import * as RouterContainerStories from './overview.stories.ts'
+
+<Meta of={RouterContainerStories} />
+
+# Router Containers
+
+## Overview
+
+Containers are components that wrap other components. For example, a NavBar container will provide a NavBar on the top of the screen with navigation options,
+and display the chosen option on the bottom of the screen.
+
+Router Containers easily integrate with the router definition to automatically generate content, while providing some customization options.
+
+## Routes and children routes
+
+In your router definition, if multiple routes/views should be grouped in a certain section of the website, a good practice is using children routes.
+
+**If one of your route has children routes, you MUST use a Container Component on it.** Router depth tracking depends on it.
+
+Let's take the example of a settings panel which contains multiples views for password reset, api token and user preferences :
+
+```ts
+/** router.ts*/
+
+routes: [
+    {
+      path: '/settings',
+      name: 'settings',
+      meta: { title: 'Settings'}
+      children: [
+        {
+          path: 'passwordreset',
+          name: 'passwordreset',
+          meta: { title: 'Password reset'},
+          component: PasswordResetView
+        },
+        {
+          path: 'apitoken',
+          name: 'apitoken',
+          meta: { title: 'API Token'},
+          component: ApiTokenView
+        },
+        {
+          path: 'preferences',
+          name: 'preferences',
+          meta: { title: 'Preferences'},
+          component: UserPreferencesView
+        }
+      ]
+    }
+  ]
+```
+
+In such a setup, you may need to have a navigation element allowing you to see and navigate between these three children routes.
+This is the purpose of the Router Containers, and can be done by defining which container component should be used on the parent route, here "/settings".
+
+```ts
+/** router.ts*/
+
+import { SideMenuContainer } from '@nside/wefa/containers'
+
+routes: [
+    {
+      path: '/settings',
+      name: 'settings',
+      meta: { title: 'Settings'}
+      component: SideMenuContainer
+      children: [
+        ...
+      ]
+    }
+  ]
+```
+
+<Canvas>
+  <Story of={RouterContainerStories.Default} />
+</Canvas>
+
+You can also have deeper hierarchy, with children of children. This is the case for the "API Token" section in the example above.
+
+```ts
+/** router.ts*/
+
+import { SideMenuContainer, NavBarContainer } from '@nside/wefa/containers'
+
+routes: [
+    {
+      path: '/settings',
+      name: 'settings',
+      meta: { title: 'Settings'},
+      component: SideMenuContainer
+      children: [
+        ...
+        {
+          path: 'apitoken',
+          name: 'apitoken',
+          meta: { title: 'API Token'},
+          component: NavBarContainer,
+          children: [
+            { path: 'readonly', meta: { title: 'Read-Only'}, ...},
+            { path: 'readwrite', meta: { title: 'Read + Write'}, ...},
+            { path: 'admin', meta: { title: 'Admin'}, ...}
+          ]
+        },
+        ...
+      ]
+    }
+  ]
+```
+
+## Customizing appearance with route.meta
+
+Navigation elements (e.g in the NavbarContainer or SideMenuContainer) will rely on metadata specified on your route.meta, such as
+
+- title
+- icon
+- showInNavigation

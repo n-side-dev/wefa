@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  base_config:
+
+    build:
+      context: ./ # Set the build context to the current directory
+
+      args: # Provided to the Dockerfile
+        NODE_IMAGE: 24.4.1-alpine # Base image. Keep consistent with .node-version
+
+    ports:
+      - "5173:5173"  # Expose the Vue.js development server port
+

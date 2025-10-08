@@ -1,0 +1,80 @@
+import { Meta, Markdown } from '@storybook/addon-docs/blocks'
+
+<Meta title='Registry/Validators' />
+
+# Validator Registry
+
+The `validatorRegistry` is a centralized map of all available validation schemas (powered by Zod) that can be dynamically applied to form fields in the library. It enables flexible, backend-driven form validation by allowing you to specify validator names (like `"email"`, `"passwordStrong"`, `"url"`) in your form field definitions, which are then resolved at runtime.
+
+## How It Works
+
+- The registry pre-registers common validation schemas for typical use cases (email, URL, password strength, etc.).
+- When a form field specifies a `custom` validator (e.g., `custom: 'email'`), the `FormComponent` uses the registry to resolve and apply the correct Zod schema.
+- If a requested validator is missing from the registry, the form will display a warning and use a fallback (no validation).
+
+## Current List of Registered Validators
+
+<Markdown>
+  {`
+| Name           | Description                                      |
+|----------------|--------------------------------------------------|
+| email          | Validates email addresses                        |
+| url            | Validates URLs                                   |
+| passwordWeak   | Basic password policy (min length, case)         |
+| passwordStrong | N-SIDE password policy (min length, ASCII, case, number, special char) |
+`}
+</Markdown>
+
+## Extending the Registry
+
+If you need a validator that is not yet available in the registry, you have two options:
+
+1. **Develop and Inject Dynamically:**
+   You can develop your own custom validator and register it at runtime using the provided API:
+
+   ```typescript
+   import { registerValidator } from '@/utils/validatorRegistry'
+   import * as z from 'zod'
+
+   // Register a custom validator factory
+   registerValidator('customValidator', (t, field) =>
+     z.string().regex(/^[A-Z]+$/, { message: t('validation.customValidator', { field }) })
+   )
+   ```
+
+2. **Contribute to the Library:**
+   If you believe your validator would be useful to others, consider contributing it to the library!
+   - Implement the validator following the library's conventions.
+   - Add it to the registry in `validatorRegistry.ts`.
+   - Submit a pull request or ask contributors to review and merge your addition.
+
+## Best Practices
+
+- Always check the registry for available validators before implementing a new one.
+- Prefer Zod schemas for consistency and composability.
+- Document new validators and their usage for other contributors.
+
+## API Reference
+
+```typescript
+export function registerValidator(
+  name: string,
+  factory: (
+    t: (key: string, params?: Record<string, unknown>) => string,
+    field: string
+  ) => z.ZodTypeAny
+): void
+```
+
+## Example Usage in FormComponent
+
+```typescript
+const { resolve: resolveValidator } = useValidatorResolver()
+const validatorSchema = resolveValidator(field.validation?.custom)
+```
+
+If the validator is not found, a warning is logged and a fallback is used.
+
+---
+
+By maintaining and extending the registry, you ensure your forms are robust, maintainable, and easy to configure for any validation use case.

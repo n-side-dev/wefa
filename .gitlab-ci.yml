@@ -1,0 +1,22 @@
+variables:
+  DOCKER_TAG: "$CI_COMMIT_SHORT_SHA"
+  DEPLOYMENT_BRANCH: "develop"
+  CI_DEPLOY_USER: "gitlab-ci-token"
+  CI_DEPLOY_PASSWORD: "$CI_JOB_TOKEN"
+  NODE_IMAGE: node:24.4.1
+
+include:
+  - project: 'n-side/qore/ci-template'
+    ref: live
+    file:
+      - 'base-pipeline-v3.yml'
+  - local: 'vue/.gitlab/*.yml'
+
+stages:
+  - test
+  - analyze
+  - build
+  - notify
+  - deploy
+  - destroy
+  - documentation

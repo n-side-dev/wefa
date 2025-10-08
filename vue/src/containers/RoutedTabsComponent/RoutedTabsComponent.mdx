@@ -1,0 +1,171 @@
+import { Meta, Story, Canvas, ArgTypes } from '@storybook/addon-docs/blocks'
+import RoutedTabsComponent from './RoutedTabsComponent.vue'
+import * as RoutedTabsComponentStories from './RoutedTabsComponent.stories'
+
+<Meta
+  title='Router container/RoutedTabsComponent/Documentation'
+  component={RoutedTabsComponent}
+  of={RoutedTabsComponentStories}
+/>
+
+# RoutedTabsComponent
+
+## Overview
+
+The `RoutedTabsComponent` is a navigation component that creates tabbed navigation using PrimeVue Tabs. Each tab corresponds to a route and automatically shows the active state based on the current route. The component maintains routing functionality while providing a modern tabbed interface.
+
+This component is built on top of PrimeVue's Tabs component and integrates seamlessly with Vue Router, similar to how AutoroutedBreadcrumb works with breadcrumb navigation.
+
+## Features
+
+- **Route-Based Navigation**: Each tab corresponds to a specific route name
+- **Automatic Active State**: Automatically highlights the active tab based on the current route
+- **Parameter Preservation**: Preserves route parameters, query strings, and hash when navigating
+- **Modern UI**: Uses PrimeVue Tabs for a clean, modern appearance
+- **TypeScript Support**: Full TypeScript support with proper interfaces
+
+## Example
+
+### Default Tabs
+
+This example shows a typical three-tab interface:
+
+<Canvas>
+  <Story id='components-routedtabscomponent--default' />
+</Canvas>
+
+## Props
+
+<ArgTypes of={RoutedTabsComponent} />
+
+## Usage
+
+### Basic Usage
+
+The component requires an array of tab names that correspond to route names:
+
+```vue
+<template>
+  <RoutedTabsComponent :tabs="['Dashboard', 'Analytics', 'Settings']" />
+</template>
+
+<script setup>
+import RoutedTabsComponent from '@/components/RoutedTabsComponent/RoutedTabsComponent.vue'
+</script>
+```
+
+### With Custom Tab Names
+
+You can use any route names that exist in your router configuration:
+
+```vue
+<template>
+  <RoutedTabsComponent :tabs="['home', 'products', 'users']" />
+</template>
+
+<script setup>
+import RoutedTabsComponent from '@/components/RoutedTabsComponent/RoutedTabsComponent.vue'
+</script>
+```
+
+## Route Configuration
+
+For the tabs to work properly, your routes should be configured with names that match the tabs array:
+
+```javascript
+const routes = [
+  {
+    path: '/dashboard',
+    name: 'Dashboard',
+    meta: { title: 'Dashboard', icon: 'pi pi-chart-line' },
+    component: DashboardComponent,
+  },
+  {
+    path: '/analytics',
+    name: 'Analytics',
+    meta: { title: 'Analytics', icon: 'pi pi-chart-bar' },
+    component: AnalyticsComponent,
+  },
+  {
+    path: '/settings',
+    name: 'Settings',
+    meta: { title: 'Settings', icon: 'pi pi-cog' },
+    component: SettingsComponent,
+  },
+]
+```
+
+## How It Works
+
+The component works by:
+
+1. Accepting an array of tab names via the `tabs` prop
+2. Using Vue Router's `useRoute()` to monitor the current route
+3. Determining the active tab index by matching the current route name with the tabs array
+4. Handling tab clicks by navigating to the corresponding route using `router.push()`
+5. Preserving route parameters, query strings, and hash during navigation (similar to AutoroutedBreadcrumb)
+
+## Navigation Behavior
+
+### Route Parameter Preservation
+
+When navigating between tabs, the component preserves:
+
+- **Route Parameters**: Any existing route parameters are maintained
+- **Query Strings**: Current query parameters are preserved
+- **Hash**: The current hash fragment is maintained
+
+This ensures that context is not lost when switching between tabs.
+
+### Active State Management
+
+The component automatically:
+
+- Highlights the active tab based on the current route name
+- Updates the active state when the route changes (even from external navigation)
+- Defaults to the first tab if the current route doesn't match any tab
+
+## Integration with Router
+
+The component integrates seamlessly with Vue Router by:
+
+- Using `useRoute()` to monitor route changes
+- Using `useRouter()` to programmatically navigate
+- Creating proper `RouteLocationRaw` objects for navigation
+- Watching for route changes to keep tabs synchronized
+
+## Accessibility
+
+The component leverages PrimeVue's Tabs component, which follows accessibility best practices:
+
+- Keyboard navigation support
+- ARIA attributes for screen readers
+- Focus management
+- Semantic HTML structure
+
+## Customization
+
+The component uses PrimeVue's Tabs component, so you can customize its appearance using:
+
+- PrimeVue's theming capabilities
+- CSS variables
+- Custom CSS classes
+- Theme presets
+
+## Edge Cases
+
+- If the current route name doesn't match any tab in the array, the first tab is selected by default
+- If a tab name doesn't correspond to a valid route, navigation will fail gracefully
+- The component handles route changes from external sources (like direct URL navigation)
+- Empty tabs array is handled gracefully (though not recommended)
+
+## Comparison with AutoroutedBreadcrumb
+
+While AutoroutedBreadcrumb automatically generates navigation items from the route hierarchy, RoutedTabsComponent requires explicit tab configuration. This gives you more control over which routes appear as tabs and in what order.
+
+Both components share similar routing patterns:
+
+- Route parameter preservation
+- Proper RouteLocationRaw object creation
+- Integration with Vue Router composables
+- TypeScript support

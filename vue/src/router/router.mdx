@@ -1,0 +1,156 @@
+import { Meta } from '@storybook/addon-docs/blocks'
+
+<Meta title='Utils/Router' />
+
+# Vue Router
+
+## Overview
+
+The Vue Router is at the center of a Vue Single Page Application (SPA).
+
+The Router dictates what route (as visible in the browser URL) should display what component/view.
+
+On top of that, it is possible to add custom metadata to your routes to control the flow of the application.
+
+To make all that easier to use, the WeFa provides you with some helpers.
+
+## External documentation
+
+Vue Router : https://router.vuejs.org/guide/
+
+## Router setup
+
+In your application, you should setup your router as below, importing and using helpers from WeFa.
+If you're using the PBT to create your project, this is already done for you.
+
+```ts
+// src/router/index.ts
+import { createRouter, createWebHistory, type NavigationGuardNext, type RouteLocationNormalized, type RouteLocationNormalizedLoaded } from 'vue-router'
+import { libRouteRecords, type WeFaRouteRecordRaw, defaultRouteGuards } from '@nside/wefa/router'
+
+//Define routes
+const routes: WeFaRouteRecordRaw[] = [
+
+  // Load common routes from WeFa
+  ...Object.values(libRouteRecords),
+
+  // Override WeFa routes with your own config
+  {
+    ...libRouteRecords.login,
+    props: { gdpr: false } // e.g disable GDPR prop on lib-provided default Login component
+  } as WeFaRouteRecordRaw,
+
+  // Add your project-specific routes
+  {
+    path: '/',
+    name: 'home',
+    meta: { title: 'Home', icon: 'pi pi-home' },
+    component: () => import('@/views/MyHomeView.vue'),
+    children: [
+      ...
+    ]
+  }
+]
+
+// Instantiate router
+const router = createRouter({
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes: routes
+})
+
+// Setup route guards
+router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormalizedLoaded, next: NavigationGuardNext) => {
+
+  // Run the default route guards provided by the library
+  defaultRouteGuards(to, from, next)
+
+  // On top, implement your own route guards
+  ...
+
+  // If all guards passed, proceed
+  next()
+});
+
+export default router
+```
+
+## Adding routes to register your own views
+
+Once you've created a Vue Single File Component (SFC) you need to add it to your router to make it visible on your application.
+
+In your project routes, add your `MyNiceComponent.vue` like this :
+
+```ts
+// Add your project-specific routes
+  {
+    path: '/',
+    name: 'home',
+    meta: { title: 'Home', icon: 'pi pi-home', requiresAuth: true, requiresUnauth: false, showInNavigation: true },
+    component: () => import('@/views/MyHomeView.vue'),
+    children: [
+      {
+        path: 'my-nice-component',
+        name: 'myNiceComponent',
+        meta: { title: 'My Nice Component', icon: 'pi pi-home' },
+        component: () => import('@/views/MyNiceComponent.vue')
+      }
+    ]
+  }
+```
+
+Your component can now be accessed by visiting the URL `/my-nice-component` (e.g `http://localhost:5173/my-nice-component`)
+
+## Route Metadata
+
+Arbitrary metadata can be attached to routes using the `meta` field.
+
+Children routes automatically inherit the metadata of their parents, and can override them.
+
+The following fields are used by WeFa :
+
+<table>
+  <thead>
+    <tr>
+      <th>Field</th>
+      <th>Required?</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class='font-mono'>title</td>
+      <td>Yes</td>
+      <td>
+        Title used to display your route in some UI components, such as the AutoroutedBreadcrumb
+      </td>
+    </tr>
+    <tr>
+      <td class='font-mono'>icon</td>
+      <td>Optional</td>
+      <td>
+        Icon used to display your route in some UI components, such as the AutoroutedBreadcrumb
+      </td>
+    </tr>
+    <tr>
+      <td class='font-mono'>requiresAuth</td>
+      <td>Optional</td>
+      <td>
+        Indicates that the user should be **authenticated** to access this route. This is enforced
+        by the default WeFa route guards.
+      </td>
+    </tr>
+    <tr>
+      <td class='font-mono'>requiresUnauth</td>
+      <td>Optional</td>
+      <td>
+        Indicates that the user should be **unauthenticated** to access this route. This is enforced
+        by the default WeFa route guards.
+      </td>
+    </tr>
+    <tr>
+      <td class='font-mono'>showInNavigation</td>
+      <td>Optional</td>
+      <td>Indicates if the route should be hidden in Navigation components (NavBar, SideMenu)</td>
+    </tr>
+  </tbody>
+</table>

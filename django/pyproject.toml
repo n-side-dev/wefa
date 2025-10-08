@@ -1,0 +1,56 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "nside-wefa"
+version = "0.1.0"
+description = "Django library with Legal Consent compliance utilities and reusable apps"
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "Apache-2.0"}
+authors = [
+    {name = "N-SIDE", email = "fso@n-side.com"},
+]
+keywords = ["django", "gdpr", "compliance", "web", "api"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Framework :: Django",
+    "Framework :: Django :: 5.2",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "django>=5.2.6",
+    "djangorestframework>=3.14.0",
+    "djangorestframework-simplejwt>=5.5.1",
+    "drf-spectacular>=0.28.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/n-side-dev/wefa"
+Repository = "https://github.com/n-side-dev/wefa"
+Documentation = "https://github.com/n-side-dev/wefa#readme"
+Issues = "https://github.com/n-side-dev/wefa/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["nside_wefa"]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.5",
+    "pytest-cov>=6.1.1",
+    "pytest-django>=4.11.1",
+    "pytest-profiling>=1.8.1",
+    "mypy>=1.18.2",
+    "mypy>=1.18.1",
+    "django-stubs[compatible-mypy]>=5.2.0",
+    "freezegun>=1.5.5",
+    "ruff>=0.13.1",
+]

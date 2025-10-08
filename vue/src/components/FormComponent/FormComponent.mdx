@@ -1,0 +1,174 @@
+import { Meta, Canvas, ArgTypes } from '@storybook/addon-docs/blocks'
+import * as FormStories from './FormComponent.stories'
+
+<Meta of={FormStories} />
+
+> **Component Registry:**
+> The FormComponent uses a dynamic [Component Registry](/docs/registry-components--docs) to resolve and render editors for each form field. This registry contains all available UI components (such as InputText, Select, Calendar, etc.) and can be extended or customized. If a required component is missing, you can develop and inject it dynamically or contribute it to the library. See the [Component Registry documentation](/docs/registry-components--docs) for details and extension instructions.
+
+> **Validator Registry:**
+> Validation for each form field is powered by a [Validator Registry](/docs/registry-validators--docs), which provides reusable Zod schemas for common and custom validation rules. You can extend this registry with your own validators or contribute new ones to the library. See the [Validator Registry documentation](/docs/registry-validators--docs) for details and extension instructions.
+
+# FormComponent
+
+A flexible form component built on PrimeVue's Form and FormField, with vee-validate for validation, TypeScript support, and Tailwind CSS styling. Designed for dynamic, backend-driven form configurations with custom editors and validations.
+
+## Overview
+
+The `FormComponent` simplifies creating forms by accepting a configuration of fields with editors and validation rules, all serializable for REST payloads. It supports dynamic field rendering, real-time validation, and passthrough props for customization.
+
+### Key Features
+
+- **PrimeVue Foundation**: Uses Form and FormField for robust form handling
+- **Dynamic Fields**: Configurable via `formFields` array with editor components
+- **Validation**: Powered by vee-validate and zod, with support for required, minLength, and custom validations
+- **v-model**: Binds form data reactively to a model object
+- **Passthrough Props**: Extend Form and FormField with custom props
+- **Optional Submit**: Configurable submit button with passthrough props
+- **Tailwind Styling**: Responsive layout with Tailwind CSS classes
+
+## Basic Usage
+
+<Canvas of={FormStories.Default} />
+
+```vue
+<template>
+  <FormComponent v-model="formData" :formFields="formFields" />
+</template>
+
+<script setup>
+import { ref } from 'vue'
+import FormComponent from '@/components/FormComponent.vue'
+
+const formData = ref({ username: '', age: 0 })
+const formFields = [
+  { field: 'username', editor: 'InputText', validation: { required: true, minLength: 3 } },
+  { field: 'age', editor: 'InputNumber', editorProps: { min: 0 }, validation: { required: true } },
+]
+</script>
+```
+
+## With Validation Errors
+
+<Canvas of={FormStories.WithValidationErrors} />
+
+```vue
+<FormComponent
+  v-model="formData"
+  :formFields="[
+    { field: 'username', editor: 'InputText', validation: { required: true, minLength: 3 } },
+    {
+      field: 'age',
+      editor: 'InputNumber',
+      editorProps: { min: 0 },
+      validation: { required: true },
+    },
+  ]"
+/>
+```
+
+## With Custom Editor Props
+
+<Canvas of={FormStories.WithCustomEditorProps} />
+
+```vue
+<FormComponent
+  v-model="formData"
+  :formFields="[
+    {
+      field: 'username',
+      editor: 'InputText',
+      editorProps: { placeholder: 'Enter your username' },
+      validation: { required: true, minLength: 3 },
+    },
+    {
+      field: 'age',
+      editor: 'InputNumber',
+      editorProps: { min: 0, showButtons: true },
+      validation: { required: true },
+    },
+  ]"
+/>
+```
+
+## With Custom Validation
+
+<Canvas of={FormStories.WithCustomValidation} />
+
+```vue
+<FormComponent
+  v-model="formData"
+  :formFields="[{ field: 'email', editor: 'InputText', validation: { custom: 'email' } }]"
+/>
+```
+
+## Form Submission
+
+<Canvas of={FormStories.FormSubmission} />
+
+```vue
+<FormComponent
+  v-model="formData"
+  :formFields="formFields"
+  @submit="
+    ({ values, valid }) => {
+      if (valid) console.log('Submitted:', values)
+    }
+  "
+/>
+```
+
+## API Reference
+
+### Props
+
+<ArgTypes of={FormStories} />
+
+```typescript
+export interface FormFieldValidation {
+  minLength?: number
+  minLengthMessage?: string
+  required?: boolean
+  requiredMessage?: string
+  custom?: string // Key to get a custom validation function from a global registry
+}
+
+export interface FormField {
+  field: string
+  editor: string
+  editorProps?: Record<string, any>
+  fieldProps?: Record<string, any>
+  validation?: FormFieldValidation
+}
+
+export interface FormProps {
+  formFields: FormField[]
+  submitProps?: Record<string, any>
+  formProps?: Record<string, any>
+}
+```
+
+- **v-model**: The form data object (required)
+- **formFields**: Array of field definitions with editors and validations (required)
+- **submitProps**: Passthrough props for the submit Button (optional)
+- **formProps**: Passthrough props for the Form component (optional)
+
+## Events
+
+- **submit**: Emitted when the form is submitted, with `{ values, valid }`
+
+## Best Practices
+
+1. **Define validations** in `formFields` for robust user input handling
+2. **Use editorProps** to customize input components (e.g., placeholders, options)
+3. **Leverage formProps** for form-level styling or PrimeVue features
+4. **Handle submit events** for server-side submission or additional logic
+5. **Register custom editors and validators** using `componentRegistry` and `validatorRegistry`
+6. **Test validation and submission** with Storybook interaction stories
+
+## Dependencies
+
+- **PrimeVue**: Form, FormField, Button, Message, InputText, InputNumber, etc.
+- **Vee-Validate**: For form validation
+- **Zod**: For schema-based validation
+- **Tailwind CSS**: For layout and styling
