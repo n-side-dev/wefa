@@ -1,0 +1,88 @@
+# Cache node_modules across all jobs
+cache:
+  key:
+    files:
+      - package-lock.json
+  paths:
+    - node_modules/
+  policy: pull-push
+
+# Additional cache for Playwright browsers
+
+.JSTest:
+  image: $NODE_IMAGE
+  stage: test
+  before_script:
+    - cd vue
+  rules:
+    - if: '$CI_MERGE_REQUEST_IID'  # Runs on merge requests (equivalent to pull_request)
+    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "develop"'  # Runs on pushes to main or develop
+
+.PlaywrightTest:
+  extends: .JSTest
+  before_script:
+    - cd vue
+    - npm ci
+    # Install Playwright browsers if not cached
+    - npx playwright install
+    - npx playwright install-deps
+
+DependenciesAudit:
+  extends: .JSTest
+  script:
+    - npm audit --audit-level high
+
+SecretsDetection:
+  extends: .JSTest
+  script:
+    - npm ci
+    - npx detect-secrets scan || true
+
+CodeQualityChecks:
+  extends: .JSTest
+  script:
+    - npm ci
+    - npm run type-check
+    - npm run lint-check
+    - npm run format-check
+    - npx cspell "src/**/*.{js,ts,vue}"
+
+UnitTests:
+  extends: .PlaywrightTest
+  script:
+    - npm run test:unit -- --coverage
+  artifacts:
+    paths:
+      - vue/coverage/
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: vue/coverage/cobertura-coverage.xml
+
+E2ETests:
+  extends: .PlaywrightTest
+  script:
+    - npm run test:e2e
+
+DuplicatedCodeCheck:
+  extends: .JSTest
+  script:
+    - npm ci
+    - npx jscpd src/
+
+BundleSizeChecking:
+  extends: .JSTest
+  script:
+    - npm ci
+    - npm run build
+    - npx bundlesize
+  artifacts:
+    paths:
+      - dist/
+
+LicenseScanning:
+  extends: .JSTest
+  script:
+    - npm ci
+    - VERSION=$(node -e "console.log(require('./package.json').version)") && npx license-checker --production --onlyAllow "MIT;ISC;Apache-2.0;BSD-2-Clause;BSD-3-Clause;BlueOak-1.0.0;MPL-2.0" --excludePackages "@nside/wefa@$VERSION"
+  allow_failure: true

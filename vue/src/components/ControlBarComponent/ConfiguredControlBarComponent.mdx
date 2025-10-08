@@ -1,0 +1,143 @@
+import { Meta, Story, Canvas, ArgTypes, Description } from '@storybook/addon-docs/blocks'
+import ConfiguredControlBarComponent from './ConfiguredControlBarComponent.vue'
+import * as ConfiguredControlBarStories from './ConfiguredControlBarComponent.stories'
+
+<Meta of={ConfiguredControlBarStories} />
+
+# ConfiguredControlBarComponent
+
+The `ConfiguredControlBarComponent` is a flexible and dynamic control bar component that renders different UI components based on configuration. It provides a clean way to display various types of data (badges, progress bars, messages, ratings) in a consistent layout.
+
+## Overview
+
+This component creates a horizontal control bar where each item is configured through a configuration array. Each item can display different components with custom properties, making it highly versatile for dashboards, status displays, and data visualization.
+
+## Features
+
+- **Dynamic Component Rendering**: Supports any component registered in the component registry
+- **Flexible Configuration**: Each item can have custom props and data bindings
+- **Responsive Layout**: Uses flexbox for responsive design
+- **Type Safety**: Full TypeScript support with proper interfaces
+- **Extensible**: Easy to add new component types
+
+## Basic Usage
+
+<Canvas of={ConfiguredControlBarStories.Default} />
+
+## Component Types
+
+### Badge Components
+
+Perfect for displaying counts, statuses, and numerical indicators with different severity levels.
+
+<Canvas of={ConfiguredControlBarStories.WithBadgeComponents} />
+
+### Progress Bars
+
+Ideal for showing completion percentages, usage metrics, and progress indicators.
+
+<Canvas of={ConfiguredControlBarStories.WithProgressBars} />
+
+### Ratings
+
+Useful for displaying user ratings, satisfaction scores, and quality metrics.
+
+<Canvas of={ConfiguredControlBarStories.WithRatings} />
+
+## Mixed Components
+
+You can combine different component types in a single control bar for comprehensive dashboards.
+
+<Canvas of={ConfiguredControlBarStories.MixedComponents} />
+
+## Configuration
+
+### Props
+
+<ArgTypes of={ConfiguredControlBarComponent} />
+
+### Configuration Interface
+
+```typescript
+interface ControlBarItemConfiguration {
+  /** The title displayed above the component */
+  title: string
+  /** The name of the component to render (must be registered in componentRegistry) */
+  component: string
+  /** The key in the data object to use as the component's value/label */
+  data: string
+  /** Additional props to pass to the component */
+  props?: Record<string, unknown>
+}
+```
+
+### Data Object
+
+The `data` prop should contain all the values that your control bar items will display:
+
+```typescript
+const data = {
+  userCount: 142,
+  completionRate: 85,
+  statusMessage: 'System operational',
+  userRating: 4.2,
+}
+```
+
+### Configuration Array
+
+The `config` prop defines what components to render and how:
+
+```typescript
+const config = [
+  {
+    title: 'Active Users',
+    component: 'Badge',
+    data: 'userCount',
+    props: { severity: 'success' },
+  },
+  {
+    title: 'Completion',
+    component: 'ProgressBar',
+    data: 'completionRate',
+  },
+  {
+    title: 'Status',
+    component: 'Message',
+    data: 'statusMessage',
+    props: { severity: 'info' },
+  },
+  {
+    title: 'Rating',
+    component: 'Rating',
+    data: 'userRating',
+    props: { readonly: true },
+  },
+]
+```
+
+## Supported Components
+
+The component works with any component registered in the component registry. Common components include:
+
+- **Badge**: For counts and status indicators
+- **ProgressBar**: For percentage-based progress
+- **Message**: For status messages and alerts
+- **Rating**: For star ratings and scores
+- **InputText**: For editable text values
+- **InputNumber**: For numeric inputs
+- **Select**: For dropdown selections
+
+## Edge Cases
+
+### Single Item
+
+<Canvas of={ConfiguredControlBarStories.SingleItem} />
+
+## Best Practices
+
+1. **Consistent Titles**: Use clear, descriptive titles for each control bar item
+2. **Appropriate Components**: Choose components that match your data type (Badge for counts, ProgressBar for percentages)
+3. **Severity Levels**: Use appropriate severity levels for badges and messages to convey meaning
+4. **Data Validation**: Ensure your data object contains all keys referenced in the configuration
+5. **Performance**: Register components lazily in the component registry for better performance

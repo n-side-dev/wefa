@@ -1,0 +1,14 @@
+{
+  "table": {
+    "submit": "Submit",
+    "name": "Name",
+    "age": "Age",
+    "status": "Status"
+  },
+  "form": {
+    "submit": "Submit",
+    "username": "Username",
+    "age": "Age",
+    "email": "Email"
+  }
+}

@@ -1,0 +1,14 @@
+import { Meta, Story, Canvas, ArgTypes } from '@storybook/addon-docs/blocks'
+
+<Meta title='Router containers/Making your own Container' />
+
+# Writing your own Container
+
+You can write a custom Container SFC in any way you want, as long as you respect the following :
+
+- In the `<script setup>`, you need to call `setupDepthTracker`. This is required to track the current depth in the whole application.
+  ```ts
+  import { setupDepthTracker } from '@nside/wefa/containers'
+  const routerViewDepth = setupDepthTracker()
+  ```
+- Have a `<RouterView>` in your `<template>`. Without it children routes/components cannot be rendered.

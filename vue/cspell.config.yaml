@@ -1,0 +1,20 @@
+words:
+  - autodocs
+  - viewports
+  - sonarjs
+  - autorouted
+  - primevue
+  - relaunchable
+  - plotly
+  - wefa
+  - unhardcode
+  - xaxis
+  - yaxis
+ignorePaths:
+  - 'src/demo/**/*'
+  - 'src/demo.ts'
+  - 'src/main.ts'
+  - 'src/**/__tests__/**/*'
+  - 'src/**/*.stories.ts'
+  - 'src/**/*.vue'
+  - 'src/**/*.spec.ts'

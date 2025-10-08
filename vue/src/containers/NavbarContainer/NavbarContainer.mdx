@@ -1,0 +1,74 @@
+import { Meta, Story, Canvas, ArgTypes } from '@storybook/addon-docs/blocks'
+
+<Meta title='Router containers/NavbarContainer' />
+
+# NavbarContainer
+
+`NavbarContainer` is a flexible container that renders a navigation bar with optional start and end slots.\
+It is commonly used at the top of a page to display the app logo, name, and user controls (settings, logout, etc.).\
+Use this container if you need a consistent header across your routes.
+
+It is based on PrimeVue's MenuBar.
+
+## Props
+
+NavbarContainer offers the following props to customize its behavior:
+
+- `depth`: number
+  If your children routes have themselves children routes, controls how deep they are checked for and displayed on the NavBar.
+  Default is `1`.
+
+- `start`: object  
+  Controls content on the left side of the navbar.
+  - `logo`?: string — URL or path to the logo image. It is recommended to use files located in your `/public` directory.
+  - `appName`?: string — Name of the application.
+
+- `end`: object  
+  Controls content on the right side of the navbar.
+  - `showUser`: boolean — Show current user name. Default: `false`.
+  - `showSettings`: boolean — Show settings button. Default: `false`.
+  - `showLogout`: boolean — Show logout button. Default: `false`.
+  - `settingsRoute`: string | RouteLocation — Route for the settings button. Default: `{ path: '/' }`.
+  - `logoutRoute`: string | RouteLocation — Route for the logout button. Default: `{ path: '/' }`.
+
+---
+
+## Usage
+
+```ts
+/** router.ts */
+
+import { NavbarContainer } from '@nside/wefa/containers'
+
+routes: [
+  {
+    path: '/my-route-path',
+    name: 'my-route-name',
+    meta: { title: 'My Route Title' },
+    component: NavbarContainer,
+    props: {
+      depth: 1,
+      start: {
+        logo: '/WEFA_notext_logo.svg',
+        appName: 'My Energy Dashboard'
+      },
+      end: {
+        showUser: true,
+        showSettings: true,
+        showLogout: true,
+        settingsRoute: { path: '/settings' },
+        logoutRoute: { path: '/logout' }
+      }
+    },
+    children: [
+      ...
+    ]
+  }
+]
+```
+
+---
+
+## Examples
+
+Examples are available in the Overview subsection.

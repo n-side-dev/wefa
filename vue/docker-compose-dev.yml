@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  vue_app:
+
+    extends:
+      file: docker-config.yml
+      service: base_config
+
+    container_name: wefa-demo-dev
+    image: wefa-demo-dev
+
+    environment:
+      - CHOKIDAR_USEPOLLING=true # Used for autoreload
+
+    build:
+      dockerfile: ./helpers/dev.Dockerfile  # Specify the path to your Dockerfile
+
+    volumes:
+      - ./:/app  # Link local files for autoreload purposes
+      - /app/node_modules/ # Prevent copying locally installed node_modules to the container

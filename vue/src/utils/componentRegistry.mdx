@@ -1,0 +1,76 @@
+import { Meta, Markdown } from '@storybook/addon-docs/blocks'
+
+<Meta title='Registry/Components' />
+
+# Component Registry
+
+The `componentRegistry` is a centralized map of all available UI components that can be dynamically rendered by the `FormComponent` and other dynamic forms in the library. It enables flexible, backend-driven form configurations by allowing you to specify component names (like `"InputText"`, `"Select"`, `"Calendar"`) in your form field definitions, which are then resolved at runtime.
+
+## How It Works
+
+- The registry pre-registers common PrimeVue components as lazy imports, making them available for use in form fields.
+- When a form field specifies an `editor` (e.g., `"InputText"`), the `FormComponent` uses the registry to resolve and render the correct component.
+- If a requested component is missing from the registry, the form will display a warning and use a fallback (usually a `<span>`).
+
+## Current List of Registered Components
+
+<Markdown>
+  {`
+| Name         | Description                                      |
+|--------------|--------------------------------------------------|
+| InputText    | Single-line text input (PrimeVue InputText)      |
+| InputNumber  | Numeric input with optional controls             |
+| Select       | Dropdown select menu                             |
+| Calendar     | Date picker/calendar input                       |
+| Checkbox     | Checkbox input                                   |
+| Textarea     | Multi-line text input                            |
+| Chip         | Chip/tag input for multiple values               |
+| ProgressBar  | Progress bar for status display                  |
+`}
+</Markdown>
+
+## Extending the Registry
+
+If you need a component that is not yet available in the registry, you have two options:
+
+1. **Develop and Inject Dynamically:**
+   You can develop your own custom component and register it at runtime using the provided API:
+
+   ```typescript
+   import { registerAsyncComponent, registerSyncComponent } from '@/utils/componentRegistry'
+
+   // Register a custom editor asynchronously
+   registerAsyncComponent('CustomEditor', '../components/CustomEditor.vue')
+
+   // Or register synchronously if already imported
+   import CustomBody from '../components/CustomBody.vue'
+   registerSyncComponent('CustomBody', CustomBody)
+   ```
+
+2. **Contribute to the Library:**
+   If you believe your component would be useful to others, consider contributing it to the library!
+   - Implement the component following the library's conventions.
+   - Add it to the registry in `componentRegistry.ts`.
+   - Submit a pull request or ask contributors to review and merge your addition.
+
+## Best Practices
+
+- Always check the registry for available components before implementing a new one.
+- Prefer lazy imports for optimal bundle size and performance.
+- Document new components and their usage for other contributors.
+
+## API Reference
+
+```typescript
+export function registerAsyncComponent(name: string, importPath: string): void
+export function registerSyncComponent(name: string, component: ResolvableComponent): void
+```
+
+## Example Usage in FormComponent
+
+```typescript
+const { resolve: resolveComponent } = useComponentResolver()
+const editorComponent = resolveComponent(field.editor)
+```
+
+If the component is not found, a warning is logged and a fallback is used.

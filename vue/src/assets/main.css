@@ -1,0 +1,8 @@
+@import 'tailwindcss';
+@import 'tailwindcss-primeui';
+@import 'primeicons/primeicons.css';
+
+/* Define here the default additional CSS 
+you want to apply on the library 
+AND projects using the library.
+Be careful about breaking changes */

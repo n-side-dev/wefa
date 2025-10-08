@@ -1,0 +1,52 @@
+import { Meta, Story, Canvas, ArgTypes } from '@storybook/addon-docs/blocks'
+
+<Meta title='Router containers/BareContainer' />
+
+# BareContainer
+
+BareContainer is a lightweight flexbox wrapper around a `<RouterView />`.  
+It ensures consistent layout sizing and makes sure that router depth is tracked (via `setupDepthTracker()`).
+Use this container if you don't want any special content around your children routes/components.
+
+## Props
+
+BareContainer offers some props to control how the children component is rendered inside.
+
+- `width`: "full" | "hug"\
+  Controls if the wrapper should try to take the full remaining horizontal space, or just the space required by the children component.\
+  "full" by default.
+- `height`: "full" | "hug"\
+  Controls if the wrapper should try to take the full remaining vertical space, or just the space required by the children component.\
+  "full" by default.
+- `direction`: "column" | "row"\
+  Flex direction used this wrapper and exposed to children components/elements.\
+  "column" by default.
+- `center`: boolean\
+  Controls if the child content should be horizontally and vertically centered inside the BareContainer.\
+  false by default.
+
+## Usage
+
+```ts
+/** router.ts*/
+
+import { BareContainer } from '@nside/wefa/containers'
+
+routes: [
+  {
+    path: '/my-route-path',
+    name: 'my-route-name',
+    meta: { title: 'My Route Title'},
+    component: BareContainer,
+    props: {
+      width: "full",
+      height: "full",
+      direction: "columnn",
+      center: false
+    }
+    children: [
+      ...
+    ]
+  }
+]
+```

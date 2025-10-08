@@ -1,0 +1,133 @@
+import { Meta, Story, Canvas, Controls, ArgTypes } from '@storybook/addon-docs/blocks'
+import * as ControlBarStories from './ControlBarComponent.stories'
+
+<Meta of={ControlBarStories} />
+
+# ControlBarComponent
+
+A flexible layout container component that provides a horizontal flexbox layout for control bar items. This component serves as the foundation for building control bars and dashboards with consistent spacing and responsive behavior.
+
+## Overview
+
+The ControlBarComponent is a simple but essential layout component that creates a horizontal container for control bar items. It uses flexbox to ensure proper alignment, spacing, and responsive behavior across different screen sizes.
+
+### Key Features
+
+- **Flexbox Layout**: Uses CSS flexbox for responsive horizontal layout
+- **Consistent Spacing**: Provides uniform gap between child components
+- **Stretch Alignment**: Ensures all child items have consistent height
+- **Responsive Design**: Automatically wraps items on smaller screens
+- **Slot-based**: Accepts any child components through Vue slots
+- **Zero Configuration**: Works out of the box with no required props
+
+## Basic Usage
+
+<Canvas of={ControlBarStories.WithControlBarItems} />
+
+The component is typically used with ControlBarItemComponent for structured control bars:
+
+```vue
+<template>
+  <ControlBarComponent>
+    <ControlBarItemComponent title="CPU Usage">
+      <ProgressBar :value="75" />
+    </ControlBarItemComponent>
+    <ControlBarItemComponent title="Memory">
+      <Badge value="8GB" severity="info" />
+    </ControlBarItemComponent>
+    <ControlBarItemComponent title="Status">
+      <Message severity="success">Online</Message>
+    </ControlBarItemComponent>
+  </ControlBarComponent>
+</template>
+```
+
+## Layout Behavior
+
+### Horizontal Layout
+
+The component creates a horizontal flexbox container that:
+
+- Arranges child components in a row
+- Provides consistent gap between items
+- Stretches all items to the same height
+- Maintains proper alignment
+
+### Responsive Wrapping
+
+<Canvas of={ControlBarStories.ResponsiveWrapping} />
+
+On smaller screens, items automatically wrap to new lines:
+
+```vue
+<template>
+  <ControlBarComponent>
+    <!-- Multiple items that will wrap on small screens -->
+    <ControlBarItemComponent v-for="item in items" :key="item.id" :title="item.title">
+      <Badge :value="item.value" />
+    </ControlBarItemComponent>
+  </ControlBarComponent>
+</template>
+```
+
+## Configuration
+
+### Props
+
+<ArgTypes of={ControlBarStories} />
+
+The ControlBarComponent has no props - it's a pure layout component that relies on Tailwind classes for styling.
+
+## Best Practices
+
+### Use with ControlBarItemComponent
+
+For consistent styling and behavior, use ControlBarComponent with ControlBarItemComponent:
+
+```vue
+<ControlBarComponent>
+  <ControlBarItemComponent title="Metric 1">
+    <Badge value="100" />
+  </ControlBarItemComponent>
+</ControlBarComponent>
+```
+
+### Limit Number of Items
+
+For optimal user experience, limit the number of direct children:
+
+- **Desktop**: 4-6 items work well
+- **Mobile**: 2-3 items per row after wrapping
+
+### Consider ConfiguredControlBarComponent
+
+For dynamic content, consider using ConfiguredControlBarComponent instead:
+
+```vue
+<ConfiguredControlBarComponent :data="metrics" :config="configuration" />
+```
+
+## Related Components
+
+- **ControlBarItemComponent**: Structured item container with title and divider
+- **ConfiguredControlBarComponent**: Dynamic control bar with configuration-based rendering
+- **Badge**: Common child component for displaying values
+- **ProgressBar**: Common child component for showing progress
+
+## Examples
+
+### Dashboard Metrics
+
+```vue
+<ControlBarComponent>
+  <ControlBarItemComponent title="Active Users">
+    <Badge value="1,234" severity="success" />
+  </ControlBarItemComponent>
+  <ControlBarItemComponent title="CPU Usage">
+    <ProgressBar :value="65" />
+  </ControlBarItemComponent>
+  <ControlBarItemComponent title="Memory">
+    <ProgressBar :value="78" />
+  </ControlBarItemComponent>
+</ControlBarComponent>
+```

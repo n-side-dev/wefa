@@ -1,0 +1,9 @@
+{
+  "login": "Login",
+  "logout": "Logout",
+  "signin": "Sign In",
+  "signout": "Sign Out",
+  "account": "Account",
+  "profile": "Profile",
+  "settings": "Settings"
+}

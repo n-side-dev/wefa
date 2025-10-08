@@ -1,0 +1,273 @@
+import { Meta, Story, Canvas, ArgTypes } from '@storybook/addon-docs/blocks'
+import PlotlyFromTableComponent from './PlotlyFromTableComponent.vue'
+import * as PlotlyFromTableComponentStories from './PlotlyFromTableComponent.stories'
+
+<Meta
+  title='Components/PlotlyComponent/PlotlyFromTableComponent/Documentation'
+  component={PlotlyFromTableComponent}
+  of={PlotlyFromTableComponentStories}
+/>
+
+# PlotlyFromTableComponent
+
+## Overview
+
+The `PlotlyFromTableComponent` is a specialized wrapper around `PlotlyComponent` designed specifically for working with **tabular data containing rows**. This component simplifies the process of creating charts from structured data by automatically mapping table columns to chart axes, eliminating the need to manually transform your data into Plotly's expected format.
+
+This component is ideal when you have data in a table-like structure (array of objects) where each object represents a row with named columns, and you want to quickly visualize relationships between different columns.
+
+## Key Features
+
+- **Tabular Data Focus**: Specifically designed for data structured as rows and columns
+- **Automatic Data Mapping**: Automatically maps specified columns to x and y axes
+- **Column-Based Configuration**: Simple configuration using column names instead of data arrays
+- **Full Plotly.js Support**: Inherits all chart types and features from the underlying PlotlyComponent
+- **Reactive Updates**: Automatically updates when table data changes
+- **TypeScript Support**: Full type safety with proper interfaces
+
+## When to Use This Component
+
+Use `PlotlyFromTableComponent` when:
+
+- Your data is structured as an array of objects (table rows)
+- Each object has named properties representing columns
+- You want to plot relationships between different columns
+- You prefer column-based configuration over manual data transformation
+
+For raw Plotly data arrays, use the base `PlotlyComponent` instead.
+
+## Example
+
+### Basic Usage
+
+This example shows how to create a chart from tabular energy consumption data:
+
+<Canvas>
+  <Story id='components-plotlycomponent-plotlyfromtablecomponent--basic-line-chart' />
+</Canvas>
+
+## Props
+
+<ArgTypes of={PlotlyFromTableComponent} />
+
+## Usage
+
+### Basic Line Chart from Table Data
+
+The component requires tabular data and a configuration specifying which columns to use:
+
+```vue
+<template>
+  <PlotlyFromTableComponent :value="tableData" :config="chartConfig" />
+</template>
+
+<script setup>
+import PlotlyFromTableComponent from '@/components/PlotlyComponent/PlotlyFromTableComponent.vue'
+
+// Tabular data - array of objects representing rows
+const tableData = [
+  { month: 'Jan', consumption: 120, temperature: 5 },
+  { month: 'Feb', consumption: 110, temperature: 8 },
+  { month: 'Mar', consumption: 95, temperature: 12 },
+  { month: 'Apr', consumption: 80, temperature: 18 },
+]
+
+// Configuration specifying which columns to use
+const chartConfig = {
+  x: 'month', // Column name for x-axis
+  y: 'consumption', // Column name for y-axis
+  layout: {
+    title: 'Monthly Energy Consumption',
+    xaxis: { title: 'Month' },
+    yaxis: { title: 'Consumption (kWh)' },
+  },
+}
+</script>
+```
+
+### Scatter Plot with Custom Trace Configuration
+
+You can customize the chart appearance using the traceConfig option:
+
+```vue
+<template>
+  <PlotlyFromTableComponent :value="tableData" :config="scatterConfig" />
+</template>
+
+<script setup>
+const tableData = [
+  { temperature: 5, consumption: 120 },
+  { temperature: 8, consumption: 110 },
+  { temperature: 12, consumption: 95 },
+  { temperature: 18, consumption: 80 },
+]
+
+const scatterConfig = {
+  x: 'temperature',
+  y: 'consumption',
+  traceConfig: [
+    {
+      mode: 'markers',
+      type: 'scatter',
+      name: 'Temperature vs Consumption',
+      marker: { size: 8, color: 'blue' },
+    },
+  ],
+  layout: {
+    title: 'Energy Consumption vs Temperature',
+    xaxis: { title: 'Temperature (°C)' },
+    yaxis: { title: 'Consumption (kWh)' },
+  },
+}
+</script>
+```
+
+### Bar Chart from Sales Data
+
+Perfect for categorical data visualization:
+
+```vue
+<template>
+  <PlotlyFromTableComponent :value="salesData" :config="barConfig" />
+</template>
+
+<script setup>
+const salesData = [
+  { product: 'Solar Panels', sales: 150 },
+  { product: 'Wind Turbines', sales: 80 },
+  { product: 'Batteries', sales: 200 },
+  { product: 'Inverters', sales: 120 },
+]
+
+const barConfig = {
+  x: 'product',
+  y: 'sales',
+  traceConfig: [
+    {
+      type: 'bar',
+      name: 'Product Sales',
+      marker: { color: 'green' },
+    },
+  ],
+  layout: {
+    title: 'Product Sales by Category',
+    xaxis: { title: 'Product' },
+    yaxis: { title: 'Units Sold' },
+  },
+}
+</script>
+```
+
+### Time Series Data
+
+Excellent for time-based data visualization:
+
+```vue
+<template>
+  <PlotlyFromTableComponent :value="timeSeriesData" :config="timeConfig" />
+</template>
+
+<script setup>
+const timeSeriesData = [
+  { timestamp: '2024-01-01T00:00:00Z', power: 1200 },
+  { timestamp: '2024-01-01T01:00:00Z', power: 1150 },
+  { timestamp: '2024-01-01T02:00:00Z', power: 1100 },
+]
+
+const timeConfig = {
+  x: 'timestamp',
+  y: 'power',
+  traceConfig: [
+    {
+      type: 'scatter',
+      mode: 'lines+markers',
+      name: 'Power Output',
+    },
+  ],
+  layout: {
+    title: 'Power Output Over Time',
+    xaxis: {
+      title: 'Time',
+      type: 'date',
+    },
+    yaxis: { title: 'Power (W)' },
+  },
+}
+</script>
+```
+
+## Configuration Options
+
+### PlotlyFromTableComponentConfig Interface
+
+```typescript
+interface PlotlyFromTableComponentConfig {
+  x: string // Column name for x-axis data
+  y: string // Column name for y-axis data
+  traceConfig?: Record<string, unknown>[] // Optional Plotly trace configuration
+  layout?: any // Optional Plotly layout configuration
+  config?: any // Optional Plotly config options
+}
+```
+
+### Data Structure Requirements
+
+Your tabular data must be structured as:
+
+```typescript
+// Array of objects where each object represents a table row
+const tableData: Record<string, unknown>[] = [
+  { month: 'Jan', consumption: 120, temperature: 5 },
+  { month: 'Feb', consumption: 110, temperature: 8 },
+  // ... more rows
+]
+```
+
+## How It Works
+
+The component transforms your tabular data by:
+
+1. **Column Extraction**: Extracts values from the specified x and y columns
+2. **Data Mapping**: Maps `value.map(row => row[config.x])` to x-axis data
+3. **Data Mapping**: Maps `value.map(row => row[config.y])` to y-axis data
+4. **Trace Creation**: Combines the mapped data with optional trace configuration
+5. **Chart Rendering**: Passes the transformed data to the underlying PlotlyComponent
+
+## Chart Types
+
+The component supports all Plotly.js chart types through the `traceConfig` option:
+
+### Line Charts (Default)
+
+```javascript
+// Default behavior - no traceConfig needed
+```
+
+### Scatter Plots
+
+```javascript
+traceConfig: [
+  {
+    mode: 'markers',
+    type: 'scatter',
+  },
+]
+```
+
+### Bar Charts
+
+```javascript
+traceConfig: [
+  {
+    type: 'bar',
+  },
+]
+```
+
+## Troubleshooting
+
+### Common Issues
+
+- **No Data Displayed**: Verify column names match your data object keys exactly
+- **Incorrect Axis Data**: Check that x and y configuration values correspond to existing columns
+- **Type Errors**: Ensure your data structure matches `Record<string, unknown>[]`

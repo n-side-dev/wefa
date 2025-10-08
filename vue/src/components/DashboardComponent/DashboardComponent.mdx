@@ -1,0 +1,277 @@
+import { Meta, Canvas, ArgTypes } from '@storybook/addon-docs/blocks'
+import * as DashboardComponentStories from './DashboardComponent.stories'
+
+<Meta of={DashboardComponentStories} />
+
+# Dashboard
+
+A flexible layout component system for organizing panels and content on a page. The Dashboard component provides easy ways to manage panel size, expanding components, and orientation while keeping everything responsive on different screen sizes.
+
+## Overview
+
+The Dashboard component system consists of three main components that work together to create flexible, responsive layouts:
+
+- **DashboardComponent**: The root container that manages the overall layout
+- **DashboardGroupComponent**: Groups panels or other groups, controlling orientation
+- **DashboardPanelComponent**: Individual content tiles that hold your components
+
+### Key Features
+
+- **Flexible Layout**: Supports both vertical and horizontal orientations
+- **Expandable Panels**: Panels can expand to take full space when needed
+- **Responsive Design**: Automatically adapts to different screen sizes
+- **Size Control**: Multiple ways to control panel sizing (weight, hug-content, max-width/height)
+- **Nested Structure**: Groups can contain other groups for complex layouts
+- **Visual Styling**: Optional boxed panel appearance with background and padding
+
+## Basic Usage
+
+<Canvas of={DashboardComponentStories.Base} />
+
+```vue
+<template>
+  <DashboardComponent boxed-panels orientation="vertical">
+    <DashboardPanel hug-content stay-visible-when-other-expand>
+      <b>Header</b>
+    </DashboardPanel>
+
+    <DashboardGroup>
+      <DashboardPanel hug-content stay-visible-when-other-expand>
+        <b>Menu</b>
+        <ul>
+          <li>Item 1</li>
+          <li>Item 2</li>
+        </ul>
+      </DashboardPanel>
+
+      <DashboardGroup>
+        <DashboardPanel can-expand>
+          <div class="notification is-success is-light">
+            <p>Main content area</p>
+          </div>
+        </DashboardPanel>
+      </DashboardGroup>
+    </DashboardGroup>
+  </DashboardComponent>
+</template>
+
+<script setup>
+import DashboardComponent from '@/components/DashboardComponent/DashboardComponent.vue'
+import DashboardGroupComponent from '@/components/DashboardComponent/DashboardGroupComponent.vue'
+import DashboardPanelComponent from '@/components/DashboardComponent/DashboardPanelComponent.vue'
+</script>
+```
+
+## Component Hierarchy
+
+<Canvas of={DashboardComponentStories.Basics} />
+
+The Dashboard system uses a hierarchical structure where:
+
+- **Dashboard** is the parent container
+- **DashboardGroup** organizes panels and other groups
+- **DashboardPanel** contains the actual content
+
+```vue
+<DashboardComponent>
+  <DashboardGroup>
+    <DashboardPanel>A1</DashboardPanel>
+    <DashboardPanel>A2</DashboardPanel>
+  </DashboardGroup>
+  
+  <DashboardGroup>
+    <DashboardPanel>B1</DashboardPanel>
+    <DashboardPanel>B2</DashboardPanel>
+  </DashboardGroup>
+</DashboardComponent>
+```
+
+## Orientation Control
+
+<Canvas of={DashboardComponentStories.Orientation} />
+
+Orientation determines how content flows within containers:
+
+- **vertical**: Content flows from top to bottom
+- **horizontal**: Content flows from left to right
+- Orientation automatically alternates at each hierarchy level
+- Can be overridden on individual groups
+
+```vue
+<DashboardComponent orientation="vertical">
+  <DashboardGroup orientation="horizontal">
+    <!-- This group will flow horizontally regardless of parent -->
+    <DashboardPanel>Left</DashboardPanel>
+    <DashboardPanel>Right</DashboardPanel>
+  </DashboardGroup>
+</DashboardComponent>
+```
+
+## Expandable Panels
+
+<Canvas of={DashboardComponentStories.Expanding} />
+
+Panels can be made expandable with several control options:
+
+```vue
+<DashboardComponent>
+  <!-- Basic expandable panel -->
+  <DashboardPanel can-expand>
+    <p>Click the expand button to make this panel take full space</p>
+  </DashboardPanel>
+  
+  <!-- Panel that stays visible when others expand -->
+  <DashboardPanel stay-visible-when-other-expand>
+    <p>This panel remains visible even when others expand</p>
+  </DashboardPanel>
+  
+  <!-- Panel that starts expanded -->
+  <DashboardPanel can-expand start-expanded>
+    <p>This panel starts in expanded state</p>
+  </DashboardPanel>
+</DashboardComponent>
+```
+
+## Panel Sizing
+
+<Canvas of={DashboardComponentStories.Sizing} />
+
+Multiple options are available to control how panels size themselves:
+
+```vue
+<DashboardComponent>
+  <DashboardGroup>
+    <!-- Default panel (weight = 1) -->
+    <DashboardPanel>
+      <p>Normal size</p>
+    </DashboardPanel>
+    
+    <!-- Panel with custom weight -->
+    <DashboardPanel :weight="3">
+      <p>Takes 3x more space than normal panels</p>
+    </DashboardPanel>
+  </DashboardGroup>
+  
+  <DashboardGroup orientation="horizontal">
+    <!-- Panel that hugs its content -->
+    <DashboardPanel hug-content>
+      <div style="width: 200px;">Fixed width content</div>
+    </DashboardPanel>
+    
+    <!-- Panel that takes remaining space -->
+    <DashboardPanel>
+      <p>Uses remaining space</p>
+    </DashboardPanel>
+  </DashboardGroup>
+  
+  <!-- Panel with maximum size limits -->
+  <DashboardPanel max-height="20%" hug-content>
+    <p>Limited to 20% of parent height</p>
+  </DashboardPanel>
+</DashboardComponent>
+```
+
+## API Reference
+
+### DashboardComponent Props
+
+<ArgTypes of={DashboardComponentStories} />
+
+```typescript
+export interface DashboardComponentProps {
+  boxedPanels?: boolean // Whether panels should have boxed styling
+  orientation?: 'vertical' | 'horizontal' // Layout orientation
+}
+```
+
+### DashboardGroupComponent Props
+
+```typescript
+export interface DashboardGroupComponentProps {
+  weight?: number // Relative size weight (default: 1)
+  hugContent?: boolean // Take minimum space for content
+  maxWidth?: string // Maximum width (e.g., '200px', '50%')
+  maxHeight?: string // Maximum height (e.g., '200px', '50%')
+  orientation?: 'vertical' | 'horizontal' // Override parent orientation
+  stayVisibleWhenOtherExpand?: boolean // Stay visible when panels expand
+}
+```
+
+### DashboardPanelComponent Props
+
+```typescript
+export interface DashboardPanelComponentProps {
+  weight?: number // Relative size weight (default: 1)
+  hugContent?: boolean // Take minimum space for content
+  maxWidth?: string // Maximum width (e.g., '200px', '50%')
+  maxHeight?: string // Maximum height (e.g., '200px', '50%')
+  canExpand?: boolean // Enable expand/collapse functionality
+  startExpanded?: boolean // Start in expanded state
+  stayVisibleWhenOtherExpand?: boolean // Stay visible when other panels expand
+}
+```
+
+## Best Practices
+
+1. **Use semantic structure** - Group related panels together in DashboardGroups
+2. **Plan your orientation** - Consider how content should flow at each level
+3. **Strategic use of hug-content** - Use for menus, toolbars, and fixed-size content
+4. **Weight for emphasis** - Use higher weights for more important content areas
+5. **Expandable for details** - Make detail panels expandable to save space
+6. **Stay-visible for navigation** - Keep navigation and critical controls always visible
+7. **Test responsiveness** - Verify layouts work well on different screen sizes
+
+## Common Patterns
+
+### Header-Sidebar-Content Layout
+
+```vue
+<DashboardComponent boxed-panels orientation="vertical">
+  <!-- Header -->
+  <DashboardPanel hug-content stay-visible-when-other-expand>
+    <AppHeader />
+  </DashboardPanel>
+  
+  <!-- Main area with sidebar and content -->
+  <DashboardGroup orientation="horizontal">
+    <!-- Sidebar -->
+    <DashboardPanel hug-content stay-visible-when-other-expand>
+      <Sidebar />
+    </DashboardPanel>
+    
+    <!-- Main content -->
+    <DashboardPanel>
+      <MainContent />
+    </DashboardPanel>
+  </DashboardGroup>
+</DashboardComponent>
+```
+
+### Dashboard with Expandable Details
+
+```vue
+<DashboardComponent boxed-panels>
+  <!-- Summary panels -->
+  <DashboardGroup>
+    <DashboardPanel>KPI 1</DashboardPanel>
+    <DashboardPanel>KPI 2</DashboardPanel>
+    <DashboardPanel>KPI 3</DashboardPanel>
+  </DashboardGroup>
+  
+  <!-- Expandable detail panels -->
+  <DashboardGroup>
+    <DashboardPanel can-expand>
+      <Chart title="Sales Overview" />
+    </DashboardPanel>
+    <DashboardPanel can-expand>
+      <DataTable title="Recent Orders" />
+    </DashboardPanel>
+  </DashboardGroup>
+</DashboardComponent>
+```
+
+## Related Components
+
+- **PrimeVue Components**: Used within panels for UI elements
+- **Custom Content Components**: Charts, tables, forms that go inside panels
+- **Layout Components**: Other layout utilities for specific use cases
