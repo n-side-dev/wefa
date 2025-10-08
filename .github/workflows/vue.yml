@@ -1,0 +1,123 @@
+name: Vue Workflow
+
+on:
+  pull_request:
+  push:
+    branches: [ main, develop ]
+
+# Run all steps from the Vue app directory by default
+defaults:
+  run:
+    working-directory: vue
+
+jobs:
+  dependencies-audit:
+    name: Dependencies Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-node
+      - name: Audit dependencies (high severity)
+        run: npm audit --audit-level high
+
+  secrets-detection:
+    name: Secrets Detection
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-node
+      - run: npm ci
+      - name: Detect secrets
+        run: npx detect-secrets scan || true
+
+  code-quality-checks:
+    name: Code Quality Checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-node
+      - run: npm ci
+      - run: npm run type-check
+      - run: npm run lint-check
+      - run: npm run format-check
+      - name: Spell check (cspell)
+        run: npx cspell "src/**/*.{js,ts,vue}"
+
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-node
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('vue/package-lock.json') }}
+      - run: npm ci
+      - name: Install Playwright (browsers and deps)
+        run: npx playwright install --with-deps
+      - name: Run unit tests with coverage
+        run: npm run test:unit -- --coverage
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vue-coverage
+          path: coverage/
+
+  e2e-tests:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-node
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('vue/package-lock.json') }}
+      - run: npm ci
+      - name: Install Playwright (browsers and deps)
+        run: npx playwright install --with-deps
+      - name: Run E2E tests
+        run: npm run test:e2e
+
+  duplicated-code-check:
+    name: Duplicated Code Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-node
+      - run: npm ci
+      - name: Check duplicated code (jscpd)
+        run: npx jscpd src/
+
+  bundle-size-checking:
+    name: Bundle Size Checking
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-node
+      - run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Check bundle size
+        run: npx bundlesize
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vue-dist
+          path: dist/
+
+  license-scanning:
+    name: License Scanning
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-node
+        with:
+          node-version: 24
+      - run: npm ci
+      - name: License check
+        run: npx license-checker --production --onlyAllow "MIT;ISC;Apache-2.0;BSD-2-Clause;BSD-3-Clause;BlueOak-1.0.0;MPL-2.0"

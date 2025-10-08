@@ -1,0 +1,22 @@
+name: Setup Node with npm cache
+description: Setup Node.js with npm cache and consistent cache-dependency-path
+
+inputs:
+  node-version:
+    description: Node.js version to use
+    required: false
+    default: '20'
+  cache-dependency-path:
+    description: Path to the package-lock.json used for npm cache key
+    required: false
+    default: 'vue/package-lock.json'
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: npm
+        cache-dependency-path: ${{ inputs.cache-dependency-path }}
