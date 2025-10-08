@@ -1,0 +1,22 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/vue"
+    schedule:
+      interval: "daily"
+    groups:
+      patch:
+        update-types:
+          - "patch"
+  - package-ecosystem: "uv"
+    directory: "/django"
+    schedule:
+      interval: "daily"
+    groups:
+      patch:
+        update-types:
+          - "patch"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
