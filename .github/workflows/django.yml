@@ -2,14 +2,8 @@ name: Django CI
 
 on:
   pull_request:
-    paths:
-      - 'django/**'
-      - '.github/workflows/django.yml'
   push:
-    branches: [ 'main', 'develop' ]
-    paths:
-      - 'django/**'
-      - '.github/workflows/django.yml'
+    branches: [ main, develop ]
 
 permissions:
   contents: read
