@@ -1,9 +1,9 @@
 import datetime
-from typing import Any
+from typing import Any, Mapping, cast
 
+from django.conf import settings
 from django.db import models
 from django.db.models import signals
-from django.conf import settings
 
 
 class _LegalConsentConfiguration:
@@ -20,9 +20,10 @@ class _LegalConsentConfiguration:
 
         Note: Configuration validation is handled by Django system checks.
         """
-        configuration = settings.NSIDE_WEFA["LEGAL_CONSENT"]
-        self.version: int = configuration["VERSION"]
-        self.expiry_limit: int = configuration["EXPIRY_LIMIT"]
+        all_conf = cast(Mapping[str, Any], getattr(settings, "NSIDE_WEFA"))
+        legal_conf = cast(Mapping[str, int], all_conf["LEGAL_CONSENT"])
+        self.version = int(legal_conf["VERSION"])
+        self.expiry_limit = int(legal_conf["EXPIRY_LIMIT"])
 
 
 class LegalConsent(models.Model):
@@ -95,9 +96,7 @@ class LegalConsent(models.Model):
         )
 
 
-def create_legal_consent(
-    sender: type, instance: settings.AUTH_USER_MODEL, created: bool, **kwargs: Any
-) -> None:
+def create_legal_consent(sender, instance, created, **kwargs):
     """
     Signal handler that creates a LegalConsent when a new User is created.
     """
