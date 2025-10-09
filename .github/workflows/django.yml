@@ -10,16 +10,10 @@ defaults:
   run:
     working-directory: django
 
-permissions:
-  contents: read
-
 jobs:
   lint:
     name: Ruff Lint
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: django
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -40,9 +34,6 @@ jobs:
     name: Mypy Type Check
     runs-on: ubuntu-latest
     needs: [lint]
-    defaults:
-      run:
-        working-directory: django
     env:
       DJANGO_SETTINGS_MODULE: demo.settings
     steps:
@@ -62,9 +53,6 @@ jobs:
     name: Django Tests
     runs-on: ubuntu-latest
     needs: [lint, type]
-    defaults:
-      run:
-        working-directory: django
     env:
       DJANGO_SETTINGS_MODULE: demo.settings
     steps:
@@ -94,9 +82,6 @@ jobs:
     name: Migrations Sanity Check
     runs-on: ubuntu-latest
     needs: [lint, type]
-    defaults:
-      run:
-        working-directory: django
     env:
       DJANGO_SETTINGS_MODULE: demo.settings
     steps:

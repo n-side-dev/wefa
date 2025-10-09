@@ -14,6 +14,10 @@ inputs:
     description: Install development dependencies using extras ([dev])
     required: false
     default: 'true'
+  project-dir:
+    description: Directory containing the Python project (pyproject.toml)
+    required: false
+    default: 'django'
 
 runs:
   using: composite
@@ -23,11 +27,12 @@ runs:
       with:
         python-version: ${{ inputs.python-version }}
         enable-cache: true
-        cache-dependency-path: ${{ inputs.cache-dependency-path }}
+        cache-dependency-glob: ${{ inputs.cache-dependency-path }}
 
     - name: Create project virtual environment (.venv)
       shell: bash
       run: |
+        cd "${{ inputs.project-dir }}"
         uv venv --python "${{ inputs.python-version }}" .venv
         echo "VIRTUAL_ENV=$PWD/.venv" >> "$GITHUB_ENV"
         echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
@@ -35,9 +40,13 @@ runs:
     - name: Install dependencies (dev)
       if: ${{ inputs.install-dev == 'true' }}
       shell: bash
-      run: uv pip install --python "$VIRTUAL_ENV" -e ".[dev]"
+      run: |
+        cd "${{ inputs.project-dir }}"
+        uv pip install --python "$VIRTUAL_ENV" -e ".[dev]"
 
     - name: Install dependencies
       if: ${{ inputs.install-dev != 'true' }}
       shell: bash
-      run: uv pip install --python "$VIRTUAL_ENV" -e "."
+      run: |
+        cd "${{ inputs.project-dir }}"
+        uv pip install --python "$VIRTUAL_ENV" -e "."
