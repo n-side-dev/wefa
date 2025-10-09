@@ -87,7 +87,7 @@
     "@storybook/vue3-vite": "^9.1.10",
     "@tsconfig/node22": "^22.0.2",
     "@types/eslint-plugin-security": "^3.0.0",
-    "@types/jsdom": "^21.1.7",
+    "@types/jsdom": "^27.0.0",
     "@types/node": "^24.7.0",
     "@types/plotly.js-dist-min": "^2.3.4",
     "@vitejs/plugin-vue": "^6.0.1",
