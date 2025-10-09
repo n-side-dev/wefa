@@ -68,7 +68,7 @@ jobs:
           cd django
           python -m pip install --upgrade pip
           python -m pip install . pdoc
-          pdoc --html --force -o ../gh-pages/django nside_wefa
+          pdoc -o ../gh-pages/django nside_wefa
           cd ..
 
           # Use tracked landing page for the portal
