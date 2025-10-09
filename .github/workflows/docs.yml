@@ -34,10 +34,9 @@ jobs:
         uses: actions/configure-pages@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: ./.github/actions/setup-node
         with:
           node-version: '22'
-          cache: 'npm'
           cache-dependency-path: 'vue/package-lock.json'
 
       - name: Install and build Vue Storybook
@@ -46,10 +45,11 @@ jobs:
           npm ci
           npm run build-storybook
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - name: Setup Python and install deps
+        uses: ./.github/actions/setup-python
         with:
           python-version: '3.12'
+          install-dev: 'false'
 
       - name: Prepare Pages content
         env:
@@ -64,11 +64,10 @@ jobs:
             echo "<html><body><h1>Vue docs</h1><p>No Storybook build found.</p></body></html>" > gh-pages/vue/index.html
           fi
 
-          # Install Python deps and pdoc, generate Django docs from nside_wefa
+          # Install Python deps and pdoc (via uv), generate Django docs from nside_wefa
           cd django
-          python -m pip install --upgrade pip
-          python -m pip install . pdoc
-          pdoc -o ../gh-pages/django nside_wefa
+          uv pip install --python "$VIRTUAL_ENV" pdoc
+          uv run pdoc -o ../gh-pages/django nside_wefa
           cd ..
 
           # Use tracked landing page for the portal
