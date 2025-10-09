@@ -53,7 +53,8 @@ export default defineConfigWithVueTs(
     rules: {
       "vue/block-order": ["error", {
         "order": [ "template", "script", "style" ] // Enforce this precise order in component definition!
-      }]
+      }],
+      "vitest/prefer-called-exactly-once-with": "off" // Not always possible to test this
     }
   }
 )
