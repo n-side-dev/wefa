@@ -1,5 +1,5 @@
-name: Setup Python with pip cache and install
-description: Setup Python, enable pip cache, upgrade pip, and install dependencies
+name: Setup Python with uv and install
+description: Setup Python via uv, create a local .venv, cache, and install dependencies
 
 inputs:
   python-version:
@@ -7,9 +7,9 @@ inputs:
     required: false
     default: '3.12'
   cache-dependency-path:
-    description: Path(s) used to compute pip cache key (e.g. requirements.txt or pyproject.toml)
+    description: Path(s) used to compute cache key (e.g. django/pyproject.toml)
     required: false
-    default: 'pyproject.toml'
+    default: 'django/pyproject.toml'
   install-dev:
     description: Install development dependencies using extras ([dev])
     required: false
@@ -18,23 +18,26 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Set up Python
-      uses: actions/setup-python@v5
+    - name: Setup uv (Python toolchain)
+      uses: astral-sh/setup-uv@v4
       with:
         python-version: ${{ inputs.python-version }}
-        cache: 'pip'
+        enable-cache: true
         cache-dependency-path: ${{ inputs.cache-dependency-path }}
 
-    - name: Upgrade pip
+    - name: Create project virtual environment (.venv)
       shell: bash
-      run: python -m pip install --upgrade pip
+      run: |
+        uv venv --python "${{ inputs.python-version }}" .venv
+        echo "VIRTUAL_ENV=$PWD/.venv" >> "$GITHUB_ENV"
+        echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
 
     - name: Install dependencies (dev)
       if: ${{ inputs.install-dev == 'true' }}
       shell: bash
-      run: pip install -e .[dev]
+      run: uv pip install --python "$VIRTUAL_ENV" -e ".[dev]"
 
     - name: Install dependencies
       if: ${{ inputs.install-dev != 'true' }}
       shell: bash
-      run: pip install -e .
+      run: uv pip install --python "$VIRTUAL_ENV" -e "."
