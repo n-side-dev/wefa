@@ -25,10 +25,10 @@ jobs:
           install-dev: 'true'
 
       - name: Ruff - static analysis
-        run: ruff check .
+        run: uv run ruff check .
 
       - name: Ruff - formatting check
-        run: ruff format --check .
+        run: uv run ruff format --check .
 
   type:
     name: Mypy Type Check
@@ -47,7 +47,7 @@ jobs:
           install-dev: 'true'
 
       - name: Run mypy
-        run: mypy --install-types --non-interactive .
+        run: uv run mypy --install-types --non-interactive .
 
   tests:
     name: Django Tests
@@ -69,7 +69,7 @@ jobs:
         run: python manage.py migrate --noinput
 
       - name: Run tests (pytest + coverage)
-        run: pytest --cov-config=.coveragerc --cov-report xml --cov .
+        run: uv run pytest --cov-config=.coveragerc --cov-report xml --cov .
 
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
