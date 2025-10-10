@@ -27,7 +27,7 @@ jobs:
       - name: Dependency Check
         uses: pypa/gh-action-pip-audit@v1.1.0
         with:
-          virtual-environment: .venv
+          virtual-environment: .venv/
           local: true
 
   lint:
