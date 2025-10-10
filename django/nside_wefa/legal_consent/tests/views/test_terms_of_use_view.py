@@ -99,7 +99,6 @@ Last updated: {{current_date}}
             self.assertTrue(len(content) > 0)
             self.assertNotIn("{{app_name}}", content)
 
-
     def test_get_terms_of_use_with_locale_parameter(self):
         """Test GET request returns content from the specified locale subfolder"""
         with tempfile.TemporaryDirectory() as temp_dir:

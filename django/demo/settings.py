@@ -67,9 +67,7 @@ REST_FRAMEWORK = {
 
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
-CORS_EXPOSE_HEADERS = [
-    "Content-Disposition"
-]
+CORS_EXPOSE_HEADERS = ["Content-Disposition"]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
