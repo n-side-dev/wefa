@@ -25,10 +25,7 @@ jobs:
           install-dev: 'true'
 
       - name: Dependency Check
-        uses: pypa/gh-action-pip-audit@v1.1.0
-        with:
-          virtual-environment: django/.venv/
-          local: true
+        run: uvx pysentry-rs .
 
   lint:
     name: Ruff Lint
