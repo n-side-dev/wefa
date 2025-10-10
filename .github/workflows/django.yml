@@ -11,8 +11,8 @@ defaults:
     working-directory: django
 
 jobs:
-  dependency-check:
-    name: Dependency Check
+  security-analysis:
+    name: Security Check
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -26,6 +26,9 @@ jobs:
 
       - name: Dependency Check
         run: uvx pysentry-rs .
+
+      - name: Bandit
+        run: bandit -c pyproject.toml -r nside_wefa -n 3 -l
 
   lint:
     name: Ruff Lint
