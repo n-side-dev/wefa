@@ -1,6 +1,13 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { mount, VueWrapper } from '@vue/test-utils'
 import { createRouter, createWebHistory, type Router } from 'vue-router'
+
+// Mock i18n composable used inside the component
+vi.mock('@/locales', () => ({
+  useI18nLib: () => ({ t: (key: string) => key }),
+}))
+
+// Import SUT after mocks so they apply
 import RoutedTabsComponent from './RoutedTabsComponent.vue'
 
 // Mock ResizeObserver for test environment

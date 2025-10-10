@@ -1,6 +1,6 @@
 <template>
   <div
-    class="m-4 h-[calc(100%-var(--spacing)*8)] w-[calc(100%-var(--spacing)*8)] rounded-4xl shadow bg-white p-4 flex items-center justify-center"
+    class="m-4 p-4 h-[calc(100%-var(--spacing)*8)] w-[calc(100%-var(--spacing)*8)] rounded shadow bg-(--p-content-background) flex-col"
   >
     <!-- Write your custom content below -->
 

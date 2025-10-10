@@ -1,0 +1,19 @@
+{
+  "title": "Legal Consent Required",
+  "intro": "To continue using our services, you must accept our terms of use and privacy notice.",
+  "terms_of_use": "Terms of Use",
+  "privacy_notice": "Privacy Notice",
+  "checkbox_label": "I have read and accept the Terms of Use and Privacy Notice",
+  "accept": "Accept",
+  "cancel": "Cancel",
+  "toast_accept_summary": "Consent Accepted",
+  "toast_accept_detail": "Thank you for accepting our terms. You can now continue using our services.",
+  "error_summary": "Error",
+  "error_detail": "There was an error processing your consent. Please try again.",
+  "confirm_message": "If you refuse to accept the terms and privacy notice, you will be disconnected from our services. Are you sure you want to cancel?",
+  "confirm_header": "Confirm Cancellation",
+  "reject_label": "No, Go Back",
+  "accept_label": "Yes, Disconnect",
+  "disconnected_summary": "Disconnected",
+  "disconnected_detail": "You have been disconnected due to refusing consent."
+}

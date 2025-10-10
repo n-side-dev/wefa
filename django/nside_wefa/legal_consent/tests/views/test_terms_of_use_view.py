@@ -46,8 +46,10 @@ class TermsOfServiceViewTest(APITestCase):
         """Test GET request uses Legal-specific TEMPLATES setting"""
         # Create a temporary directory structure for custom template
         with tempfile.TemporaryDirectory() as temp_dir:
-            # Create custom Terms of Use template directly in temp_dir
-            custom_template = Path(temp_dir) / "terms_of_use.md"
+            # Create custom Terms of Use template in 'en' locale subfolder
+            en_dir = Path(temp_dir) / "en"
+            en_dir.mkdir(parents=True, exist_ok=True)
+            custom_template = en_dir / "terms_of_use.md"
             custom_content = """# Custom Terms of Use for {{app_name}}
 
 This is a custom Terms of Use document for {{app_name}}.
@@ -96,3 +98,28 @@ Last updated: {{current_date}}
             # Check that content is rendered and templating was applied
             self.assertTrue(len(content) > 0)
             self.assertNotIn("{{app_name}}", content)
+
+
+    def test_get_terms_of_use_with_locale_parameter(self):
+        """Test GET request returns content from the specified locale subfolder"""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            fr_dir = Path(temp_dir) / "fr"
+            fr_dir.mkdir(parents=True, exist_ok=True)
+            custom_template = fr_dir / "terms_of_use.md"
+            custom_content = """# Conditions d'utilisation FR pour {{app_name}}
+
+Bienvenue FR.
+"""
+            custom_template.write_text(custom_content)
+
+            with override_settings(
+                NSIDE_WEFA={
+                    "APP_NAME": "CustomApp",
+                    "LEGAL_CONSENT": {"VERSION": 1, "TEMPLATES": str(temp_dir)},
+                }
+            ):
+                response = self.client.get(self.url, {"locale": "fr"})
+                self.assertEqual(response.status_code, status.HTTP_200_OK)
+                body = response.content.decode("utf-8")
+                self.assertIn("Bienvenue FR.", body)
+                self.assertNotIn("{{app_name}}", body)

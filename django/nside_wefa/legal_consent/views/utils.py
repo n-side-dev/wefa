@@ -2,10 +2,14 @@ from django.conf import settings
 from pathlib import Path
 
 
-def get_document_content(filename: str) -> str:
-    """Load and process the document content with templating."""
-    # Simplified logic: either a specific location or the default one
+def get_document_content(filename: str, locale: str = "en") -> str:
+    """Load and process the document content with templating and locale support.
 
+    The function looks for the markdown file under a locale subfolder, e.g.:
+    - <custom_templates>/<locale>/<filename>
+    - <app_templates>/<locale>/<filename>
+    Default locale is 'en'.
+    """
     # Check for LegalConsent-specific TEMPLATES setting
     legal_consent_settings = getattr(settings, "NSIDE_WEFA", {}).get(
         "LEGAL_CONSENT", {}
@@ -14,10 +18,10 @@ def get_document_content(filename: str) -> str:
 
     if legal_templates:
         # Use specific template directory
-        template_path = Path(legal_templates) / filename
+        template_path = Path(legal_templates) / locale / filename
     else:
         # Use default template from the LegalConsent app
-        template_path = Path(__file__).parent.parent / "templates" / filename
+        template_path = Path(__file__).parent.parent / "templates" / locale / filename
 
     # Read the template content
     try:

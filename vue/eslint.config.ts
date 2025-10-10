@@ -23,7 +23,7 @@ export default defineConfigWithVueTs(
     files: ['**/*.{ts,mts,tsx,vue}'],
   },
 
-  globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**']),
+  globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**', '**/openapi/**']),
 
   pluginVue.configs['flat/recommended'],
   vueTsConfigs.recommended,
@@ -54,7 +54,7 @@ export default defineConfigWithVueTs(
       "vue/block-order": ["error", {
         "order": [ "template", "script", "style" ] // Enforce this precise order in component definition!
       }],
-      "vitest/prefer-called-exactly-once-with": "off" // Not always possible to test this
+      "vitest/prefer-called-exactly-once-with": "off" // Exactly once is not always possible
     }
   }
 )

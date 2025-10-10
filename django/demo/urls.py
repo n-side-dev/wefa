@@ -20,6 +20,6 @@ from django.urls import path, include
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("legal_consent/", include("nside_wefa.legal_consent.urls")),
+    path("legal-consent/", include("nside_wefa.legal_consent.urls")),
     path("authentication/", include("nside_wefa.authentication.urls")),
 ]

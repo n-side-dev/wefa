@@ -10,12 +10,14 @@ import dts from 'vite-plugin-dts'
 export default defineConfig({
   plugins: [
     vue({script: {defineModel: true}}),
+    // vueDevTools(),
     tailwindcss(),
     dts({
       include: ['src'],
       tsconfigPath: './tsconfig.app.json',
       rollupTypes: true
-    })
+    }),
+    ...(process.env.NODE_ENV === 'development' ? [vueDevTools()] : [])
   ],
   resolve: {
     alias: {
@@ -29,7 +31,8 @@ export default defineConfig({
       entry: {
         lib: resolve(__dirname, "src/lib.ts"),
         router: resolve(__dirname, "src/router/index.ts"),
-        containers: resolve(__dirname, "src/containers/index.ts")
+        containers: resolve(__dirname, "src/containers/index.ts"),
+        network: resolve(__dirname, "src/network/index.ts")
       },
       name: "wefa",
       // the name of the output files when the build is run

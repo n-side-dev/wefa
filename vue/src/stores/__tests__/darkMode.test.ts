@@ -42,27 +42,27 @@ describe('useDarkModeStore', () => {
     const store = useDarkModeStore()
     store.setDarkMode()
     expect(store.mode).toBe('dark')
-    expect(classListAdd).toHaveBeenCalledWith('app-dark-mode')
+    expect(classListAdd).toHaveBeenCalledExactlyOnceWith('app-dark-mode')
   })
 
   it('should set light mode and remove class', () => {
     const store = useDarkModeStore()
     store.setLightMode()
     expect(store.mode).toBe('light')
-    expect(classListRemove).toHaveBeenCalledWith('app-dark-mode')
+    expect(classListRemove).toHaveBeenCalledExactlyOnceWith('app-dark-mode')
   })
 
   it('should set system mode and apply correct class based on matchMedia', () => {
     const store = useDarkModeStore()
     store.setSystemMode()
     expect(store.mode).toBe('system')
-    expect(classListAdd).toHaveBeenCalledWith('app-dark-mode')
+    expect(classListAdd).toHaveBeenCalledExactlyOnceWith('app-dark-mode')
   })
 
   it('should update the dark mode selector', () => {
     const store = useDarkModeStore()
     store.setDarkModeSelector('custom-dark')
     store.setDarkMode()
-    expect(classListAdd).toHaveBeenCalledWith('custom-dark')
+    expect(classListAdd).toHaveBeenCalledExactlyOnceWith('custom-dark')
   })
 })

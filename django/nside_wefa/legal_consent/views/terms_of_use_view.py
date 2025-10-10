@@ -37,9 +37,12 @@ class TermsOfUseView(APIView):
         """
         Get the Terms of Use document with app name templating applied.
 
+        Accepts an optional 'locale' query parameter to select the localized
+        document from a locale subfolder (defaults to 'en').
         The view first looks for a custom terms_of_use.md file in the project's
-        templates/legal_consent/ directory. If not found, it uses the default template
+        templates/legal_consent/<locale>/ directory. If not found, it uses the default template
         from the LegalConsent app.
         """
-        content = get_document_content("terms_of_use.md")
+        locale = request.query_params.get("locale", "en")
+        content = get_document_content("terms_of_use.md", locale=locale)
         return HttpResponse(content, content_type="text/plain; charset=utf-8")

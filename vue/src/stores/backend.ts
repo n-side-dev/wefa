@@ -1,8 +1,8 @@
 import { defineStore, type Pinia, type StoreDefinition } from 'pinia'
 import { type Ref, ref, watch, type WatchHandle } from 'vue'
-import type { AxiosResponse, AxiosError, InternalAxiosRequestConfig } from 'axios'
+import type { AxiosResponse, AxiosError, InternalAxiosRequestConfig, AxiosInstance } from 'axios'
 import type { Router } from 'vue-router'
-import { ApiClient } from '../network'
+import axiosInstance from '@/network/axios'
 
 /**
  * Represents the types of authentication mechanisms that can be used.
@@ -29,7 +29,7 @@ export interface Credentials {
 
 export interface BackendStore {
   authenticated: Ref<boolean>
-  apiClient: ApiClient
+  axiosInstance: AxiosInstance
   login: (credentials: Credentials) => Promise<AxiosResponse>
   logout: () => void
   setPostLogin: (fn: () => void) => void
@@ -39,7 +39,6 @@ export interface BackendStore {
 }
 
 export interface BackendStoreOptions {
-  backendBaseUrl: string
   authenticationType: AuthenticationType
 }
 
@@ -77,9 +76,9 @@ export const defineBackendStore = (backendStoreOptions: BackendStoreOptions): St
 function getBackendStoreSetup(backendStoreOptions: BackendStoreOptions): BackendStore {
   switch (backendStoreOptions.authenticationType) {
     case 'TOKEN':
-      return tokenAuthenticationBackendStoreSetup(backendStoreOptions)
+      return tokenAuthenticationBackendStoreSetup()
     case 'JWT':
-      return jwtAuthenticationBackendStoreSetup(backendStoreOptions)
+      return jwtAuthenticationBackendStoreSetup()
     default:
       throw new Error(`Unknown authentication type: ${backendStoreOptions.authenticationType}`)
   }
@@ -168,13 +167,12 @@ function createCommonAuthFunctions(
  * Configures and sets up a token-based authentication backend store for managing API authentication.
  *
  * The method initializes authentication states, such as tokens, login/logout handlers, and
- * an instance of the API client with authentication interceptors for requests and responses.
+ * authentication interceptors on the axiosInstance for requests and responses.
  * It also provides helper functions for handling authentication processes, like login, logout,
  * and post-login/logout callbacks. Additionally, it enables the setting of route guards to
  * respond to authentication status changes in a Vue.js application.
- * @param backendStoreOptions - Configuration options for the backend store
  * @returns An object containing authentication state, API client instance, and helper functions:
- * - `apiClient`: Pre-configured API client with authentication support
+ * - `axiosInstance`: Pre-configured axios instance with authentication support
  * - `authenticated`: Reactive flag representing the authentication status
  * - `login`: Function to authenticate users using credentials
  * - `logout`: Function to deauthenticate users and clear authentication tokens
@@ -182,9 +180,7 @@ function createCommonAuthFunctions(
  * - `setPostLogout`: Method to set a callback function invoked after logout
  * - `setupAuthRouteGuard`: Function to set up route guard for managing authentication-driven route reevaluations
  */
-function tokenAuthenticationBackendStoreSetup(
-  backendStoreOptions: BackendStoreOptions
-): BackendStore {
+function tokenAuthenticationBackendStoreSetup(): BackendStore {
   /**
    * A reactive variable that indicates whether a user is authenticated or not.
    *
@@ -210,14 +206,10 @@ function tokenAuthenticationBackendStoreSetup(
     localStorage.setItem(localStorageKey, _token.value ?? '')
   })
 
-  const apiClient: ApiClient = new ApiClient(backendStoreOptions.backendBaseUrl, {
-    withCredentials: true,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
+  axiosInstance.defaults.withCredentials = true
+  axiosInstance.defaults.headers.common['Content-Type'] = 'application/json'
 
-  apiClient.axiosInstance.interceptors.request.use(
+  axiosInstance.interceptors.request.use(
     async (config) => {
       if (authenticated.value && _token.value) {
         config.headers['Authorization'] = `Token ${_token.value}`
@@ -227,7 +219,7 @@ function tokenAuthenticationBackendStoreSetup(
     (error) => Promise.reject(error)
   )
 
-  apiClient.axiosInstance.interceptors.response.use(
+  axiosInstance.interceptors.response.use(
     (response) => response,
     async (error) => {
       if (error.response.status === 403) {
@@ -248,7 +240,7 @@ function tokenAuthenticationBackendStoreSetup(
    * @returns A promise that resolves to the Axios response object returned from the authentication request.
    */
   async function login(credentials: Credentials): Promise<AxiosResponse> {
-    const response = await apiClient.axiosInstance.post('/api/token-auth/', credentials)
+    const response = await axiosInstance.post('/api/token-auth/', credentials)
     if (response.status === 200) {
       authenticated.value = true
       _token.value = response.data.token
@@ -272,7 +264,7 @@ function tokenAuthenticationBackendStoreSetup(
   }
 
   return {
-    apiClient,
+    axiosInstance,
     authenticated,
     login,
     logout,
@@ -287,15 +279,14 @@ function tokenAuthenticationBackendStoreSetup(
  * Configures and sets up a JWT-based authentication backend store for managing API authentication.
  *
  * The method initializes authentication states, such as access and refresh tokens, login/logout handlers, and
- * an instance of the API client with authentication interceptors for requests and responses.
+ * authentication interceptors on the axios instance for requests and responses.
  * It also provides helper functions for handling authentication processes, like login, logout,
  * and post-login/logout callbacks. Additionally, it enables the setting of route guards to
  * respond to authentication status changes in a Vue.js application.
  *
  * This implementation is designed to work with a Django backend using the "Simple JWT" library.
- * @param backendStoreOptions - Configuration options for the backend store
  * @returns An object containing authentication state, API client instance, and helper functions:
- * - `apiClient`: Pre-configured API client with authentication support
+ * - `axiosInstance`: Pre-configured axios instance with authentication support
  * - `authenticated`: Reactive flag representing the authentication status
  * - `login`: Function to authenticate users using credentials
  * - `logout`: Function to deauthenticate users and clear authentication tokens
@@ -303,9 +294,7 @@ function tokenAuthenticationBackendStoreSetup(
  * - `setPostLogout`: Method to set a callback function invoked after logout
  * - `setupAuthRouteGuard`: Function to set up route guard for managing authentication-driven route reevaluations
  */
-function jwtAuthenticationBackendStoreSetup(
-  backendStoreOptions: BackendStoreOptions
-): BackendStore {
+function jwtAuthenticationBackendStoreSetup(): BackendStore {
   /**
    * A reactive variable that indicates whether a user is authenticated or not.
    *
@@ -339,14 +328,10 @@ function jwtAuthenticationBackendStoreSetup(
     localStorage.setItem(jwtRefreshTokenKey, _refreshToken.value ?? '')
   })
 
-  const apiClient: ApiClient = new ApiClient(backendStoreOptions.backendBaseUrl, {
-    withCredentials: true,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
+  axiosInstance.defaults.withCredentials = true
+  axiosInstance.defaults.headers.common['Content-Type'] = 'application/json'
 
-  apiClient.axiosInstance.interceptors.request.use(
+  axiosInstance.interceptors.request.use(
     async (config) => {
       if (authenticated.value && _accessToken.value) {
         config.headers['Authorization'] = `Bearer ${_accessToken.value}`
@@ -379,7 +364,7 @@ function jwtAuthenticationBackendStoreSetup(
   async function handleTokenRefresh(
     originalRequest: InternalAxiosRequestConfig
   ): Promise<AxiosResponse> {
-    const response = await apiClient.axiosInstance.post(refreshUrl, {
+    const response = await axiosInstance.post(refreshUrl, {
       refresh: _refreshToken.value,
     })
 
@@ -392,12 +377,12 @@ function jwtAuthenticationBackendStoreSetup(
 
       // Retry the original request with the new token
       originalRequest.headers['Authorization'] = `Bearer ${_accessToken.value}`
-      return apiClient.axiosInstance(originalRequest)
+      return axiosInstance(originalRequest)
     }
     throw new Error('Token refresh failed')
   }
 
-  apiClient.axiosInstance.interceptors.response.use(
+  axiosInstance.interceptors.response.use(
     (response) => response,
     async (error) => {
       if (!isTokenError(error)) {
@@ -429,7 +414,7 @@ function jwtAuthenticationBackendStoreSetup(
    * @returns A promise that resolves to the Axios response object returned from the authentication request.
    */
   async function login(credentials: Credentials): Promise<AxiosResponse> {
-    const response = await apiClient.axiosInstance.post('/api/token/', credentials)
+    const response = await axiosInstance.post('/api/token/', credentials)
     if (response.status === 200) {
       authenticated.value = true
       _accessToken.value = response.data.access
@@ -456,7 +441,7 @@ function jwtAuthenticationBackendStoreSetup(
   }
 
   return {
-    apiClient,
+    axiosInstance,
     authenticated,
     login,
     logout,

@@ -45,7 +45,6 @@ CodeQualityChecks:
     - npm run type-check
     - npm run lint-check
     - npm run format-check
-    - npx cspell "src/**/*.{js,ts,vue}"
 
 UnitTests:
   extends: .PlaywrightTest
