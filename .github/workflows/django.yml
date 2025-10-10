@@ -11,6 +11,23 @@ defaults:
     working-directory: django
 
 jobs:
+  dependency-check:
+    name: Dependency Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python and install deps
+        uses: ./.github/actions/setup-python
+        with:
+          python-version: '3.12'
+          install-dev: 'true'
+      - name: Dependency Check
+        uses: pypa/gh-action-pip-audit@v1.1.0
+        with:
+          inputs: django
+
   lint:
     name: Ruff Lint
     runs-on: ubuntu-latest
