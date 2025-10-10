@@ -1,15 +1,9 @@
 name: Build and Publish Docs (Vue + Django)
 
 on:
-  pull_request:
   push:
-    branches: [ main, develop ]
-
-# Restore before workflow validated and merge done
-#on:
-#  push:
-#    branches: [ main, develop ]
-#  workflow_dispatch:
+    branches: [ main ]
+  workflow_dispatch:
 
 # Permissions required for GitHub Pages
 permissions:
