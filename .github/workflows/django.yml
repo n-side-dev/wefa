@@ -28,7 +28,7 @@ jobs:
         run: uvx pysentry-rs .
 
       - name: Bandit
-        run: bandit -c pyproject.toml -r nside_wefa -n 3 -l
+        run: uv run bandit -c pyproject.toml -r nside_wefa -n 3 -l
 
   lint:
     name: Ruff Lint
