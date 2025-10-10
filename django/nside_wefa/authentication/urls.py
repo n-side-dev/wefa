@@ -1,3 +1,13 @@
+"""
+URL configuration for the nside_wefa.authentication app.
+
+This module exposes authentication endpoints depending on the configured
+authentication types in ``NSIDE_WEFA.AUTHENTICATION.TYPES``. When enabled:
+
+- ``TOKEN``: exposes ``/token-auth/`` using Django REST framework token auth.
+- ``JWT``: exposes ``/token/`` and ``/token/refresh/`` using SimpleJWT.
+"""
+
 from django.urls import path
 from rest_framework.authtoken.views import obtain_auth_token
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView

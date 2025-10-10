@@ -1,3 +1,11 @@
+"""
+Models for the nside_wefa.legal_consent app.
+
+This module defines the LegalConsent model used to track a user's acceptance
+of legal documents (e.g., privacy notice and terms of use) and provides
+helpers to manage validity and automatic creation on user signup.
+"""
+
 import datetime
 from typing import Any, Mapping, cast
 

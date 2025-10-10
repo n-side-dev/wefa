@@ -64,10 +64,10 @@ jobs:
             echo "<html><body><h1>Vue docs</h1><p>No Storybook build found.</p></body></html>" > gh-pages/vue/index.html
           fi
 
-          # Install Python deps and pdoc (via uv), generate Django docs from nside_wefa
+          # Install Python deps and Sphinx (via uv), generate Django docs from nside_wefa
           cd django
-          uv pip install --python "$VIRTUAL_ENV" pdoc
-          uv run pdoc -o ../gh-pages/django nside_wefa
+          uv pip install --python "$VIRTUAL_ENV" sphinx
+          uv run sphinx-build -b html docs/source ../gh-pages/django
           cd ..
 
           # Use tracked landing page for the portal

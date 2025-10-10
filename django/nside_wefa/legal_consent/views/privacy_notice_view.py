@@ -1,3 +1,10 @@
+"""
+Views for serving privacy-related legal documents.
+
+This module exposes an API view that returns the Privacy Notice markdown
+content with basic templating applied.
+"""
+
 from django.http import HttpResponse
 from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView

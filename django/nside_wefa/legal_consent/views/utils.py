@@ -1,9 +1,29 @@
+"""
+Utilities for serving Legal Consent markdown documents.
+
+This module provides helpers to load the Privacy Notice and Terms of Use
+markdown templates, apply simple templating (e.g., application name), and
+return them as plain text.
+"""
+
 from django.conf import settings
 from pathlib import Path
 
 
 def get_document_content(filename: str) -> str:
-    """Load and process the document content with templating."""
+    """Load a legal document template and apply simple templating.
+
+    The function attempts to read the specified markdown file either from a
+    custom directory defined in ``NSIDE_WEFA.LEGAL_CONSENT.TEMPLATES`` or from
+    the app's default templates directory. It replaces the ``{{app_name}}`` token
+    with the value of ``NSIDE_WEFA.APP_NAME`` (defaults to ``"Application"``).
+
+    :param filename: Template file name (e.g., ``"privacy_notice.md"``).
+    :type filename: str
+    :return: The processed template content as text. If the file is not found,
+        an error message indicating the missing path is returned.
+    :rtype: str
+    """
     # Simplified logic: either a specific location or the default one
 
     # Check for LegalConsent-specific TEMPLATES setting
