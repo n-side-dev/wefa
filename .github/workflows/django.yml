@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Python and install deps
         uses: ./.github/actions/setup-python
@@ -38,7 +38,7 @@ jobs:
       DJANGO_SETTINGS_MODULE: demo.settings
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Python and install deps
         uses: ./.github/actions/setup-python
@@ -57,7 +57,7 @@ jobs:
       DJANGO_SETTINGS_MODULE: demo.settings
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Python and install deps
         uses: ./.github/actions/setup-python
@@ -86,7 +86,7 @@ jobs:
       DJANGO_SETTINGS_MODULE: demo.settings
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Python and install deps
         uses: ./.github/actions/setup-python
