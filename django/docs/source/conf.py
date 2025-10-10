@@ -5,6 +5,7 @@ This file sets up Python and Django paths so that autodoc can import the
 project modules and generate API documentation. It is used by the docs build
 locally and in CI.
 """
+
 from __future__ import annotations
 
 import os
