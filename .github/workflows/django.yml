@@ -23,10 +23,12 @@ jobs:
         with:
           python-version: '3.12'
           install-dev: 'true'
+
       - name: Dependency Check
         uses: pypa/gh-action-pip-audit@v1.1.0
         with:
-          inputs: django
+          virtual-environment: .venv
+          local: true
 
   lint:
     name: Ruff Lint
