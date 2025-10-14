@@ -7,11 +7,20 @@ helpers to manage validity and automatic creation on user signup.
 """
 
 import datetime
-from typing import Any
+from typing import Any, TypedDict, cast
 
+from django.conf import settings
 from django.db import models
 from django.db.models import signals
-from django.conf import settings
+
+
+class _LegalConsentSettingsDict(TypedDict):
+    VERSION: int
+    EXPIRY_LIMIT: int
+
+
+class _NsideWefaSettings(TypedDict):
+    LEGAL_CONSENT: _LegalConsentSettingsDict
 
 
 class _LegalConsentConfiguration:
@@ -28,9 +37,10 @@ class _LegalConsentConfiguration:
 
         Note: Configuration validation is handled by Django system checks.
         """
-        configuration = settings.NSIDE_WEFA["LEGAL_CONSENT"]
-        self.version: int = configuration["VERSION"]
-        self.expiry_limit: int = configuration["EXPIRY_LIMIT"]
+        nside_wefa_settings = cast(_NsideWefaSettings, settings.NSIDE_WEFA)
+        configuration = nside_wefa_settings["LEGAL_CONSENT"]
+        self.version = configuration["VERSION"]
+        self.expiry_limit = configuration["EXPIRY_LIMIT"]
 
 
 class LegalConsent(models.Model):
@@ -104,7 +114,7 @@ class LegalConsent(models.Model):
 
 
 def create_legal_consent(
-    sender: type, instance: settings.AUTH_USER_MODEL, created: bool, **kwargs: Any
+    sender: type[models.Model], instance: Any, created: bool, **kwargs: Any
 ) -> None:
     """
     Signal handler that creates a LegalConsent when a new User is created.
