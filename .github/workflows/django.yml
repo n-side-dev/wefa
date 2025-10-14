@@ -11,6 +11,25 @@ defaults:
     working-directory: django
 
 jobs:
+  security-analysis:
+    name: Security Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Python and install deps
+        uses: ./.github/actions/setup-python
+        with:
+          python-version: '3.12'
+          install-dev: 'true'
+
+      - name: Dependency Check
+        run: uvx pysentry-rs .
+
+      - name: Bandit
+        run: uv run bandit -c pyproject.toml -r nside_wefa -n 3 -l
+
   lint:
     name: Ruff Lint
     runs-on: ubuntu-latest

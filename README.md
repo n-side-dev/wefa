@@ -1,5 +1,7 @@
 # N-SIDE WeFa (Web Factory)
 
+[![security: bandit](https://img.shields.io/badge/security-bandit-yellow.svg)](https://github.com/PyCQA/bandit)
+
 N-SIDE WeFa (Web Factory) is an open-source toolkit for building full-stack, product-ready web experiences. It brings together:
 
 - **WeFa Django Toolkit** – reusable Django apps for authentication, consent management, and shared utilities (`django/`)

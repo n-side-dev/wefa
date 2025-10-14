@@ -3,3 +3,5 @@
 .vscode
 *.code-workspace
 *.iml
+django/docs/source/api/*
+django/docs/output/**/*

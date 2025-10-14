@@ -1,3 +1,16 @@
+"""
+Utility functions to implement Django system checks for nside_wefa.
+
+This module provides helpers used by the nside_wefa Django apps to validate
+project configuration and application ordering:
+
+- check_nside_wefa_settings: validates NSIDE_WEFA.<SECTION> configuration.
+- check_apps_dependencies_order: verifies INSTALLED_APPS ordering for dependent apps.
+
+See also
+- Django system check framework: https://docs.djangoproject.com/en/stable/topics/checks/
+"""
+
 from typing import Any, Dict, List, Callable, Optional
 from django.conf import settings
 from django.core.checks import Error
@@ -8,16 +21,24 @@ def check_nside_wefa_settings(
     required_keys: List[str],
     custom_validators: Optional[Dict[str, Callable[[Any], List[Error]]]] = None,
 ) -> List[Error]:
-    """
-    Generic function to check NSIDE_WEFA settings configuration.
+    """Validate a subsection of the ``NSIDE_WEFA`` settings.
 
-    Args:
-        section_name: The section name under NSIDE_WEFA (e.g., "AUTHENTICATION", "GDPR")
-        required_keys: List of required keys that must be present in the section
-        custom_validators: Optional dict mapping keys to custom validation functions
+    This function checks that the top-level ``NSIDE_WEFA`` dictionary contains
+    a subsection named ``section_name`` and that all ``required_keys`` are
+    present in that subsection. If ``custom_validators`` are provided, each
+    callable will be invoked for its corresponding key to perform additional
+    validation.
 
-    Returns:
-        List of Error objects for any configuration issues
+    :param section_name: The subsection name under ``NSIDE_WEFA`` (e.g.,
+        ``"AUTHENTICATION"``).
+    :type section_name: str
+    :param required_keys: Keys that must be present in the subsection.
+    :type required_keys: list[str]
+    :param custom_validators: Mapping of setting key to a callable that receives
+        the value for that key and returns a list of errors for that key.
+    :type custom_validators: dict[str, Callable[[Any], list[django.core.checks.Error]]] | None
+    :return: A list of configuration errors. Empty if everything is correctly configured.
+    :rtype: list[django.core.checks.Error]
     """
     errors: List[Error] = []
 
@@ -56,15 +77,16 @@ def check_nside_wefa_settings(
 
 
 def check_apps_dependencies_order(dependencies: list[str]) -> list[Error]:
-    """
-    Check that apps in the dependencies list are ordered correctly in INSTALLED_APPS.
+    """Verify the ordering of dependent apps in ``INSTALLED_APPS``.
 
-    Args:
-        dependencies: An ordered list of app names that should appear in this order
-                     in INSTALLED_APPS. Each app must come before the next one in the list.
+    Given an ordered list of app labels, this ensures that each app appears
+    before the next one in Django's ``INSTALLED_APPS`` and that required apps
+    are present.
 
-    Returns:
-        List of Error objects for any ordering violations or missing required apps.
+    :param dependencies: Ordered app labels to enforce.
+    :type dependencies: list[str]
+    :return: Errors for ordering violations or missing apps. Empty if valid.
+    :rtype: list[django.core.checks.Error]
     """
     errors: list[Error] = []
     installed_apps = getattr(settings, "INSTALLED_APPS", [])

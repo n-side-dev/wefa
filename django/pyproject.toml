@@ -43,6 +43,9 @@ Issues = "https://github.com/n-side-dev/wefa/issues"
 [tool.hatch.build.targets.wheel]
 packages = ["nside_wefa"]
 
+[tool.bandit]
+exclude_dirs = ["tests"]
+
 [dependency-groups]
 dev = [
     "pytest>=8.3.5",
@@ -50,8 +53,9 @@ dev = [
     "pytest-django>=4.11.1",
     "pytest-profiling>=1.8.1",
     "mypy>=1.18.2",
-    "mypy>=1.18.1",
     "django-stubs[compatible-mypy]>=5.2.0",
     "freezegun>=1.5.5",
     "ruff>=0.13.1",
+    "sphinx>=8.2.3",
+    "bandit>=1.8.6",
 ]
