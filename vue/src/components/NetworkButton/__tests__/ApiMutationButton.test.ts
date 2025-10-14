@@ -1,11 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
-import { ref, nextTick } from 'vue'
+import { ref, nextTick, defineComponent, h } from 'vue'
 
 // Stub PrimeVue Button so we can inspect props and trigger clicks
 vi.mock('primevue/button', () => {
-  const { defineComponent, h } = require('vue')
   const ButtonStub = defineComponent({
     name: 'PrimeVueButtonStub',
     props: {
@@ -47,6 +46,16 @@ describe('ApiMutationButton.vue', () => {
     mutateSpy = vi.fn()
   })
 
+  /**
+   *
+   * @param state
+   * @param state.isPending
+   * @param state.data
+   * @param state.error
+   * @param state.body
+   * @param state.relaunchableOnSuccess
+   * @param state.relaunchableOnError
+   */
   function mountWithState(
     state: {
       isPending?: boolean
