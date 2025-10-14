@@ -93,7 +93,7 @@ const dummyRoutes = [
       },
     ]
   },
-  
+
   // Add a catch-all route to handle any unmatched paths
   {
     path: '/:pathMatch(.*)*',
@@ -151,6 +151,7 @@ const preview: Preview = {
     options: {
       storySort: {
         order: [
+          'Overview',
           'Router containers', [
             'Overview',
             'BareContainer',
@@ -158,6 +159,7 @@ const preview: Preview = {
             'SideMenuContainer',
             'Making your own Container'
           ],
+          '...'
         ],
       },
     },
