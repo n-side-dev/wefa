@@ -125,11 +125,19 @@ Layers of functionality, starting from the top, way to be used by end-user
 1. URL-based or OpenAPI-based wrapper around TanStack
 
 ```ts
-const { /* ... */ } = apiClient.query(ref('/api/my/url'))
-const { /* ... */ } = apiClient.mutation(ref('/api/my/url'), myBody)
+const {
+  /* ... */
+} = apiClient.query(ref('/api/my/url'))
+const {
+  /* ... */
+} = apiClient.mutation(ref('/api/my/url'), myBody)
 
-const { /* ... */ } = typedApiClient.query(getHello, options)
-const { /* ... */ } = typedApiClient.mutation(postHello, options)
+const {
+  /* ... */
+} = typedApiClient.query(getHello, options)
+const {
+  /* ... */
+} = typedApiClient.mutation(postHello, options)
 ```
 
 2. Using TanStack directly
@@ -138,7 +146,9 @@ const { /* ... */ } = typedApiClient.mutation(postHello, options)
 import { axiosInstance } from '@nside/wefa/network'
 // import { useQuery, useMutation } from '@tanstack/vue-query'
 
-const { /* ... */ } = useQuery({
+const {
+  /* ... */
+} = useQuery({
   queryKey: ['myQueryKey'],
   queryFn: async () => {
     return (await axiosInstance.get('/api/my/url')).data
@@ -146,7 +156,9 @@ const { /* ... */ } = useQuery({
   // ...queryOptions
 })
 
-const { /* ... */ } = useMutation({
+const {
+  /* ... */
+} = useMutation({
   mutationFn: async () => {
     return (await postHello(options)).data
   },
