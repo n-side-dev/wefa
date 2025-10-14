@@ -1,6 +1,7 @@
 name: Build and Publish Docs (Vue + Django)
 
 on:
+  pull_request:
   push:
     branches: [ main ]
   workflow_dispatch:
@@ -65,7 +66,7 @@ jobs:
           cd ..
 
           # Build Tailwind CSS for the landing page
-          npx --yes -p tailwindcss tailwindcss -i .github/page/input.css -o gh-pages/assets/tailwind.css --minify --content .github/page/index.html
+          npx --yes @tailwindcss/cli@latest -i .github/page/input.css -o gh-pages/assets/tailwind.css --minify --content .github/page/index.html
 
           # Use tracked landing page for the portal
           cp .github/page/index.html gh-pages/index.html
