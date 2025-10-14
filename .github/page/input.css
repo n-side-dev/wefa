@@ -1,4 +1,2 @@
 /* Tailwind CSS entry for the docs landing page */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
