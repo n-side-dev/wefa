@@ -50,7 +50,7 @@ jobs:
           DJANGO_SETTINGS_MODULE: demo.settings
         run: |
           set -e
-          mkdir -p gh-pages/vue gh-pages/django
+          mkdir -p gh-pages/vue gh-pages/django gh-pages/assets
           # Copy Vue Storybook (if present) under /vue
           if [ -d "vue/storybook-static" ]; then
             cp -r vue/storybook-static/* gh-pages/vue/
@@ -64,8 +64,10 @@ jobs:
           uv run sphinx-build -b html docs/source ../gh-pages/django
           cd ..
 
+          # Build Tailwind CSS for the landing page
+          npx --yes tailwindcss -i .github/page/input.css -o gh-pages/assets/tailwind.css --minify --content .github/page/index.html
+
           # Use tracked landing page for the portal
-          mkdir -p gh-pages
           cp .github/page/index.html gh-pages/index.html
 
           # Disable Jekyll on GitHub Pages artifact
