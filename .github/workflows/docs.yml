@@ -65,6 +65,7 @@ jobs:
           cd ..
 
           # Build Tailwind CSS for the landing page
+          npm install tailwindcss @tailwindcss/cli
           npx --yes @tailwindcss/cli@latest -i .github/page/input.css -o gh-pages/assets/tailwind.css --minify --content .github/page/index.html
 
           # Use tracked landing page for the portal
