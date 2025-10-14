@@ -2,7 +2,6 @@ import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import { resolve } from "path"
 import vue from '@vitejs/plugin-vue'
-import vueDevTools from 'vite-plugin-vue-devtools'
 import tailwindcss from '@tailwindcss/vite'
 import dts from 'vite-plugin-dts'
 
@@ -17,7 +16,6 @@ export default defineConfig({
       tsconfigPath: './tsconfig.app.json',
       rollupTypes: true
     }),
-    ...(process.env.NODE_ENV === 'development' ? [vueDevTools()] : [])
   ],
   resolve: {
     alias: {
