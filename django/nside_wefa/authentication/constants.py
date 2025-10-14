@@ -9,7 +9,7 @@ supported authentication mechanisms.
 :data AUTHENTICATION_TYPES: Ordered list of all supported authentication types.
 """
 
-AUTH_TYPE_TOKEN = "TOKEN"
+AUTH_TYPE_TOKEN = "TOKEN"  # nosec
 AUTH_TYPE_JWT = "JWT"
 
 AUTHENTICATION_TYPES = [AUTH_TYPE_TOKEN, AUTH_TYPE_JWT]
