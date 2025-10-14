@@ -1,13 +1,13 @@
-name: Setup Node with npm cache
-description: Setup Node.js with npm cache and consistent cache-dependency-path
+name: Setup Node.js with cache
+description: Setup Node.js and enable npm cache for faster installs
 
 inputs:
   node-version:
     description: Node.js version to use
     required: false
-    default: '20'
+    default: '22'
   cache-dependency-path:
-    description: Path to the package-lock.json used for npm cache key
+    description: Path(s) used to compute cache key (e.g. vue/package-lock.json)
     required: false
     default: 'vue/package-lock.json'
 
@@ -20,3 +20,9 @@ runs:
         node-version: ${{ inputs.node-version }}
         cache: npm
         cache-dependency-path: ${{ inputs.cache-dependency-path }}
+
+    - name: Show Node/npm versions
+      shell: bash
+      run: |
+        node -v
+        npm -v

@@ -52,4 +52,5 @@ dev = [
     "django-stubs[compatible-mypy]>=5.2.0",
     "freezegun>=1.5.5",
     "ruff>=0.13.1",
+    "sphinx>=8.2.3",
 ]

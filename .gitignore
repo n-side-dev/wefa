@@ -2,3 +2,5 @@
 .idea
 .vscode
 *.code-workspace
+django/docs/source/api/*
+django/docs/output/**/*

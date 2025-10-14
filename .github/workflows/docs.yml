@@ -1,0 +1,89 @@
+name: Build and Publish Docs (Vue + Django)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+# Permissions required for GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Ensure only one pages deployment runs at a time
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build docs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Setup Node.js
+        uses: ./.github/actions/setup-node
+        with:
+          node-version: '22'
+          cache-dependency-path: 'vue/package-lock.json'
+
+      - name: Install and build Vue Storybook
+        working-directory: vue
+        run: |
+          npm ci
+          npm run build-storybook
+
+      - name: Setup Python and install deps
+        uses: ./.github/actions/setup-python
+        with:
+          python-version: '3.12'
+          install-dev: 'false'
+
+      - name: Prepare Pages content
+        env:
+          DJANGO_SETTINGS_MODULE: demo.settings
+        run: |
+          set -e
+          mkdir -p gh-pages/vue gh-pages/django
+          # Copy Vue Storybook (if present) under /vue
+          if [ -d "vue/storybook-static" ]; then
+            cp -r vue/storybook-static/* gh-pages/vue/
+          else
+            echo "<html><body><h1>Vue docs</h1><p>No Storybook build found.</p></body></html>" > gh-pages/vue/index.html
+          fi
+
+          # Install Python deps and Sphinx (via uv), generate Django docs from nside_wefa
+          cd django
+          uv pip install --python "$VIRTUAL_ENV" sphinx
+          uv run sphinx-build -b html docs/source ../gh-pages/django
+          cd ..
+
+          # Use tracked landing page for the portal
+          mkdir -p gh-pages
+          cp .github/page/index.html gh-pages/index.html
+
+          # Disable Jekyll on GitHub Pages artifact
+          touch gh-pages/.nojekyll
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: gh-pages
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4

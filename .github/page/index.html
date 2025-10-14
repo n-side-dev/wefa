@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>N-SIDE WEFA Documentation Portal</title>
+  <meta name="description" content="Unified documentation for the Vue UI library and the Django package (nside_wefa)." />
+  <style>
+    :root { color-scheme: light dark; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 2rem; line-height: 1.6; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin-top: 1rem; }
+    a.card { display: block; padding: 1rem; border: 1px solid #444; border-radius: 10px; text-decoration: none; }
+    h1 { margin-bottom: .5rem; }
+    p { margin: .2rem 0 0; }
+    footer { margin-top: 2rem; font-size: 0.9rem; color: #666; }
+  </style>
+</head>
+<body>
+  <h1>N-SIDE WEFA Documentation</h1>
+  <p>Select a documentation site:</p>
+  <div class="grid">
+    <a class="card" href="./vue/index.html">
+      <strong>Vue UI Library</strong>
+      <p>Storybook docs and component previews.</p>
+    </a>
+    <a class="card" href="./django/index.html">
+      <strong>Django Library (nside_wefa)</strong>
+      <p>Auto-generated API documentation.</p>
+    </a>
+  </div>
+  <footer>
+    <p>
+      Source: <a href="https://github.com/n-side-dev/wefa" target="_blank" rel="noopener">github.com/n-side-dev/wefa</a>
+    </p>
+  </footer>
+</body>
+</html>
