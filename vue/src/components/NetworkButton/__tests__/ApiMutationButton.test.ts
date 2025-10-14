@@ -29,7 +29,7 @@ vi.mock('primevue/button', () => {
             class: attrs.class,
             onClick: () => emit('click'),
           },
-          props.label as any,
+          props.label as any
         )
     },
   })
@@ -47,14 +47,16 @@ describe('ApiMutationButton.vue', () => {
     mutateSpy = vi.fn()
   })
 
-  function mountWithState(state: {
-    isPending?: boolean
-    data?: any
-    error?: any
-    body?: any
-    relaunchableOnSuccess?: boolean
-    relaunchableOnError?: boolean
-  } = {}) {
+  function mountWithState(
+    state: {
+      isPending?: boolean
+      data?: any
+      error?: any
+      body?: any
+      relaunchableOnSuccess?: boolean
+      relaunchableOnError?: boolean
+    } = {}
+  ) {
     const mutation = {
       isPending: ref(!!state.isPending),
       data: ref(state.data),
@@ -115,7 +117,10 @@ describe('ApiMutationButton.vue', () => {
   })
 
   it('renders success state (relaunchable): enabled and triggers mutate on click', async () => {
-    const { mutation, btn, label, severity, mutationBody } = mountWithState({ data: { ok: true }, relaunchableOnSuccess: true })
+    const { mutation, btn, label, severity, mutationBody } = mountWithState({
+      data: { ok: true },
+      relaunchableOnSuccess: true,
+    })
     mutation.isPending.value = false
     await nextTick()
 
@@ -136,7 +141,10 @@ describe('ApiMutationButton.vue', () => {
   })
 
   it('renders error state (relaunchable): shows retry, enabled, triggers mutate on click', async () => {
-    const { btn, label, severity, mutationBody } = mountWithState({ error: new Error('boom'), relaunchableOnError: true })
+    const { btn, label, severity, mutationBody } = mountWithState({
+      error: new Error('boom'),
+      relaunchableOnError: true,
+    })
     expect(label()).toBe('network_button.retry')
     expect(severity()).toBe('danger')
     expect(btn().attributes('disabled')).toBeUndefined()

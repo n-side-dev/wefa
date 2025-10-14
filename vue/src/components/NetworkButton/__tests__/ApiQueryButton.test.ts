@@ -29,7 +29,7 @@ vi.mock('primevue/button', () => {
             class: attrs.class,
             onClick: () => emit('click'),
           },
-          props.label as any,
+          props.label as any
         )
     },
   })
@@ -47,13 +47,15 @@ describe('ApiQueryButton.vue', () => {
     refetchSpy = vi.fn()
   })
 
-  function mountWithState(state: {
-    isLoading?: boolean
-    data?: any
-    error?: any
-    relaunchableOnSuccess?: boolean
-    relaunchableOnError?: boolean
-  } = {}) {
+  function mountWithState(
+    state: {
+      isLoading?: boolean
+      data?: any
+      error?: any
+      relaunchableOnSuccess?: boolean
+      relaunchableOnError?: boolean
+    } = {}
+  ) {
     const query = {
       isLoading: ref(!!state.isLoading),
       data: ref(state.data),
@@ -110,7 +112,10 @@ describe('ApiQueryButton.vue', () => {
   })
 
   it('renders success state (relaunchable): enabled and triggers refetch on click', async () => {
-    const { query, btn, label, severity } = mountWithState({ data: { ok: true }, relaunchableOnSuccess: true })
+    const { query, btn, label, severity } = mountWithState({
+      data: { ok: true },
+      relaunchableOnSuccess: true,
+    })
     query.isLoading.value = false
     await nextTick()
 
@@ -130,7 +135,10 @@ describe('ApiQueryButton.vue', () => {
   })
 
   it('renders error state (relaunchable): shows retry, enabled, triggers refetch on click', async () => {
-    const { btn, label, severity } = mountWithState({ error: new Error('boom'), relaunchableOnError: true })
+    const { btn, label, severity } = mountWithState({
+      error: new Error('boom'),
+      relaunchableOnError: true,
+    })
     expect(label()).toBe('network_button.retry')
     expect(severity()).toBe('danger')
     expect(btn().attributes('disabled')).toBeUndefined()
