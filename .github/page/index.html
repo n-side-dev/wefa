@@ -1,37 +1,51 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="h-full antialiased">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>N-SIDE WEFA Documentation Portal</title>
+  <title>N-SIDE WeFa Documentation Portal</title>
   <meta name="description" content="Unified documentation for the Vue UI library and the Django package (nside_wefa)." />
-  <style>
-    :root { color-scheme: light dark; }
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 2rem; line-height: 1.6; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin-top: 1rem; }
-    a.card { display: block; padding: 1rem; border: 1px solid #444; border-radius: 10px; text-decoration: none; }
-    h1 { margin-bottom: .5rem; }
-    p { margin: .2rem 0 0; }
-    footer { margin-top: 2rem; font-size: 0.9rem; color: #666; }
-  </style>
+  <meta name="color-scheme" content="light dark" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/tailwind.css" />
+<!--  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>-->
+
 </head>
-<body>
-  <h1>N-SIDE WEFA Documentation</h1>
-  <p>Select a documentation site:</p>
-  <div class="grid">
-    <a class="card" href="./vue/index.html">
-      <strong>Vue UI Library</strong>
-      <p>Storybook docs and component previews.</p>
-    </a>
-    <a class="card" href="./django/index.html">
-      <strong>Django Library (nside_wefa)</strong>
-      <p>Auto-generated API documentation.</p>
-    </a>
-  </div>
-  <footer>
-    <p>
-      Source: <a href="https://github.com/n-side-dev/wefa" target="_blank" rel="noopener">github.com/n-side-dev/wefa</a>
-    </p>
-  </footer>
+<body class="min-h-screen bg-white text-[#182950] dark:bg-[#182950] dark:text-white" style="font-family:'Poppins', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;">
+  <main class="mx-auto max-w-3xl px-6 py-16">
+    <header class="mb-10">
+      <div class="inline-block rounded-full px-3 py-1 text-xs font-medium bg-[#182950]/5 text-[#182950]/90 dark:bg-white/10 dark:text-white/90">
+        N-SIDE
+      </div>
+      <h1 class="mt-3 text-4xl font-semibold leading-tight tracking-tight text-transparent bg-clip-text bg-[linear-gradient(270deg,#ff48a0,#f5a258)]">
+        WeFa Documentation
+      </h1>
+      <p class="mt-3 text-sm leading-6 text-[#182950]/70 dark:text-white/70">
+        Select a documentation site:
+      </p>
+    </header>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <a class="group block rounded-[1.6rem] border border-[#182950]/10 bg-white p-5 shadow-sm ring-1 ring-black/5 transition hover:-translate-y-0.5 hover:shadow-md hover:border-[#182950]/20 dark:bg-white/5 dark:border-white/10 dark:ring-white/5 dark:hover:border-white/20" href="./vue/index.html">
+        <strong class="text-base font-semibold">Vue UI Library</strong>
+        <p class="mt-1 text-sm text-[#182950]/70 dark:text-white/70">Storybook docs and component previews.</p>
+        <span class="mt-3 inline-flex items-center text-xs font-medium text-transparent bg-clip-text bg-[linear-gradient(270deg,#ff48a0,#f5a258)]">Explore →</span>
+      </a>
+      <a class="group block rounded-[1.6rem] border border-[#182950]/10 bg-white p-5 shadow-sm ring-1 ring-black/5 transition hover:-translate-y-0.5 hover:shadow-md hover:border-[#182950]/20 dark:bg-white/5 dark:border-white/10 dark:ring-white/5 dark:hover:border-white/20" href="./django/index.html">
+        <strong class="text-base font-semibold">Django Library (nside_wefa)</strong>
+        <p class="mt-1 text-sm text-[#182950]/70 dark:text-white/70">Auto-generated API documentation.</p>
+        <span class="mt-3 inline-flex items-center text-xs font-medium text-transparent bg-clip-text bg-[linear-gradient(270deg,#ff48a0,#f5a258)]">Open docs →</span>
+      </a>
+    </div>
+
+    <footer class="mt-12 border-t border-[#182950]/10 dark:border-white/10 pt-6">
+      <p class="text-sm text-[#182950]/70 dark:text-white/70">
+        Source:
+        <a class="font-medium underline decoration-transparent hover:decoration-current text-[#182950] hover:text-[#182950] dark:text-white" href="https://github.com/n-side-dev/wefa" target="_blank" rel="noopener">github.com/n-side-dev/wefa</a>
+      </p>
+    </footer>
+  </main>
 </body>
 </html>
