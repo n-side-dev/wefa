@@ -509,7 +509,7 @@ wheels = [
 
 [[package]]
 name = "nside-wefa"
-version = "1.0.0"
+version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "django" },
@@ -545,7 +545,6 @@ dev = [
     { name = "bandit", specifier = ">=1.8.6" },
     { name = "django-stubs", extras = ["compatible-mypy"], specifier = ">=5.2.0" },
     { name = "freezegun", specifier = ">=1.5.5" },
-    { name = "mypy", specifier = ">=1.18.1" },
     { name = "mypy", specifier = ">=1.18.2" },
     { name = "pytest", specifier = ">=8.3.5" },
     { name = "pytest-cov", specifier = ">=6.1.1" },
