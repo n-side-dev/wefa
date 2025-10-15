@@ -1,0 +1,41 @@
+import {Meta, Story, Canvas, ArgTypes} from '@storybook/addon-docs/blocks'
+import * as MutationStories from './ApiMutationButton.stories.ts'
+
+<Meta of={MutationStories} />
+
+# ApiMutationButton
+
+A network-aware button component built on PrimeVue Button that reflects the state of a TanStack Mutation (loading, success, error) and supports optional relaunch behavior when successful or on error.
+
+## Basic usage
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import { ApiMutationButton } from '@nside/wefa'
+
+// Using your own mutation composable
+const { mutation, body } = useMyMutation()
+</script>
+
+<template>
+  <ApiMutationButton :mutation="mutation" :mutationBody="body" />
+</template>
+```
+
+## Playground
+
+<Canvas>
+  <Story of={MutationStories.Default} />
+</Canvas>
+
+## States
+
+- Default: shows Submit label
+- Loading: shows Loading... and is disabled
+- Success: shows Success; can be relaunchable if `relaunchableOnSuccess` is true
+- Error: shows Error; or Retry if `relaunchableOnError` is true
+
+## Props
+
+<ArgTypes of={MutationStories} />

@@ -1,0 +1,41 @@
+import {Meta, Story, Canvas, ArgTypes} from '@storybook/addon-docs/blocks'
+import * as QueryStories from './ApiQueryButton.stories.ts'
+
+<Meta of={QueryStories} />
+
+# ApiQueryButton
+
+A network-aware button component built on PrimeVue Button that reflects the state of a TanStack Query (loading, success, error) and supports optional relaunch behavior when successful or on error.
+
+## Basic usage
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import { ApiQueryButton } from '@nside/wefa'
+
+// Using your own query composable
+const query = useMyQuery()
+</script>
+
+<template>
+  <ApiQueryButton :query="query" />
+</template>
+```
+
+## Playground
+
+<Canvas>
+  <Story of={QueryStories.Default} />
+</Canvas>
+
+## States
+
+- Default: shows Submit label
+- Loading: shows Loading... and is disabled
+- Success: shows Success; can be relaunchable if `relaunchableOnSuccess` is true
+- Error: shows Error; or Retry if `relaunchableOnError` is true
+
+## Props
+
+<ArgTypes of={QueryStories} />

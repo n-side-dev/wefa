@@ -4,6 +4,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import type { App } from 'vue'
 import PrimeVue from 'primevue/config'
 import Aura from '@primeuix/themes/aura'
+import { VueQueryPlugin, QueryClient } from '@tanstack/vue-query'
 import { createLibI18n } from '../src/locales'
 import '../src/assets/main.css'
 import NotFoundView from '../src/views/NotFoundView.vue'
@@ -129,6 +130,9 @@ setup((app: App) => {
       preset: Aura,
     },
   })
+  // Provide TanStack Query client for components/stories using useQuery/useMutation
+  const queryClient = new QueryClient()
+  app.use(VueQueryPlugin, { queryClient })
   app.use(i18n)
 })
 

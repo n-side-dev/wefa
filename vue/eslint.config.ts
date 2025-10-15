@@ -33,7 +33,7 @@ export default defineConfigWithVueTs(
   storybook.configs['flat/recommended'],
   {
     plugins: { '@cspell': cspellPlugin },
-    ignores: ['src/**/__tests__/**/*', 'src/**/*.stories.ts', 'src/**/*.spec.ts', 'src/**/*.vue'],
+    ignores: ['src/**/*.stories.ts', 'src/**/*.vue'],
     rules: {
       '@cspell/spellchecker': ['warn', { configFile: './cspell.config.yaml' }],
       'sonarjs/todo-tag': 'warn'
@@ -41,7 +41,7 @@ export default defineConfigWithVueTs(
   },
   {
     ...pluginVitest.configs.recommended,
-    files: ['src/**/__tests__/*'],
+    files: ['src/**/__tests__/**/*', 'src/**/*.{test,spec}.{js,ts,jsx,tsx}'],
   },
 
   {
