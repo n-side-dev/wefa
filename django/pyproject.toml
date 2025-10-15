@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "nside-wefa"
-version = "0.1.0-rc1"
+version = "0.1.0-rc2"
 description = "Django library with Legal Consent compliance utilities and reusable apps"
 readme = "README.md"
 requires-python = ">=3.12"
