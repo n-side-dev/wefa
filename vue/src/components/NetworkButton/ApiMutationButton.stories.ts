@@ -51,7 +51,12 @@ function createMockMutation(options?: { outcome?: 'success' | 'error'; delayMs?:
     mutate,
   } satisfies Record<string, unknown>
 
-  const mutation = mutationMinimal as unknown as UseMutationReturnType<unknown, AxiosError, unknown, unknown>
+  const mutation = mutationMinimal as unknown as UseMutationReturnType<
+    unknown,
+    AxiosError,
+    unknown,
+    unknown
+  >
 
   return { mutation, mutationBody }
 }
