@@ -12,6 +12,7 @@ import {
 } from 'vue-router'
 import { markRaw } from 'vue'
 import { type Credentials, type AuthenticationType, useBackendStore } from '@/stores'
+import { axiosInstance } from '@/network'
 
 describe('Token Backend Store', () => {
   let axiosMock: AxiosMockAdapter
@@ -32,7 +33,7 @@ describe('Token Backend Store', () => {
     backendStore = useBackendStore(backendStoreOptions)
 
     // Set up axios mock for the API client
-    axiosMock = new AxiosMockAdapter(backendStore.apiClient.axiosInstance)
+    axiosMock = new AxiosMockAdapter(axiosInstance)
 
     // Create a minimal router for testing route guards
     router = createRouter({
@@ -249,7 +250,7 @@ describe('Token Backend Store', () => {
         return [401, { error: 'Unauthorized' }]
       })
 
-      const response = await backendStore.apiClient.axiosInstance.get('/protected-resource')
+      const response = await axiosInstance.get('/protected-resource')
       expect(response.status).toBe(200)
       expect(response.data).toEqual({ data: 'protected data' })
     })

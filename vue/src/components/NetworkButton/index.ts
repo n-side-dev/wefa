@@ -1,5 +1,5 @@
-export {
-  default as NetworkButton,
-  type SingleNetworkButtonProps,
-  type NetworkButtonProps,
-} from './NetworkButton.vue'
+export * from './types'
+
+export { default as ApiMutationButton } from './ApiMutationButton.vue'
+
+export { default as ApiQueryButton } from './ApiQueryButton.vue'

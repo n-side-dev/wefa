@@ -29,6 +29,6 @@ app_name = "legal_consent"
 
 urlpatterns = [
     path("agreement/", LegalConsentView.as_view(), name="legal_consent"),
-    path("terms-of-service/", TermsOfUseView.as_view(), name="terms_of_use"),
-    path("privacy-policy/", PrivacyNoticeView.as_view(), name="privacy_notice"),
+    path("terms-of-use/", TermsOfUseView.as_view(), name="terms_of_use"),
+    path("privacy-notice/", PrivacyNoticeView.as_view(), name="privacy_notice"),
 ]

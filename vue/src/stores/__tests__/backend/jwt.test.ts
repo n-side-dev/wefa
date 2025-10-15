@@ -12,6 +12,7 @@ import {
 } from 'vue-router'
 import { markRaw } from 'vue'
 import { type Credentials, type AuthenticationType, useBackendStore } from '@/stores'
+import { axiosInstance } from '@/network'
 
 describe('JWT Backend Store', () => {
   let axiosMock: AxiosMockAdapter
@@ -32,7 +33,7 @@ describe('JWT Backend Store', () => {
     backendStore = useBackendStore(backendStoreOptions)
 
     // Set up axios mock for the API client
-    axiosMock = new AxiosMockAdapter(backendStore.apiClient.axiosInstance)
+    axiosMock = new AxiosMockAdapter(axiosInstance)
 
     // Create a minimal router for testing route guards
     router = createRouter({
@@ -233,7 +234,7 @@ describe('JWT Backend Store', () => {
       })
 
       // Make the request that will trigger the refresh flow
-      const response = await backendStore.apiClient.axiosInstance.get('/protected-resource')
+      const response = await axiosInstance.get('/protected-resource')
 
       // Verify the response is successful
       expect(response.status).toBe(200)
@@ -256,9 +257,7 @@ describe('JWT Backend Store', () => {
         .replyOnce(401, { error: 'Invalid refresh token', code: 'token_not_valid' })
 
       // Make the request that will trigger the refresh flow and fail
-      await expect(
-        backendStore.apiClient.axiosInstance.get('/protected-resource')
-      ).rejects.toThrow()
+      await expect(axiosInstance.get('/protected-resource')).rejects.toThrow()
 
       expect(backendStore.authenticated).toBe(false)
       expect(localStorage.getItem('jwtAccessToken')).toBeNull()
@@ -294,7 +293,7 @@ describe('JWT Backend Store', () => {
         return [401, { error: 'Unauthorized' }]
       })
 
-      const response = await backendStore.apiClient.axiosInstance.get('/protected-resource')
+      const response = await axiosInstance.get('/protected-resource')
       expect(response.status).toBe(200)
       expect(response.data).toEqual({ data: 'protected data' })
     })

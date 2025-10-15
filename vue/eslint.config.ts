@@ -23,7 +23,7 @@ export default defineConfigWithVueTs(
     files: ['**/*.{ts,mts,tsx,vue}'],
   },
 
-  globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**']),
+  globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**', '**/openapi/**']),
 
   pluginVue.configs['flat/recommended'],
   vueTsConfigs.recommended,
@@ -33,7 +33,7 @@ export default defineConfigWithVueTs(
   storybook.configs['flat/recommended'],
   {
     plugins: { '@cspell': cspellPlugin },
-    ignores: ['src/**/__tests__/**/*', 'src/**/*.stories.ts', 'src/**/*.spec.ts', 'src/**/*.vue'],
+    ignores: ['src/**/*.stories.ts', 'src/**/*.vue'],
     rules: {
       '@cspell/spellchecker': ['warn', { configFile: './cspell.config.yaml' }],
       'sonarjs/todo-tag': 'warn'
@@ -41,7 +41,7 @@ export default defineConfigWithVueTs(
   },
   {
     ...pluginVitest.configs.recommended,
-    files: ['src/**/__tests__/*'],
+    files: ['src/**/__tests__/**/*', 'src/**/*.{test,spec}.{js,ts,jsx,tsx}'],
   },
 
   {
@@ -54,7 +54,7 @@ export default defineConfigWithVueTs(
       "vue/block-order": ["error", {
         "order": [ "template", "script", "style" ] // Enforce this precise order in component definition!
       }],
-      "vitest/prefer-called-exactly-once-with": "off" // Not always possible to test this
+      "vitest/prefer-called-exactly-once-with": "off" // Exactly once is not always possible
     }
   }
 )

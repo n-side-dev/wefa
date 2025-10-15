@@ -19,8 +19,12 @@ export * from '@/components/TableComponent'
 // Export stores
 export * from '@/stores/darkMode'
 
+// Export plugins
+export * from '@/plugins'
+
 // Export utility functions
 export * from '@/locales'
+export * from '@/utils/markdown'
 
 // Install as plugin
 export default {

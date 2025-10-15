@@ -1,15 +1,20 @@
 words:
+  - wefa
   - autodocs
   - viewports
   - sonarjs
   - autorouted
   - primevue
+  - primeuix
   - relaunchable
   - plotly
   - wefa
   - unhardcode
   - xaxis
   - yaxis
+  - nside
+  - codegen
+  - vnode
 ignorePaths:
   - 'src/demo/**/*'
   - 'src/demo.ts'

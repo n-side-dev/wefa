@@ -1,5 +1,5 @@
 <template>
-  <PlotlyComponent :data="plotlyData" :layout="processedLayout" :config="processedConfig" /> >
+  <PlotlyComponent :data="plotlyData" :layout="processedLayout" :config="processedConfig" />
 </template>
 
 <script setup lang="ts">

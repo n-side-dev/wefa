@@ -1,0 +1,190 @@
+openapi: 3.0.3
+info:
+  title: Hello API
+  version: 1.0.0
+
+paths:
+  # 1. Basic GET: no input, no output
+  /basic-get:
+    get:
+      summary: Basic GET (no input, no output)
+      operationId: getHello1
+      responses:
+        '200':
+          description: Empty response
+          content:
+            application/json:
+              schema:
+                type: object
+
+  # 2. Simple GET: simple input (query), simple output
+  /simple-get:
+    get:
+      summary: Simple GET (simple input/output)
+      operationId: getHello2
+      parameters:
+        - name: name
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Simple string response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  greeting:
+                    type: string
+                required:
+                  - greeting
+
+  # 3. Complex GET: path + query, complex output
+  /complex-get/{userId}:
+    get:
+      summary: Complex GET (complex input/output)
+      operationId: getHello3
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: verbose
+          in: query
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Complex object response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                      details:
+                        type: object
+                        properties:
+                          age:
+                            type: integer
+                          email:
+                            type: string
+                  status:
+                    type: string
+                required:
+                  - user
+                  - status
+
+  # 1. Basic POST: no input, no output
+  /basic-post:
+    post:
+      summary: Basic POST (no input, no output)
+      operationId: postHello1
+      responses:
+        '201':
+          description: Empty response
+          content:
+            application/json:
+              schema:
+                type: object
+
+  # 2. Simple POST: simple input (query), simple output
+  /simple-post:
+    post:
+      summary: Simple POST (simple input/output)
+      operationId: postHello2
+      parameters:
+        - name: value
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '201':
+          description: Simple numeric response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: integer
+                required:
+                  - result
+
+  # 3. Complex POST: path + body, complex output
+  /complex-post/{itemId}:
+    post:
+      summary: Complex POST (complex input/output)
+      operationId: postHello3
+      parameters:
+        - name: itemId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                meta:
+                  type: object
+                  properties:
+                    timestamp:
+                      type: string
+                    tags:
+                      type: array
+                      items:
+                        type: string
+                payload:
+                  type: object
+                  properties:
+                    data:
+                      type: string
+                    count:
+                      type: integer
+              required:
+                - meta
+                - payload
+      responses:
+        '201':
+          description: Complex object response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  item:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      processed:
+                        type: boolean
+                      summary:
+                        type: string
+                  info:
+                    type: object
+                    properties:
+                      createdAt:
+                        type: string
+                      notes:
+                        type: array
+                        items:
+                          type: string
+                required:
+                  - item
+                  - info

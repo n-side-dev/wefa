@@ -120,4 +120,4 @@ jobs:
           node-version: 24
       - run: npm ci
       - name: License check
-        run: npx license-checker --production --onlyAllow "MIT;ISC;Apache-2.0;BSD-2-Clause;BSD-3-Clause;BlueOak-1.0.0;MPL-2.0"
+        run: npx license-checker --production --onlyAllow "MIT;ISC;Apache-2.0;BSD-2-Clause;BSD-3-Clause;BlueOak-1.0.0;MPL-2.0;Python-2.0"

@@ -1,0 +1,286 @@
+import { Meta } from '@storybook/addon-docs/blocks'
+
+<Meta title='Network/Overview' />
+
+# Network
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Stack](#stack)
+- [Setup order](#setup-order)
+- [Axios](#axios)
+- [URL API Client](#url-api-client)
+- [Typed API Client](#typed-api-client)
+- [Layers](#layers)
+- [Tips and tricks](#tips-and-tricks)
+
+## Overview
+
+The lib provide utils and helpers to handle communications with a backend (ReST API), such as :
+
+- Login and logout flows
+- User status helpers
+- Route guards to prevent unauthenticated navigation
+- Supports multiple authentication methods (JWT, Token, Session, ...)
+- Reactive state management of API calls
+- Typing API calls inputs and responses, if an OpenAPI schema is available
+
+## Stack
+
+- Axios client: makes the HTTP calls
+- TanStack Vue Query: state management around calls
+- (optional) Hey-API TypeScript: codegen functions and calls from an OpenAPI schema
+
+## Setup order
+
+1. Initialize TanStack Vue Query at app-level
+2. Create the axios instance, using the backend URL
+3. Create your URL-based API Client
+   1. Attach axios to the "client"
+   2. Ensure TanStack wrappers are up and running
+4. Create your OpenAPI-based API Client, if applicable
+   1. Attach axios to the "client"
+   2. Ensure TanStack wrappers are up and running
+5. Initialize the backendStore
+   1. Attach the reactive interceptors on the axios Instance, for authentication
+6. You're now ready to make API calls, either using the axios instance directly, or by using the TanStack useQuery or useMutation (wrapped or not)
+
+## Axios
+
+The lib provides an Axios instance singleton, pre-configured for the backend specified in the end var BACKEND_BASE_URL.
+All calls to the backend should use this single Axios instance, either directly or through API Client wrappers.
+
+If BACKEND_BASE_URL is not defined, you need to set up the baseUrl with the code below:
+
+```ts
+import { axiosInstance } from '@nside/wefa/network'
+axiosInstance.defaults.baseURL = 'http://example.com'
+```
+
+Usually the API Clients will suit your needs,
+but here is an example on how to call it either from a TypeScript file, or from a SFC.
+
+```ts
+import { axiosInstance } from '@nside/wefa/network'
+
+try {
+  const response = await axiosInstance.get('/api/example/1')
+  console.log('Data:', response.data)
+  return response.data
+} catch (error) {
+  console.error('Error fetching data:', error)
+  return null
+}
+```
+
+## URL API Client
+
+This first API Client provides a layer of state management around URL-based API calls.
+
+Two methods are exposed : `.query` and `.mutation`, to respectively handle GET-like and POST-like requests.
+Both methods return a myriad of reactive variables, ready to be used in your components.
+
+```ts
+import { apiClient } from '@nside/wefa/network'
+
+// Query (GET)
+const { data, isLoading, error, refetch } = apiClient.query(ref('/api/get-data/'))
+
+// Mutation (POST)
+const { isPending, isError, error, isSuccess, mutate } = apiClient.mutation(ref('/api/post-data/'))
+mutate({ foo: 'bar' })
+```
+
+For more complete documentation, see the JSDoc of methods themselves, and TanStack [Queries](https://tanstack.com/query/v5/docs/framework/vue/guides/queries) and [Mutations](https://tanstack.com/query/v5/docs/framework/vue/guides/mutations) documentation.
+
+## Typed API Client
+
+If your backend exposes an OpenAPI schema, you can leverage it by auto-generating helpers function and types, to bring type safety and intellisense to your API calls.
+
+- From your OpenAPI specs, generate a typed SDK : `npx @hey-api/openapi-ts --input ./path/to/openapi.yaml --output ./src/openapi --client @hey-api/client-axios`
+- Link the typedApiClient to the SDK, in main.ts :
+  ```ts
+  import { client } from '@/openapi/client.gen'
+  import { typedApiClient } from '@nside/wefa/network'
+  typedApiClient.setupOpenApiClient(client)
+  ```
+- Use the wrappers anywhere :
+
+  ```ts
+  import { getDashboard, postNotification } from '@/openapi/sdk.gen'
+  import { typedApiClient } from '@nside/wefa/network'
+
+  // Query (GET)
+  const { data, isLoading, error, refetch } = typedApiClient.query(
+    getDashboard,
+    ref({ path: { dashboardId: 3 } })
+  )
+  ```
+
+## Layers
+
+Layers of functionality, starting from the top, way to be used by end-user
+
+1. URL-based or OpenAPI-based wrapper around TanStack
+
+```ts
+const {
+  /* ... */
+} = apiClient.query(ref('/api/my/url'))
+const {
+  /* ... */
+} = apiClient.mutation(ref('/api/my/url'), myBody)
+
+const {
+  /* ... */
+} = typedApiClient.query(getHello, options)
+const {
+  /* ... */
+} = typedApiClient.mutation(postHello, options)
+```
+
+2. Using TanStack directly
+
+```ts
+import { axiosInstance } from '@nside/wefa/network'
+// import { useQuery, useMutation } from '@tanstack/vue-query'
+
+const {
+  /* ... */
+} = useQuery({
+  queryKey: ['myQueryKey'],
+  queryFn: async () => {
+    return (await axiosInstance.get('/api/my/url')).data
+  },
+  // ...queryOptions
+})
+
+const {
+  /* ... */
+} = useMutation({
+  mutationFn: async () => {
+    return (await postHello(options)).data
+  },
+  // ...mutationOptions
+})
+```
+
+3. Make the axios call yourself
+
+```ts
+import { axiosInstance } from '@nside/wefa/network'
+
+async function myGet() {
+  try {
+    const response = await axiosInstance.get('/api/my/url')
+    return response.data
+  } catch (error) {
+    console.error(error)
+    return null
+  }
+}
+```
+
+## Tips and tricks
+
+### Automatically refetch when URL changes
+
+Let's say you want to query something based on user input (e.g dashboard based on dashboardId), and you want to query to :
+
+- Run automatically when dashboardId is changed
+- Don't run when dashboardId is undefined
+
+With the API Clients, this is relatively straightforward, by building the URL/Options in a reactive way.
+
+For the URL API Client :
+
+```ts
+// Import the API Client
+import { apiClient } from '@/network'
+
+// Arg we need to make the query, used in a v-model for user input
+const dashboardId: Ref<number | undefined> = ref(3)
+
+// Build the options reactivelly with a computed that depends on dashboardId
+const getDashboardUrl = computed(() => {
+  // If we're missing required args, return undefined, this way the query is not made
+  if (!dashboardId.value) {
+    return undefined
+  }
+  // If we have everything we need, build the URL
+  return `/api/get-dashboard/${dashboardId.value}/`
+})
+
+const getDashboardQuery = apiClient.query(getDashboardUrl)
+```
+
+For the Typed API Client :
+
+```ts
+// Import the API Client and the sdk function
+import { typedApiClient } from '@/network'
+import { getDashboard } from '@/demo/openapi/sdk.gen'
+
+// Arg we need to make the query, used in a v-model for user input
+const dashboardId: Ref<number | undefined> = ref(3)
+
+// Build the options reactivelly with a computed that depends on dashboardId
+const getDashboardOptions = computed(() => {
+  // If we're missing required args, return undefined, this way the query is not made
+  if (!dashboardId.value) {
+    return undefined
+  }
+  // If we have everything we need, build the query options
+  return { path: { dashboardId: dashboardId.value } }
+})
+
+const getDashboardQuery = typedApiClient.query(getDashboard, getDashboardOptions)
+```
+
+And then in your HTML template :
+
+```html
+<InputNumber v-model="dashboardId" />
+
+<pre>{{ getDashboardQuery.isLoading }}</pre>
+<pre>{{ getDashboardQuery.data }}</pre>
+<pre>{{ getDashboardQuery.error }}</pre>
+<pre>...</pre>
+```
+
+### Refetching on an interval
+
+This can be done by using the optional queryOptions argument.
+
+```ts
+const query = apiClient.query(ref(url), {
+  refetchInterval: 5000, //  milliseconds
+})
+
+const query = typedApiClient.query(getData, ref(options), {
+  refetchInterval: 5000, //  milliseconds
+})
+```
+
+[See the full Queries documentation.](https://tanstack.com/query/v5/docs/framework/vue/reference/useQuery)
+
+### Mutation hooks
+
+TanStack offers multiple hooks to run custom code before of after the mutation happens.
+
+```ts
+const { mutate, onMutate, onSuccess, onError, onSettled } = client.mutation(...)
+```
+
+[See the full Mutations documentation.](https://tanstack.com/query/v5/docs/framework/vue/reference/useMutation)
+
+### Retry strategy
+
+You can override the default retry strategies for queries and mutations.
+See the full TanStack documentation for [Queries](https://tanstack.com/query/v5/docs/framework/vue/reference/useQuery) and [Mutations](https://tanstack.com/query/v5/docs/framework/vue/reference/useMutation).
+
+### Lazy queries
+
+If you want queries to only run "manually", use the option `subscribed: false` in combination with `refetch`.
+See the full TanStack documentation for [Queries](https://tanstack.com/query/v5/docs/framework/vue/reference/useQuery)

@@ -22,7 +22,7 @@ export default mergeConfig(
         reporter: ['text', 'cobertura', 'lcov'],
         reportsDirectory: './coverage',
         exclude: [
-          ...coverageConfigDefaults.exclude, 
+          ...coverageConfigDefaults.exclude,
           'dist-demo/**',
           'src/demo.ts',
           'src/demo/**'
@@ -63,6 +63,18 @@ export default mergeConfig(
             // Store tests may involve state management and async operations
             testTimeout: 30000, // 30 seconds for store tests
             hookTimeout: 10000, // 10 seconds for store setup/teardown
+            setupFiles: ['vitetestPlugins.setup.ts'],
+          },
+        },
+        {
+          extends: true,
+          test: {
+            name: 'plugins',
+            environment: 'jsdom',
+            include: ['src/plugins/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+            // Plugin tests may involve Vue app initialization and routing
+            testTimeout: 30000, // 30 seconds for plugin tests
+            hookTimeout: 10000, // 10 seconds for plugin setup/teardown
             setupFiles: ['vitetestPlugins.setup.ts'],
           },
         },

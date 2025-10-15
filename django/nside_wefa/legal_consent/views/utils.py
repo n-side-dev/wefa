@@ -1,3 +1,6 @@
+from django.conf import settings
+from pathlib import Path
+
 """
 Utilities for serving Legal Consent markdown documents.
 
@@ -6,11 +9,8 @@ markdown templates, apply simple templating (e.g., application name), and
 return them as plain text.
 """
 
-from django.conf import settings
-from pathlib import Path
 
-
-def get_document_content(filename: str) -> str:
+def get_document_content(filename: str, locale: str = "en") -> str:
     """Load a legal document template and apply simple templating.
 
     The function attempts to read the specified markdown file either from a
@@ -19,12 +19,10 @@ def get_document_content(filename: str) -> str:
     with the value of ``NSIDE_WEFA.APP_NAME`` (defaults to ``"Application"``).
 
     :param filename: Template file name (e.g., ``"privacy_notice.md"``).
-    :type filename: str
+    :param locale: Locale for which to fetch the templates
     :return: The processed template content as text. If the file is not found,
         an error message indicating the missing path is returned.
-    :rtype: str
     """
-    # Simplified logic: either a specific location or the default one
 
     # Check for LegalConsent-specific TEMPLATES setting
     legal_consent_settings = getattr(settings, "NSIDE_WEFA", {}).get(
@@ -34,10 +32,10 @@ def get_document_content(filename: str) -> str:
 
     if legal_templates:
         # Use specific template directory
-        template_path = Path(legal_templates) / filename
+        template_path = Path(legal_templates) / locale / filename
     else:
         # Use default template from the LegalConsent app
-        template_path = Path(__file__).parent.parent / "templates" / filename
+        template_path = Path(__file__).parent.parent / "templates" / locale / filename
 
     # Read the template content
     try:
