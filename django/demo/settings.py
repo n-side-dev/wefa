@@ -12,46 +12,6 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 from typing import Any
-
-# Temporary compatibility shim for altered Django logging import paths in the test venv.
-# Some environments may have 'django.utils.log' references rewritten to
-# 'django.nside_wefa.utils.log'. To avoid touching the venv, provide a lightweight
-# alias module path that re-exports Django's own logging classes so that logging
-# configuration can import them successfully during django.setup().
-try:
-    import sys
-    from types import ModuleType
-    from django.utils.log import (
-        ServerFormatter as _ServerFormatter,
-        RequireDebugTrue as _RequireDebugTrue,
-        RequireDebugFalse as _RequireDebugFalse,
-        AdminEmailHandler as _AdminEmailHandler,
-    )
-    import django as _django
-
-    _pkg_root = ModuleType("django.nside_wefa")
-    _pkg_root.__path__ = []  # mark as a namespace/package for submodule imports
-    _pkg_utils = ModuleType("django.nside_wefa.utils")
-    _pkg_utils.__path__ = []
-    _mod_log = ModuleType("django.nside_wefa.utils.log")
-
-    # Re-export Django's logging classes
-    _mod_log.ServerFormatter = _ServerFormatter
-    _mod_log.RequireDebugTrue = _RequireDebugTrue
-    _mod_log.RequireDebugFalse = _RequireDebugFalse
-    _mod_log.AdminEmailHandler = _AdminEmailHandler
-
-    # Register modules and bind attributes so import machinery can resolve them
-    sys.modules["django.nside_wefa"] = _pkg_root
-    sys.modules["django.nside_wefa.utils"] = _pkg_utils
-    sys.modules["django.nside_wefa.utils.log"] = _mod_log
-    setattr(_pkg_root, "utils", _pkg_utils)
-    setattr(_pkg_utils, "log", _mod_log)
-    setattr(_django, "nside_wefa", _pkg_root)
-except Exception:
-    # Best effort; if anything goes wrong, let Django proceed with default behavior.
-    pass
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
