@@ -19,7 +19,7 @@ from django.core.checks import Error, register
 
 from nside_wefa.common.apps import CommonConfig
 from nside_wefa.legal_consent.apps import LegalConsentConfig
-from utils.checks import check_nside_wefa_settings, check_apps_dependencies_order
+from nside_wefa.utils.checks import check_nside_wefa_settings, check_apps_dependencies_order
 
 
 @register()
@@ -44,7 +44,7 @@ def wefa_apps_dependencies_check(app_configs, **kwargs) -> list[Error]:
 def legal_consent_settings_check(app_configs, **kwargs) -> list[Error]:
     """Validate the ``NSIDE_WEFA.LEGAL_CONSENT`` settings section.
 
-    Delegates to :func:`utils.checks.check_nside_wefa_settings` to ensure that
+    Delegates to :func:`nside_wefa.utils.checks.check_nside_wefa_settings` to ensure that
     the section exists and contains required keys: ``VERSION`` and ``EXPIRY_LIMIT``.
 
     :param app_configs: Iterable of Django app configs provided by the check
