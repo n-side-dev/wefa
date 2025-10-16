@@ -22,7 +22,10 @@ from django.core.checks import Error, register
 from nside_wefa.authentication.constants import AUTHENTICATION_TYPES
 from nside_wefa.authentication.apps import AuthenticationConfig
 from nside_wefa.common.apps import CommonConfig
-from nside_wefa.utils.checks import check_apps_dependencies_order, check_nside_wefa_settings
+from nside_wefa.utils.checks import (
+    check_apps_dependencies_order,
+    check_nside_wefa_settings,
+)
 
 
 @register()

@@ -19,7 +19,10 @@ from django.core.checks import Error, register
 
 from nside_wefa.common.apps import CommonConfig
 from nside_wefa.legal_consent.apps import LegalConsentConfig
-from nside_wefa.utils.checks import check_nside_wefa_settings, check_apps_dependencies_order
+from nside_wefa.utils.checks import (
+    check_nside_wefa_settings,
+    check_apps_dependencies_order,
+)
 
 
 @register()
