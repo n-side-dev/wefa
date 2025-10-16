@@ -1,6 +1,11 @@
 # N-SIDE WeFa (Web Factory)
 
 [![security: bandit](https://img.shields.io/badge/security-bandit-yellow.svg)](https://github.com/PyCQA/bandit)
+[![Release](https://github.com/n-side-dev/wefa/actions/workflows/release.yml/badge.svg)](https://github.com/n-side-dev/wefa/actions/workflows/release.yml)
+[![GitHub Releases](https://img.shields.io/github/v/release/n-side-dev/wefa?include_prereleases&label=latest%20release)](https://github.com/n-side-dev/wefa/releases)
+[![npm version](https://img.shields.io/npm/v/%40nside/wefa)](https://www.npmjs.com/package/@nside/wefa)
+[![PyPI version](https://img.shields.io/pypi/v/nside-wefa)](https://pypi.org/project/nside-wefa/)
+[![License](https://img.shields.io/github/license/n-side-dev/wefa)](https://github.com/n-side-dev/wefa/blob/main/LICENSE)
 
 N-SIDE WeFa (Web Factory) is an open-source toolkit for building full-stack, product-ready web experiences. It brings together:
 

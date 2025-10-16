@@ -22,7 +22,10 @@ from django.core.checks import Error, register
 from nside_wefa.authentication.constants import AUTHENTICATION_TYPES
 from nside_wefa.authentication.apps import AuthenticationConfig
 from nside_wefa.common.apps import CommonConfig
-from utils.checks import check_apps_dependencies_order, check_nside_wefa_settings
+from nside_wefa.utils.checks import (
+    check_apps_dependencies_order,
+    check_nside_wefa_settings,
+)
 
 
 @register()
@@ -79,7 +82,7 @@ def validate_authentication_types(authentication_types: Any) -> list[Error]:
 def authentication_settings_check(app_configs, **kwargs) -> list[Error]:
     """Run validation for the ``NSIDE_WEFA.AUTHENTICATION`` settings section.
 
-    Delegates to :func:`utils.checks.check_nside_wefa_settings` and applies the
+    Delegates to :func:`nside_wefa.utils.checks.check_nside_wefa_settings` and applies the
     custom validator for the ``TYPES`` key.
 
     :param app_configs: Iterable of Django app configs provided by the check
