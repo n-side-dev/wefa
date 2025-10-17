@@ -1,6 +1,6 @@
 {
   "name": "@nside/wefa",
-  "version": "0.1.0-rc3",
+  "version": "0.1.0",
   "type": "module",
   "main": "./dist/lib.umd.cjs",
   "module": "./dist/lib.js",
