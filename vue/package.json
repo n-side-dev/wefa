@@ -109,7 +109,7 @@
     "@vue/tsconfig": "^0.8.1",
     "autoprefixer": "^10.4.21",
     "axios-mock-adapter": "^2.1.0",
-    "eslint": "^9.37.0",
+    "eslint": "^9.38.0",
     "eslint-plugin-jsdoc": "^61.1.4",
     "to-valid-identifier": "^1.0.0",
     "eslint-plugin-playwright": "^2.2.2",
