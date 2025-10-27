@@ -1,4 +1,3 @@
-// cspell:ignore datatable
 import { describe, it, expect, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import TableComponent from './TableComponent.vue'

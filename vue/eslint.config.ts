@@ -10,7 +10,6 @@ import sonarjs from 'eslint-plugin-sonarjs'
 import jsdoc from 'eslint-plugin-jsdoc'
 import pluginPlaywright from 'eslint-plugin-playwright'
 import skipFormatting from '@vue/eslint-config-prettier/skip-formatting'
-import cspellPlugin from '@cspell/eslint-plugin'
 
 // To allow more languages other than `ts` in `.vue` files, uncomment the following lines:
 // import { configureVueProject } from '@vue/eslint-config-typescript'
@@ -32,14 +31,6 @@ export default defineConfigWithVueTs(
   jsdoc.configs['flat/recommended-typescript'],
   storybook.configs['flat/recommended'],
   {
-    plugins: { '@cspell': cspellPlugin },
-    ignores: ['src/**/*.stories.ts', 'src/**/*.vue'],
-    rules: {
-      '@cspell/spellchecker': ['warn', { configFile: './cspell.config.yaml' }],
-      'sonarjs/todo-tag': 'warn'
-    }
-  },
-  {
     ...pluginVitest.configs.recommended,
     files: ['src/**/__tests__/**/*', 'src/**/*.{test,spec}.{js,ts,jsx,tsx}'],
   },
@@ -54,7 +45,18 @@ export default defineConfigWithVueTs(
       "vue/block-order": ["error", {
         "order": [ "template", "script", "style" ] // Enforce this precise order in component definition!
       }],
-      "vitest/prefer-called-exactly-once-with": "off" // Exactly once is not always possible
+      "vitest/prefer-called-exactly-once-with": "off", // Exactly once is not always possible
+      'sonarjs/todo-tag': 'warn' // TODOs can refer to issues that are not yet fixed
+    }
+  },
+  {
+    // Disable JSDoc and other requirements in test files (unit and e2e) and stories.
+    files: ['src/**/__tests__/**/*', 'src/**/*.{test,spec,stories}.{js,ts,jsx,tsx}', 'e2e/**/*.{test,spec}.{js,ts,jsx,tsx}'],
+    rules: {
+      'jsdoc/require-jsdoc': 'off',
+      'jsdoc/require-param-description': 'off',
+      'jsdoc/require-returns': 'off',
+      'security/detect-object-injection': 'off'
     }
   }
 )

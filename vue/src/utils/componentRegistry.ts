@@ -1,4 +1,3 @@
-// cspell:ignore inputtext inputnumber
 import { defineAsyncComponent } from 'vue'
 
 import type { Component } from 'vue'
