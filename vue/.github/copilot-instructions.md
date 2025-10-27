@@ -194,7 +194,6 @@ Comprehensive linting setup with multiple plugins:
 - **Documentation**: `eslint-plugin-jsdoc` for JSDoc validation
 - **Testing**: Specific rules for Vitest and Playwright
 - **Storybook**: `eslint-plugin-storybook` integration
-- **Spelling**: `@cspell/eslint-plugin` for spell checking
 
 **Custom Rules**:
 ```json
