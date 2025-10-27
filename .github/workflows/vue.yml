@@ -60,7 +60,7 @@ jobs:
       - name: Run unit tests with coverage
         run: npm run test:unit -- --coverage
       - name: Upload coverage artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: vue-coverage
           path: coverage/
@@ -104,7 +104,7 @@ jobs:
       - name: Check bundle size
         run: npx bundlesize
       - name: Upload dist artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: vue-dist
           path: dist/
