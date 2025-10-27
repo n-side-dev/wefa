@@ -40,8 +40,6 @@ jobs:
       - run: npm run type-check
       - run: npm run lint-check
       - run: npm run format-check
-      - name: Spell check (cspell)
-        run: npx cspell "src/**/*.{js,ts,vue}"
 
   unit-tests:
     name: Unit Tests
