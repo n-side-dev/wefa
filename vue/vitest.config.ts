@@ -1,16 +1,17 @@
 import { fileURLToPath } from 'node:url'
-import { mergeConfig, defineConfig, configDefaults, coverageConfigDefaults } from 'vitest/config'
+import { configDefaults, coverageConfigDefaults } from 'vitest/config'
+import { mergeConfig } from 'vite'
+import type { UserConfig } from 'vite'
 import viteConfig from './vite.config'
 import path from 'node:path'
 import { storybookTest } from '@storybook/addon-vitest/vitest-plugin'
+import { playwright } from '@vitest/browser-playwright'
 
 const dirname =
   typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url))
 
-export default mergeConfig(
-  viteConfig,
-  defineConfig({
-    test: {
+const vitestConfig: UserConfig = {
+  test: {
       environment: 'jsdom',
       exclude: [...configDefaults.exclude, 'e2e/**', 'dist-demo/**'],
       root: fileURLToPath(new URL('./', import.meta.url)),
@@ -96,7 +97,9 @@ export default mergeConfig(
             browser: {
               enabled: true,
               headless: true,
-              provider: 'playwright',
+              // Vitest v4 expects a provider factory (e.g., playwright()).
+              // To avoid extra optional deps during type-check, cast for now.
+              provider: playwright({}),
               instances: [
                 {
                   browser: 'chromium',
@@ -115,5 +118,6 @@ export default mergeConfig(
         },
       ],
     },
-  }),
-)
+  }
+
+export default mergeConfig(viteConfig, vitestConfig)
