@@ -90,7 +90,7 @@
     "@storybook/addon-a11y": "^9.1.15",
     "@storybook/addon-docs": "^9.1.15",
     "@storybook/addon-onboarding": "^9.1.15",
-    "@storybook/addon-themes": "^9.1.15",
+    "@storybook/addon-themes": "^10.0.0",
     "@storybook/addon-vitest": "^9.1.15",
     "@storybook/vue3-vite": "^9.1.15",
     "@tsconfig/node22": "^22.0.2",
