@@ -66,17 +66,13 @@ const processedLayout: ComputedRef<Partial<Layout> | undefined> = computed(() =>
 
 const plotlyData: ComputedRef<Data[]> = computed(() => {
   return config.data.map((trace) => {
-    const xKey = trace.xKey
-    const yKey = trace.yKey
+    const { xKey, yKey, ...other } = trace
     return {
-      ...trace,
+      ...other,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       x: value.map((row) => row[xKey] as any),
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       y: value.map((row) => row[yKey] as any),
-      // Exclude xKey and yKey from the trace
-      xKey: undefined,
-      yKey: undefined,
     }
   })
 })
