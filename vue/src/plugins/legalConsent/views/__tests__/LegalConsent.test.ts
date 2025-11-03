@@ -4,6 +4,11 @@ import { nextTick } from 'vue'
 
 const flushPromises = () => new Promise((resolve) => setTimeout(resolve))
 
+// Minimal local type for a Vitest spy used in this file
+// Avoids importing incompatible vitest types across versions and satisfies ESLint no-explicit-any
+// Use the shape from vi.fn() to ensure compatibility with spies
+type PushSpy = Pick<ReturnType<typeof vi.fn>, 'mock' | 'mockResolvedValue'>
+
 // Mock i18n util to return the key itself for easier assertions
 vi.mock('@/locales', () => ({
   useI18nLib: () => ({ t: (key: string) => key }),
@@ -63,7 +68,7 @@ import LegalConsent from '../LegalConsent.vue'
 
 describe('LegalConsent.vue', () => {
   let router: Router
-  let pushSpy: any
+  let pushSpy: PushSpy
 
   beforeEach(() => {
     acceptLegalConsentSpy.mockReset()
