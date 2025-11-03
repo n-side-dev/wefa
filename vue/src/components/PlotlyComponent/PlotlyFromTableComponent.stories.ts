@@ -66,12 +66,27 @@ const timeSeriesData = [
   { timestamp: '2024-01-01T05:00:00Z', power: 1080, voltage: 232 },
 ]
 
+const timeSeriesData2 = [
+  { timestamp: '2024-01-01T00:00:00Z', forecast: 1200, actual: 1100 },
+  { timestamp: '2024-01-01T01:00:00Z', forecast: 1120, actual: 1050 },
+  { timestamp: '2024-01-01T02:00:00Z', forecast: 1100, actual: 1250 },
+  { timestamp: '2024-01-01T03:00:00Z', forecast: 1050, actual: 1200 },
+  { timestamp: '2024-01-01T04:00:00Z', forecast: 1100, actual: 1250 },
+  { timestamp: '2024-01-01T05:00:00Z', forecast: 1080, actual: 1200 },
+  { timestamp: '2024-01-01T06:00:00Z', forecast: 1000 },
+  { timestamp: '2024-01-01T07:00:00Z', forecast: 1080 },
+]
+
 export const BasicLineChart: Story = {
   args: {
     value: energyConsumptionData,
     config: {
-      x: 'month',
-      y: 'consumption',
+      data: [
+        {
+          xKey: 'month',
+          yKey: 'consumption',
+        },
+      ],
       layout: {
         title: { text: 'plot.title.text', subtitle: { text: 'plot.title.subtitle' } },
         xaxis: { title: { text: 'plot.xaxis.title' } },
@@ -107,14 +122,16 @@ export const ScatterPlot: Story = {
   args: {
     value: energyConsumptionData,
     config: {
-      x: 'temperature',
-      y: 'consumption',
-      traceConfig: {
-        mode: 'markers',
-        type: 'scatter',
-        name: 'Temperature vs Consumption',
-        marker: { size: 8, color: 'blue' },
-      },
+      data: [
+        {
+          xKey: 'temperature',
+          yKey: 'consumption',
+          mode: 'markers',
+          type: 'scatter',
+          name: 'Temperature vs Consumption',
+          marker: { size: 8, color: 'blue' },
+        },
+      ],
       layout: {
         title: { text: 'Energy Consumption vs Temperature' },
         xaxis: { title: { text: 'Temperature (°C)' } },
@@ -134,13 +151,15 @@ export const BarChart: Story = {
   args: {
     value: salesData,
     config: {
-      x: 'product',
-      y: 'sales',
-      traceConfig: {
-        type: 'bar',
-        name: 'Product Sales',
-        marker: { color: 'green' },
-      },
+      data: [
+        {
+          xKey: 'product',
+          yKey: 'sales',
+          type: 'bar',
+          name: 'Product Sales',
+          marker: { color: 'green' },
+        },
+      ],
       layout: {
         title: { text: 'Product Sales by Category' },
         xaxis: { title: { text: 'Product' } },
@@ -160,14 +179,16 @@ export const TimeSeriesChart: Story = {
   args: {
     value: timeSeriesData,
     config: {
-      x: 'timestamp',
-      y: 'power',
-      traceConfig: {
-        type: 'scatter',
-        mode: 'lines+markers',
-        name: 'Power Output',
-        line: { color: 'red' },
-      },
+      data: [
+        {
+          xKey: 'timestamp',
+          yKey: 'power',
+          type: 'scatter',
+          mode: 'lines+markers',
+          name: 'Power Output',
+          line: { color: 'red' },
+        },
+      ],
       layout: {
         title: { text: 'Power Output Over Time' },
         xaxis: {
@@ -186,22 +207,64 @@ export const TimeSeriesChart: Story = {
   },
 }
 
+export const MultipleTraces: Story = {
+  args: {
+    value: timeSeriesData2,
+    config: {
+      data: [
+        {
+          xKey: 'timestamp',
+          yKey: 'forecast',
+          type: 'scatter',
+          mode: 'lines+markers',
+          name: 'Forecast',
+          line: { color: 'red' },
+        },
+        {
+          xKey: 'timestamp',
+          yKey: 'actual',
+          type: 'scatter',
+          mode: 'lines',
+          name: 'Actual',
+          line: { color: 'green', shape: 'spline' },
+        },
+      ],
+      layout: {
+        title: { text: 'Power Forecast and Actuals' },
+        xaxis: {
+          title: { text: 'Time' },
+          type: 'date',
+        },
+        yaxis: { title: { text: 'Power (W)' } },
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitFor(() => {
+      expect(canvas.getByText('Power Forecast and Actuals')).toBeInTheDocument()
+    })
+  },
+}
+
 export const CustomConfiguration: Story = {
   args: {
     value: salesData,
     config: {
-      x: 'sales',
-      y: 'profit',
-      traceConfig: {
-        type: 'scatter',
-        mode: 'markers',
-        name: 'Sales vs Profit',
-        marker: {
-          size: 12,
-          color: 'purple',
-          opacity: 0.7,
+      data: [
+        {
+          xKey: 'sales',
+          yKey: 'profit',
+          type: 'scatter',
+          mode: 'markers',
+          name: 'Sales vs Profit',
+          marker: {
+            size: 12,
+            color: 'purple',
+            opacity: 0.7,
+          },
         },
-      },
+      ],
       layout: {
         title: { text: 'Sales vs Profit Analysis' },
         xaxis: { title: { text: 'Units Sold' } },
