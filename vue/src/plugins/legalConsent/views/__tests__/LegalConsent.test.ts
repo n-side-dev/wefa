@@ -27,10 +27,10 @@ vi.mock('@/plugins/legalConsent', () => ({
 const toastAddSpy: ReturnType<typeof vi.fn> = vi.fn()
 const confirmRequireSpy: ReturnType<typeof vi.fn> = vi.fn()
 vi.mock('primevue/usetoast', () => ({
-  useToast: () => ({ add: (...args: unknown[]) => toastAddSpy(...args) }),
+  useToast: () => ({ add: (...args: unknown[]) => new toastAddSpy(...args) }),
 }))
 vi.mock('primevue/useconfirm', () => ({
-  useConfirm: () => ({ require: (...args: unknown[]) => confirmRequireSpy(...args) }),
+  useConfirm: () => ({ require: (...args: unknown[]) => new confirmRequireSpy(...args) }),
 }))
 
 // Stub PrimeVue complex components so we can interact easily
