@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, type MockInstance } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount, RouterLinkStub } from '@vue/test-utils'
 import { nextTick } from 'vue'
 
@@ -24,13 +24,13 @@ vi.mock('@/plugins/legalConsent', () => ({
 }))
 
 // Mock PrimeVue toast and confirm composables
-const toastAddSpy: ReturnType<typeof vi.fn> = vi.fn()
-const confirmRequireSpy: ReturnType<typeof vi.fn> = vi.fn()
+const toastAddSpy = vi.fn()
+const confirmRequireSpy = vi.fn()
 vi.mock('primevue/usetoast', () => ({
-  useToast: () => ({ add: (...args: unknown[]) => new toastAddSpy(...args) }),
+  useToast: () => ({ add: (...args: unknown[]) => toastAddSpy(...args) }),
 }))
 vi.mock('primevue/useconfirm', () => ({
-  useConfirm: () => ({ require: (...args: unknown[]) => new confirmRequireSpy(...args) }),
+  useConfirm: () => ({ require: (...args: unknown[]) => confirmRequireSpy(...args) }),
 }))
 
 // Stub PrimeVue complex components so we can interact easily
@@ -63,7 +63,7 @@ import LegalConsent from '../LegalConsent.vue'
 
 describe('LegalConsent.vue', () => {
   let router: Router
-  let pushSpy: MockInstance
+  let pushSpy: any
 
   beforeEach(() => {
     acceptLegalConsentSpy.mockReset()
