@@ -112,7 +112,7 @@
     "eslint": "^9.38.0",
     "eslint-plugin-jsdoc": "^61.1.11",
     "to-valid-identifier": "^1.0.0",
-    "eslint-plugin-playwright": "^2.2.2",
+    "eslint-plugin-playwright": "^2.3.0",
     "eslint-plugin-security": "^3.0.1",
     "eslint-plugin-sonarjs": "^3.0.5",
     "eslint-plugin-storybook": "^10.0.2",
