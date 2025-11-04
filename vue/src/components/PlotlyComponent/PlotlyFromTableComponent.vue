@@ -9,10 +9,15 @@ import PlotlyComponent from '@/components/PlotlyComponent/PlotlyComponent.vue'
 import { useI18nLib } from '@/locales'
 import { applyTranslations } from '@/utils/translations'
 
+// Ideally we'd like to Omit 'x' and 'y' from DataFromTable,
+// but this causes issues with optional fields coming from Data.
+export type DataFromTable = {
+  xKey: string
+  yKey: string
+} & Data
+
 export interface PlotlyFromTableComponentConfig {
-  x: string
-  y: string
-  traceConfig?: Partial<Data>
+  data: DataFromTable[]
   layout?: Partial<Layout>
   config?: Partial<Config>
 }
@@ -60,12 +65,15 @@ const processedLayout: ComputedRef<Partial<Layout> | undefined> = computed(() =>
 )
 
 const plotlyData: ComputedRef<Data[]> = computed(() => {
-  return [
-    {
-      x: value.map((row) => row[config.x]),
-      y: value.map((row) => row[config.y]),
-      ...(config.traceConfig ?? {}),
-    },
-  ] as Data[]
+  return config.data.map((trace) => {
+    const { xKey, yKey, ...other } = trace
+    return {
+      ...other,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      x: value.map((row) => row[xKey] as any),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      y: value.map((row) => row[yKey] as any),
+    }
+  })
 })
 </script>

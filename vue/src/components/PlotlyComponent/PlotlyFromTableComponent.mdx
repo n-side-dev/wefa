@@ -52,36 +52,50 @@ This example shows how to create a chart from tabular energy consumption data:
 
 ## Usage
 
+### Importing the component
+
+```js
+// Just the component
+import { PlotlyFromTableComponent } from '@nside/wefa'
+
+// Component and Props type
+import { PlotlyFromTableComponent, type PlotlyFromTableComponentProps } from '@nside/wefa'
+```
+
 ### Basic Line Chart from Table Data
 
 The component requires tabular data and a configuration specifying which columns to use:
 
-```vue
+```html
 <template>
   <PlotlyFromTableComponent :value="tableData" :config="chartConfig" />
 </template>
 
-<script setup>
-import PlotlyFromTableComponent from '@/components/PlotlyComponent/PlotlyFromTableComponent.vue'
+<script setup lang="ts">
+  import { PlotlyFromTableComponent } from '@nside/wefa'
 
-// Tabular data - array of objects representing rows
-const tableData = [
-  { month: 'Jan', consumption: 120, temperature: 5 },
-  { month: 'Feb', consumption: 110, temperature: 8 },
-  { month: 'Mar', consumption: 95, temperature: 12 },
-  { month: 'Apr', consumption: 80, temperature: 18 },
-]
+  // Tabular data - array of objects representing rows
+  const tableData = [
+    { month: 'Jan', consumption: 120, temperature: 5 },
+    { month: 'Feb', consumption: 110, temperature: 8 },
+    { month: 'Mar', consumption: 95, temperature: 12 },
+    { month: 'Apr', consumption: 80, temperature: 18 },
+  ]
 
-// Configuration specifying which columns to use
-const chartConfig = {
-  x: 'month', // Column name for x-axis
-  y: 'consumption', // Column name for y-axis
-  layout: {
-    title: 'Monthly Energy Consumption',
-    xaxis: { title: 'Month' },
-    yaxis: { title: 'Consumption (kWh)' },
-  },
-}
+  // Configuration specifying which columns to use
+  const chartConfig = {
+    data: [
+      {
+        xKey: 'month', // Column name for x-axis
+        yKey: 'consumption', // Column name for y-axis
+      },
+    ],
+    layout: {
+      title: { text: 'Monthly Energy Consumption' },
+      xaxis: { title: { text: 'Month' } },
+      yaxis: { title: { text: 'Consumption (kWh)' } },
+    },
+  }
 </script>
 ```
 
@@ -89,36 +103,36 @@ const chartConfig = {
 
 You can customize the chart appearance using the traceConfig option:
 
-```vue
+```html
 <template>
   <PlotlyFromTableComponent :value="tableData" :config="scatterConfig" />
 </template>
 
-<script setup>
-const tableData = [
-  { temperature: 5, consumption: 120 },
-  { temperature: 8, consumption: 110 },
-  { temperature: 12, consumption: 95 },
-  { temperature: 18, consumption: 80 },
-]
+<script setup lang="ts">
+  const tableData = [
+    { temperature: 5, consumption: 120 },
+    { temperature: 8, consumption: 110 },
+    { temperature: 12, consumption: 95 },
+    { temperature: 18, consumption: 80 },
+  ]
 
-const scatterConfig = {
-  x: 'temperature',
-  y: 'consumption',
-  traceConfig: [
-    {
-      mode: 'markers',
-      type: 'scatter',
-      name: 'Temperature vs Consumption',
-      marker: { size: 8, color: 'blue' },
+  const scatterConfig = {
+    data: [
+      {
+        xKey: 'temperature',
+        yKey: 'consumption',
+        mode: 'markers',
+        type: 'scatter',
+        name: 'Temperature vs Consumption',
+        marker: { size: 8, color: 'blue' },
+      },
+    ],
+    layout: {
+      title: { text: 'Energy Consumption vs Temperature' },
+      xaxis: { title: { text: 'Temperature (°C)' } },
+      yaxis: { title: { text: 'Consumption (kWh)' } },
     },
-  ],
-  layout: {
-    title: 'Energy Consumption vs Temperature',
-    xaxis: { title: 'Temperature (°C)' },
-    yaxis: { title: 'Consumption (kWh)' },
-  },
-}
+  }
 </script>
 ```
 
@@ -126,35 +140,35 @@ const scatterConfig = {
 
 Perfect for categorical data visualization:
 
-```vue
+```html
 <template>
   <PlotlyFromTableComponent :value="salesData" :config="barConfig" />
 </template>
 
-<script setup>
-const salesData = [
-  { product: 'Solar Panels', sales: 150 },
-  { product: 'Wind Turbines', sales: 80 },
-  { product: 'Batteries', sales: 200 },
-  { product: 'Inverters', sales: 120 },
-]
+<script setup lang="ts">
+  const salesData = [
+    { product: 'Solar Panels', sales: 150 },
+    { product: 'Wind Turbines', sales: 80 },
+    { product: 'Batteries', sales: 200 },
+    { product: 'Inverters', sales: 120 },
+  ]
 
-const barConfig = {
-  x: 'product',
-  y: 'sales',
-  traceConfig: [
-    {
-      type: 'bar',
-      name: 'Product Sales',
-      marker: { color: 'green' },
+  const barConfig = {
+    data: [
+      {
+        xKey: 'product',
+        yKey: 'sales',
+        type: 'bar',
+        name: 'Product Sales',
+        marker: { color: 'green' },
+      },
+    ],
+    layout: {
+      title: { text: 'Product Sales by Category' },
+      xaxis: { title: { text: 'Product' } },
+      yaxis: { title: { text: 'Units Sold' } },
     },
-  ],
-  layout: {
-    title: 'Product Sales by Category',
-    xaxis: { title: 'Product' },
-    yaxis: { title: 'Units Sold' },
-  },
-}
+  }
 </script>
 ```
 
@@ -162,37 +176,90 @@ const barConfig = {
 
 Excellent for time-based data visualization:
 
-```vue
+```html
 <template>
   <PlotlyFromTableComponent :value="timeSeriesData" :config="timeConfig" />
 </template>
 
-<script setup>
-const timeSeriesData = [
-  { timestamp: '2024-01-01T00:00:00Z', power: 1200 },
-  { timestamp: '2024-01-01T01:00:00Z', power: 1150 },
-  { timestamp: '2024-01-01T02:00:00Z', power: 1100 },
-]
+<script setup lang="ts">
+  const timeSeriesData = [
+    { timestamp: '2024-01-01T00:00:00Z', power: 1200 },
+    { timestamp: '2024-01-01T01:00:00Z', power: 1150 },
+    { timestamp: '2024-01-01T02:00:00Z', power: 1100 },
+  ]
 
-const timeConfig = {
-  x: 'timestamp',
-  y: 'power',
-  traceConfig: [
-    {
-      type: 'scatter',
-      mode: 'lines+markers',
-      name: 'Power Output',
+  const timeConfig = {
+    data: [
+      {
+        xKey: 'timestamp',
+        yKey: 'power',
+        type: 'scatter',
+        mode: 'lines+markers',
+        name: 'Power Output',
+        line: { color: 'red' },
+      },
+    ],
+    layout: {
+      title: { text: 'Power Output Over Time' },
+      xaxis: {
+        title: { text: 'Time' },
+        type: 'date',
+      },
+      yaxis: { title: { text: 'Power (W)' } },
     },
-  ],
-  layout: {
-    title: 'Power Output Over Time',
-    xaxis: {
-      title: 'Time',
-      type: 'date',
+  }
+</script>
+```
+
+### Multiple traces
+
+You can extract and plot multiple columns as different traces:
+
+```html
+<template>
+  <PlotlyFromTableComponent :value="timeSeriesData2" :config="timeConfig" />
+</template>
+
+<script setup lang="ts">
+  const timeSeriesData2 = [
+    { timestamp: '2024-01-01T00:00:00Z', forecast: 1200, actual: 1100 },
+    { timestamp: '2024-01-01T01:00:00Z', forecast: 1120, actual: 1050 },
+    { timestamp: '2024-01-01T02:00:00Z', forecast: 1100, actual: 1250 },
+    { timestamp: '2024-01-01T03:00:00Z', forecast: 1050, actual: 1200 },
+    { timestamp: '2024-01-01T04:00:00Z', forecast: 1100, actual: 1250 },
+    { timestamp: '2024-01-01T05:00:00Z', forecast: 1080, actual: 1200 },
+    { timestamp: '2024-01-01T06:00:00Z', forecast: 1000 },
+    { timestamp: '2024-01-01T07:00:00Z', forecast: 1080 },
+  ]
+
+  const timeConfig = {
+    data: [
+      {
+        xKey: 'timestamp',
+        yKey: 'forecast',
+        type: 'scatter',
+        mode: 'lines+markers',
+        name: 'Forecast',
+        line: { color: 'red' },
+      },
+      {
+        xKey: 'timestamp',
+        yKey: 'actual',
+        type: 'scatter',
+        mode: 'lines',
+        name: 'Actual',
+        line: { color: 'green', shape: 'spline' },
+      },
+    ],
+    layout: {
+      title: { text: 'Power Forecast and Actuals' },
+      xaxis: {
+        title: { text: 'Time' },
+        type: 'date',
+      },
+      yaxis: { title: { text: 'Power (W)' } },
     },
-    yaxis: { title: 'Power (W)' },
-  },
-}
+  }
 </script>
 ```
 
@@ -201,12 +268,17 @@ const timeConfig = {
 ### PlotlyFromTableComponentConfig Interface
 
 ```typescript
+import { type Data, type Layout, type Config } from 'plotly.js-dist-min'
+
+type DataFromTable = {
+  xKey: string // Column name for x-axis data
+  yKey: string // Column name for y-axis data
+} & Data // rest of the Plotly trace configuration
+
 interface PlotlyFromTableComponentConfig {
-  x: string // Column name for x-axis data
-  y: string // Column name for y-axis data
-  traceConfig?: Record<string, unknown>[] // Optional Plotly trace configuration
-  layout?: any // Optional Plotly layout configuration
-  config?: any // Optional Plotly config options
+  data: DataFromTable[] // Array of trace configurations
+  layout?: Partial<Layout> // Optional Plotly layout configuration
+  config?: Partial<Config> // Optional Plotly config options
 }
 ```
 
@@ -228,14 +300,14 @@ const tableData: Record<string, unknown>[] = [
 The component transforms your tabular data by:
 
 1. **Column Extraction**: Extracts values from the specified x and y columns
-2. **Data Mapping**: Maps `value.map(row => row[config.x])` to x-axis data
-3. **Data Mapping**: Maps `value.map(row => row[config.y])` to y-axis data
+2. **Data Mapping**: Maps `value.map((row) => row[xKey])` to x-axis data
+3. **Data Mapping**: Maps `value.map((row) => row[yKey])` to y-axis data
 4. **Trace Creation**: Combines the mapped data with optional trace configuration
 5. **Chart Rendering**: Passes the transformed data to the underlying PlotlyComponent
 
 ## Chart Types
 
-The component supports all Plotly.js chart types through the `traceConfig` option:
+The component supports all Plotly.js chart types through the traces configuration options :
 
 ### Line Charts (Default)
 
@@ -246,8 +318,9 @@ The component supports all Plotly.js chart types through the `traceConfig` optio
 ### Scatter Plots
 
 ```javascript
-traceConfig: [
+data: [
   {
+    ...
     mode: 'markers',
     type: 'scatter',
   },
@@ -257,8 +330,9 @@ traceConfig: [
 ### Bar Charts
 
 ```javascript
-traceConfig: [
+data: [
   {
+    ...
     type: 'bar',
   },
 ]
@@ -269,5 +343,5 @@ traceConfig: [
 ### Common Issues
 
 - **No Data Displayed**: Verify column names match your data object keys exactly
-- **Incorrect Axis Data**: Check that x and y configuration values correspond to existing columns
-- **Type Errors**: Ensure your data structure matches `Record<string, unknown>[]`
+- **Incorrect Axis Data**: Check that xKey and yKey configuration values correspond to existing columns
+- **Type Errors**: Ensure your table data structure matches `Record<string, unknown>[]`

@@ -20,8 +20,12 @@ const sampleTableData = [
 ]
 
 const basicConfig = {
-  x: 'month',
-  y: 'consumption',
+  data: [
+    {
+      xKey: 'month',
+      yKey: 'consumption',
+    },
+  ],
   layout: {
     title: 'Test Chart',
     xaxis: { title: 'Month' },
@@ -87,13 +91,15 @@ describe('PlotlyFromTableComponent', () => {
 
   it('applies trace configuration correctly', () => {
     const configWithTrace = {
-      x: 'month',
-      y: 'consumption',
-      traceConfig: {
-        type: 'bar',
-        name: 'Monthly Consumption',
-        marker: { color: 'blue' },
-      },
+      data: [
+        {
+          xKey: 'month',
+          yKey: 'consumption',
+          type: 'bar',
+          name: 'Monthly Consumption',
+          marker: { color: 'blue' },
+        },
+      ],
     }
 
     const wrapper = mount(PlotlyFromTableComponent, {
@@ -135,8 +141,12 @@ describe('PlotlyFromTableComponent', () => {
 
   it('passes config configuration to PlotlyComponent', () => {
     const configWithPlotlyConfig = {
-      x: 'month',
-      y: 'consumption',
+      data: [
+        {
+          xKey: 'month',
+          yKey: 'consumption',
+        },
+      ],
       config: {
         displayModeBar: false,
         responsive: true,
@@ -161,8 +171,7 @@ describe('PlotlyFromTableComponent', () => {
 
   it('handles missing columns gracefully', () => {
     const configWithMissingColumn = {
-      x: 'nonexistent',
-      y: 'consumption',
+      data: [{ xKey: 'nonexistent', yKey: 'consumption' }],
     }
 
     const wrapper = mount(PlotlyFromTableComponent, {
@@ -221,8 +230,7 @@ describe('PlotlyFromTableComponent', () => {
 
     // Change to different columns
     const newConfig = {
-      x: 'temperature',
-      y: 'consumption',
+      data: [{ xKey: 'temperature', yKey: 'consumption' }],
     }
 
     await wrapper.setProps({ config: newConfig })
@@ -263,8 +271,7 @@ describe('PlotlyFromTableComponent', () => {
     ]
 
     const numericConfig = {
-      x: 'x_val',
-      y: 'y_val',
+      data: [{ xKey: 'x_val', yKey: 'y_val' }],
     }
 
     const wrapper = mount(PlotlyFromTableComponent, {
