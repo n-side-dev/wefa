@@ -1,8 +1,13 @@
-import { describe, it, expect, vi, beforeEach, type MockInstance } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount, RouterLinkStub } from '@vue/test-utils'
 import { nextTick } from 'vue'
 
 const flushPromises = () => new Promise((resolve) => setTimeout(resolve))
+
+// Minimal local type for a Vitest spy used in this file
+// Avoids importing incompatible vitest types across versions and satisfies ESLint no-explicit-any
+// Use the shape from vi.fn() to ensure compatibility with spies
+type PushSpy = Pick<ReturnType<typeof vi.fn>, 'mock' | 'mockResolvedValue'>
 
 // Mock i18n util to return the key itself for easier assertions
 vi.mock('@/locales', () => ({
@@ -24,8 +29,8 @@ vi.mock('@/plugins/legalConsent', () => ({
 }))
 
 // Mock PrimeVue toast and confirm composables
-const toastAddSpy: ReturnType<typeof vi.fn> = vi.fn()
-const confirmRequireSpy: ReturnType<typeof vi.fn> = vi.fn()
+const toastAddSpy = vi.fn()
+const confirmRequireSpy = vi.fn()
 vi.mock('primevue/usetoast', () => ({
   useToast: () => ({ add: (...args: unknown[]) => toastAddSpy(...args) }),
 }))
@@ -63,7 +68,7 @@ import LegalConsent from '../LegalConsent.vue'
 
 describe('LegalConsent.vue', () => {
   let router: Router
-  let pushSpy: MockInstance
+  let pushSpy: PushSpy
 
   beforeEach(() => {
     acceptLegalConsentSpy.mockReset()
