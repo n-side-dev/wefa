@@ -96,7 +96,7 @@
     "@tsconfig/node22": "^22.0.2",
     "@types/eslint-plugin-security": "^3.0.0",
     "@types/jsdom": "^27.0.0",
-    "@types/node": "^24.9.2",
+    "@types/node": "^24.10.0",
     "@types/plotly.js-dist-min": "^2.3.4",
     "@vitejs/plugin-vue": "^6.0.1",
     "@vitest/browser": "4.0.6",
