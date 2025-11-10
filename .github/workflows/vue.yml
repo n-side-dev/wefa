@@ -30,6 +30,15 @@ jobs:
       - name: Detect secrets
         run: npx detect-secrets scan || true
 
+  unused-dependencies-check:
+    name: Unused Dependencies Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/setup-node
+      - name: Check for unused dependencies
+        run: npm run knip -- --exclude exports,unlisted,duplicates,devDependencies,files
+
   code-quality-checks:
     name: Code Quality Checks
     runs-on: ubuntu-latest
