@@ -36,6 +36,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: ./.github/actions/setup-node
+      - run: npm ci
       - name: Check for unused dependencies
         run: npm run knip -- --exclude exports,unlisted,duplicates,devDependencies,files
 
