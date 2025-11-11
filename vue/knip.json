@@ -1,0 +1,12 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "ignoreExportsUsedInFile": {
+    "interface": true,
+    "type": true
+  },
+  "ignoreFiles": ["src/*"],
+  "ignoreDependencies": ["@tailwindcss/cli", "@vee-validate/zod"],
+  "tags": [
+    "-lintignore"
+  ]
+}
