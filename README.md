@@ -12,6 +12,10 @@ N-SIDE WeFa (Web Factory) is an open-source toolkit for building full-stack, pro
 - **WeFa Django Toolkit** – reusable Django apps for authentication, consent management, and shared utilities (`django/`)
 - **WeFa Frontend Library** – a Vue 3 component system, CLI helpers, and Storybook demos (`vue/`)
 
+## Documentation
+
+Explore the [interactive documentation](https://n-side-dev.github.io/wefa/) for the Django and Vue packages.
+
 ## Packages at a Glance
 
 - `django/` – source code for the Django distribution published as `nside-wefa`. Includes the demo project in `django/demo`.
