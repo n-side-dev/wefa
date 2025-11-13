@@ -117,7 +117,7 @@
     "eslint-plugin-storybook": "^10.0.7",
     "eslint-plugin-vue": "~10.5.1",
     "jiti": "^2.6.1",
-    "jsdom": "^27.1.0",
+    "jsdom": "^27.2.0",
     "knip": "^5.69.1",
     "npm-run-all2": "^8.0.4",
     "playwright": "^1.55.0",
