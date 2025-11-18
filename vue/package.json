@@ -75,7 +75,7 @@
     "axios": "^1.13.2",
     "marked": "^17.0.0",
     "pinia": "^3.0.4",
-    "plotly.js-dist-min": "^3.2.0",
+    "plotly.js-dist-min": "^3.3.0",
     "primeicons": "^7.0.0",
     "primevue": "^4.4.1",
     "tailwindcss-primeui": "^0.6.1",
