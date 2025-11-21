@@ -17,7 +17,7 @@ jobs:
         working-directory: vue
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup Node.js (with cache)
         uses: ./.github/actions/setup-node
@@ -56,7 +56,7 @@ jobs:
         working-directory: django
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup Python and create venv (uv)
         uses: ./.github/actions/setup-python
