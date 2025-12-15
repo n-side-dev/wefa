@@ -51,29 +51,22 @@
 </template>
 
 <script setup lang="ts">
-import { computed, type ComputedRef } from 'vue'
+import { computed } from 'vue'
 import { DateTime } from 'luxon'
 
 const DAY_CELL_WIDTH_PX = 40 // match Tailwind w-10 (2.5rem) at base 16px
 
-const dateRange: ComputedRef<Date[]> = computed(() => {
-  const dates = []
-  const currentDate = new Date(2026, 0, 1)
-  const endDate = new Date(2026, 11, 31)
+export interface GanttChartRowProps {
+  dateRange: Date[]
+}
 
-  while (currentDate <= endDate) {
-    dates.push(new Date(currentDate))
-    currentDate.setDate(currentDate.getDate() + 1)
-  }
-
-  return dates
-})
+const { dateRange } = defineProps<GanttChartRowProps>()
 
 const weeks = computed(() => {
   type WeekGroup = { weekYear: number; weekNumber: number; days: Date[] }
   const groups: WeekGroup[] = []
 
-  dateRange.value.forEach((date) => {
+  dateRange.forEach((date) => {
     const luxonDate = DateTime.fromJSDate(date)
     const keyYear = luxonDate.weekYear
     const keyNumber = luxonDate.weekNumber
@@ -97,7 +90,7 @@ const months = computed(() => {
   type MonthGroup = { month: number; year: number; label: string; days: Date[] }
   const groups: MonthGroup[] = []
 
-  dateRange.value.forEach((date) => {
+  dateRange.forEach((date) => {
     const luxonDate = DateTime.fromJSDate(date)
     const keyYear = luxonDate.year
     const keyMonth = luxonDate.month
