@@ -6,6 +6,13 @@
           <!-- Months header -->
           <div class="flex">
             <div
+              class="flex-none sticky left-0 z-30 box-border border border-gray-300 bg-white text-gray-700 text-xs font-semibold px-3 py-1"
+              :style="{ width: `${ROW_HEADER_WIDTH_PX}px` }"
+              aria-hidden="true"
+            >
+              Rows
+            </div>
+            <div
               v-for="month in months"
               :key="`${month.year}-${month.month}`"
               class="flex-none box-border border border-gray-300 bg-gray-100 text-gray-800 text-xs font-semibold text-center py-1"
@@ -18,6 +25,13 @@
           </div>
           <!-- Weeks header -->
           <div class="flex">
+            <div
+              class="flex-none sticky left-0 z-30 box-border border border-gray-300 bg-white text-gray-700 text-xs font-medium px-3 py-1"
+              :style="{ width: `${ROW_HEADER_WIDTH_PX}px` }"
+              aria-hidden="true"
+            >
+              &nbsp;
+            </div>
             <div
               v-for="week in weeks"
               :key="`${week.weekYear}-W${week.weekNumber}`"
@@ -32,6 +46,12 @@
           <!-- Days row -->
           <div class="flex">
             <div
+              class="flex-none sticky left-0 z-30 box-border border border-gray-200 bg-white text-gray-600 text-xs font-medium px-3 py-2 select-none"
+              :style="{ width: `${ROW_HEADER_WIDTH_PX}px` }"
+            >
+              Dates
+            </div>
+            <div
               v-for="date in dateRange"
               :key="date.toISOString()"
               class="flex-none box-border border border-gray-200 text-center py-2 text-xs select-none"
@@ -39,6 +59,27 @@
               :title="date.toDateString()"
             >
               {{ date.getDate() }}
+            </div>
+          </div>
+
+          <!-- Rows -->
+          <div>
+            <div
+              v-for="row in rows"
+              :key="row.id"
+              class="flex items-center"
+            >
+              <div
+                class="flex-none sticky left-0 z-20 box-border border border-gray-200 bg-white text-gray-800 text-sm font-medium px-3 py-2"
+                :style="{ width: `${ROW_HEADER_WIDTH_PX}px` }"
+              >
+                {{ row.title }}
+              </div>
+              <div
+                class="flex-none box-border border border-gray-200 bg-blue-50 h-10"
+                :style="{ width: `${timelineWidthPx}px` }"
+                :aria-label="`${row.title} timeline spanning full date range`"
+              ></div>
             </div>
           </div>
         </div>
@@ -52,6 +93,7 @@ import { computed, type ComputedRef, onMounted, useTemplateRef } from 'vue'
 import { DateTime } from 'luxon'
 
 const DAY_CELL_WIDTH_PX = 40 // match Tailwind w-10 (2.5rem) at base 16px
+const ROW_HEADER_WIDTH_PX = 160
 
 const ganntChart = useTemplateRef('ganntChart')
 
@@ -70,6 +112,15 @@ const dateRange: ComputedRef<Date[]> = computed(() => {
   }
 
   return dates
+})
+
+const timelineWidthPx = computed(() => dateRange.value.length * DAY_CELL_WIDTH_PX)
+
+const rows = computed(() => {
+  return Array.from({ length: 10 }, (_, index) => ({
+    id: index + 1,
+    title: `Row ${index + 1}`,
+  }))
 })
 
 const weeks = computed(() => {
