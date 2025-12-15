@@ -3,6 +3,19 @@
     <div ref="ganntChart" class="w-full h-full bg-white">
       <div class="overflow-x-auto">
         <div class="min-w-max">
+          <!-- Months header -->
+          <div class="flex">
+            <div
+              v-for="month in months"
+              :key="`${month.year}-${month.month}`"
+              class="flex-none box-border border border-gray-300 bg-gray-100 text-gray-800 text-xs font-semibold text-center py-1"
+              :style="{ width: `${month.days.length * DAY_CELL_WIDTH_PX}px` }"
+              :title="`${month.label} (${month.days.length} days)`"
+              :aria-label="`Month ${month.label}`"
+            >
+              {{ month.label }}
+            </div>
+          </div>
           <!-- Weeks header -->
           <div class="flex">
             <div
@@ -48,8 +61,8 @@ onMounted(() => {
 
 const dateRange: ComputedRef<Date[]> = computed(() => {
   const dates = []
-  const currentDate = new Date(2025, 0, 2)
-  const endDate = new Date(2025, 11, 31)
+  const currentDate = new Date(2026, 0, 1)
+  const endDate = new Date(2026, 11, 31)
 
   while (currentDate <= endDate) {
     dates.push(new Date(currentDate))
@@ -75,6 +88,31 @@ const weeks = computed(() => {
       groups.push({
         weekYear: keyYear,
         weekNumber: keyNumber,
+        days: [date],
+      })
+    }
+  })
+
+  return groups
+})
+
+const months = computed(() => {
+  type MonthGroup = { month: number; year: number; label: string; days: Date[] }
+  const groups: MonthGroup[] = []
+
+  dateRange.value.forEach((date) => {
+    const luxonDate = DateTime.fromJSDate(date)
+    const keyYear = luxonDate.year
+    const keyMonth = luxonDate.month
+    const existing = groups.find((m) => m.year === keyYear && m.month === keyMonth)
+
+    if (existing) {
+      existing.days.push(date)
+    } else {
+      groups.push({
+        month: keyMonth,
+        year: keyYear,
+        label: luxonDate.toFormat('MMM yy'),
         days: [date],
       })
     }
