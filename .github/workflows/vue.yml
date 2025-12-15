@@ -58,7 +58,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-node
       - name: Cache Playwright browsers
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles('vue/package-lock.json') }}
@@ -68,7 +68,7 @@ jobs:
       - name: Run unit tests with coverage
         run: npm run test:unit -- --coverage
       - name: Upload coverage artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: vue-coverage
           path: coverage/
@@ -80,7 +80,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-node
       - name: Cache Playwright browsers
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles('vue/package-lock.json') }}
@@ -112,7 +112,7 @@ jobs:
       - name: Check bundle size
         run: npx bundlesize
       - name: Upload dist artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: vue-dist
           path: dist/
