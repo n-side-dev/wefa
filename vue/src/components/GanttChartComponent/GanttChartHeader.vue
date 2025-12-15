@@ -39,7 +39,7 @@
         <div
           v-for="date in dateRange"
           :key="date.toISOString()"
-          class="flex-none box-border border border-gray-200 text-center py-2 text-xs select-none"
+          class="flex-none box-border border border-gray-200 bg-white text-center py-2 text-xs select-none"
           :style="{ width: `${DAY_CELL_WIDTH_PX}px` }"
           :title="date.toDateString()"
         >
