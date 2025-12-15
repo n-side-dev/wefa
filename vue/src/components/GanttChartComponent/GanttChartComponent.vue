@@ -1,13 +1,15 @@
 <template>
   <div ref="gantt-container" class="w-full h-full p-2">
-    <div
-      v-bind="containerProps"
-      class="flex flex-col w-full bg-white overflow-x-auto justify-start p-0 *:w-full *:min-w-fit *:shrink-0"
-      :style="{ height: `${containerHeight}px` }"
-    >
-      <GanttChartHeader :date-range="dateRange" />
-      <div id="fb" class="min-w-fit w-full shrink-0" v-bind="wrapperProps">
-        <GanttChartRow v-for="(item, idx) in list" :key="idx" :date-range="dateRange" />
+    <div class="rounded-2xl overflow-hidden">
+      <div
+        v-bind="containerProps"
+        class="flex flex-col w-full bg-white overflow-auto justify-start p-0 *:w-full *:min-w-fit *:shrink-0"
+        :style="{ height: `${containerHeight}px` }"
+      >
+        <GanttChartHeader :date-range="dateRange" />
+        <div id="fb" class="min-w-fit w-full shrink-0" v-bind="wrapperProps">
+          <GanttChartRow v-for="(item, idx) in list" :key="idx" :date-range="dateRange" />
+        </div>
       </div>
     </div>
   </div>
