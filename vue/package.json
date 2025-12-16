@@ -115,7 +115,7 @@
     "eslint-plugin-security": "^3.0.1",
     "eslint-plugin-sonarjs": "^3.0.5",
     "eslint-plugin-storybook": "^10.1.8",
-    "eslint-plugin-vue": "~10.5.1",
+    "eslint-plugin-vue": "~10.6.2",
     "jiti": "^2.6.1",
     "jsdom": "^27.3.0",
     "knip": "^5.69.1",
