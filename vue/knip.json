@@ -8,5 +8,9 @@
   "ignoreDependencies": ["@tailwindcss/cli", "@vee-validate/zod"],
   "tags": [
     "-lintignore"
-  ]
+  ],
+  "storybook": {
+    "config": [".storybook/main.ts"],
+    "entry": [".storybook/preview.ts", "src/**/*.stories.@(js|jsx|ts|tsx)"]
+  }
 }
