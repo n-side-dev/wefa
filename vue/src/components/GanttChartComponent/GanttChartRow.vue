@@ -1,11 +1,16 @@
 <template>
-  <div class="flex flex-row w-full" :style="{ height: `${ROW_HEIGHT_PX}px` }">
+  <div class="flex flex-row w-full group" :style="{ height: `${ROW_HEIGHT_PX}px` }">
     <div
-      class="left-0 p-0 w-80 flex shrink-0 sticky z-5 justify-center items-center box-border border border-gray-300 bg-gray-100"
+      class="left-0 p-0 w-80 flex shrink-0 sticky z-5 justify-center items-center box-border border border-gray-300 bg-white group-hover:bg-blue-50"
     >
       Header
     </div>
-    <div class="box-border border border-gray-300" :style="`width: ${lineWidth}`">Content</div>
+    <div
+      class="box-border border border-gray-300 group-hover:bg-blue-50"
+      :style="`width: ${lineWidth}`"
+    >
+      Content
+    </div>
   </div>
 </template>
 
