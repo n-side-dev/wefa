@@ -19,7 +19,7 @@ const router = createRouter({
     {
       path: '/playground',
       name: 'playground',
-      component: PlaygroundView
+      component: PlaygroundView,
     },
     {
       path: '/:pathMatch(.*)*',
