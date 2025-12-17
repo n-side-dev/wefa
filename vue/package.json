@@ -92,7 +92,7 @@
     "@storybook/addon-onboarding": "^10.1.9",
     "@storybook/addon-themes": "^10.1.9",
     "@storybook/addon-vitest": "^10.0.7",
-    "@storybook/vue3-vite": "^10.0.7",
+    "@storybook/vue3-vite": "^10.1.10",
     "@tsconfig/node22": "^22.0.5",
     "@types/eslint-plugin-security": "^3.0.0",
     "@types/jsdom": "^27.0.0",
