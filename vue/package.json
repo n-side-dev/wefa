@@ -66,7 +66,7 @@
     "knip": "knip"
   },
   "dependencies": {
-    "@primeuix/themes": "^1.2.5",
+    "@primeuix/themes": "^2.0.2",
     "@primevue/forms": "^4.4.1",
     "@tailwindcss/cli": "^4.1.18",
     "@tailwindcss/vite": "^4.1.18",
@@ -127,7 +127,7 @@
     "tailwindcss": "^4.1.12",
     "to-valid-identifier": "^1.0.0",
     "typescript": "~5.9.3",
-    "vite": "^7.2.7",
+    "vite": "^7.3.0",
     "vite-plugin-dts": "^4.5.4",
     "vite-plugin-vue-devtools": "^8.0.5",
     "vitest": "^4.0.2",
