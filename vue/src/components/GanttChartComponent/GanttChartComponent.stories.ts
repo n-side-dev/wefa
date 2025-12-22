@@ -75,7 +75,7 @@ const meta: Meta<typeof GanttChartComponent> = {
   args: {
     dateRange: buildDateRange(new Date(2026, 0, 1), new Date(2026, 1, 28)),
     rows: buildRows(40),
-    headerLabel: 'Line',
+    headerLabel: 'gantt_chart.header',
     viewMode: 'day',
     showWeekendShading: true,
     stackMiniActivities: true,

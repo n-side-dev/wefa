@@ -25,7 +25,7 @@ The GanttChart component renders a calendar grid with month and week headers, an
 
 ```vue
 <template>
-  <GanttChartComponent :date-range="dateRange" :rows="rows" header-label="gantt.header" />
+  <GanttChartComponent :date-range="dateRange" :rows="rows" header-label="gantt_chart.header" />
 </template>
 
 <script setup lang="ts">
@@ -36,11 +36,11 @@ const dateRange = ref([new Date(2026, 0, 1), new Date(2026, 0, 2)])
 const rows = ref([
   {
     id: 1,
-    header: 'gantt.row.lineA',
+    header: 'gantt_chart.row',
     activities: [
       {
         id: 'planned',
-        label: 'gantt.activity.planned',
+        label: 'gantt_chart.activity',
         startDate: new Date(2026, 0, 1),
         endDate: new Date(2026, 0, 4),
         visualType: 'stripe',
@@ -48,7 +48,7 @@ const rows = ref([
       },
       {
         id: 'optimized',
-        label: 'gantt.activity.optimized',
+        label: 'gantt_chart.activity',
         startDate: new Date(2026, 0, 2),
         endDate: new Date(2026, 0, 8),
         visualType: 'bar',
@@ -120,4 +120,4 @@ export type GanttChartRowData = {
 ## Translation Notes
 
 - `headerLabel`, `row.header`, `row.label`, and `activity.label` are treated as translation keys.
-- Week labels use the key `Week` by default.
+- Week labels use the key `gantt_chart.week` by default.

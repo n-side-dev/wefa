@@ -1,5 +1,5 @@
 <template>
-  <GanttChartComponent :date-range="dateRange" :rows="rows" header-label="Line" />
+  <GanttChartComponent :date-range="dateRange" :rows="rows" header-label="gantt_chart.header" />
 </template>
 
 <script setup lang="ts">

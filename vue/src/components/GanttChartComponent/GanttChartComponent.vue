@@ -77,7 +77,7 @@ interface GanttChartComponentProps {
 const props = withDefaults(defineProps<GanttChartComponentProps>(), {
   dateRange: () => [],
   rows: () => [],
-  headerLabel: 'Header',
+  headerLabel: 'gantt_chart.header',
   viewMode: 'day',
   showWeekendShading: true,
   stackMiniActivities: true,

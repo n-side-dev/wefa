@@ -3,7 +3,7 @@
     <div
       class="left-0 p-0 w-80 flex shrink-0 sticky z-20 justify-center items-center box-border border-b border-r border-surface-200 bg-surface-0 text-surface-900 font-medium group-hover:bg-surface-50"
     >
-      {{ t(props.rowLabel ?? 'Row') }}
+      {{ t(props.rowLabel ?? 'gantt_chart.row') }}
     </div>
     <div
       class="box-border border-b border-surface-200 bg-surface-0 group-hover:bg-surface-50 relative overflow-hidden z-0"
@@ -37,7 +37,7 @@
             @click="emit('activityClick', activity, props.rowData)"
           >
             <span class="px-2 text-xs font-medium text-white truncate whitespace-nowrap">{{
-              t(activity.label ?? 'Activity')
+              t(activity.label ?? 'gantt_chart.activity')
             }}</span>
           </div>
         </slot>
@@ -105,7 +105,7 @@ export interface GanttChartRowProps {
 const { t } = useI18nLib()
 
 const defaultTooltip = (activity: GanttChartActivityData) => {
-  const labelKey = activity.label ?? 'Activity'
+  const labelKey = activity.label ?? 'gantt_chart.activity'
   const start = DateTime.fromJSDate(activity.startDate).toFormat('LLL d')
   const end = DateTime.fromJSDate(activity.endDate).toFormat('LLL d')
   return `${t(labelKey)}: ${start} – ${end}`

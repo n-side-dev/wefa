@@ -130,7 +130,7 @@ describe('GanttChartComponent', () => {
       },
     })
 
-    const weekLabels = wrapper.findAll('[aria-label^="Week "]')
+    const weekLabels = wrapper.findAll('[aria-label^="gantt_chart.week "]')
     expect(weekLabels.length).toBe(expectedWeeks)
     expect(wrapper.text()).toContain('Jan 2026')
     expect(wrapper.text()).toContain('Feb 2026')

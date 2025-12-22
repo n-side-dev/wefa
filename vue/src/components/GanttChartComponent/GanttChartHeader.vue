@@ -48,10 +48,10 @@
             :key="`${week.weekYear}-W${week.weekNumber}-${week.start.toISOString()}`"
             class="flex-none box-border border-b border-r border-surface-200 bg-surface-0 text-surface-600 text-[11px] font-semibold h-9 flex items-center justify-center text-center leading-tight px-1"
             :style="{ width: `${columnWidthPx}px` }"
-            :title="`${t('Week')} ${week.weekNumber}`"
-            :aria-label="`${t('Week')} ${week.weekNumber}`"
+            :title="`${t('gantt_chart.week')} ${week.weekNumber}`"
+            :aria-label="`${t('gantt_chart.week')} ${week.weekNumber}`"
           >
-            {{ t('Week') }} {{ week.weekNumber }}
+            {{ t('gantt_chart.week') }} {{ week.weekNumber }}
           </div>
         </template>
         <template v-else>
@@ -60,10 +60,10 @@
             :key="`${week.weekYear}-W${week.weekNumber}`"
             class="flex-none box-border border-b border-r border-surface-200 bg-surface-0 text-surface-600 text-[11px] font-semibold h-9 flex items-center justify-center text-center leading-tight px-1"
             :style="{ width: `${week.days.length * DAY_CELL_WIDTH_PX}px` }"
-            :title="`${t('Week')} ${week.weekNumber} (${week.days.length} days)`"
-            :aria-label="`${t('Week')} ${week.weekNumber}`"
+            :title="`${t('gantt_chart.week')} ${week.weekNumber} (${week.days.length} days)`"
+            :aria-label="`${t('gantt_chart.week')} ${week.weekNumber}`"
           >
-            {{ t('Week') }} {{ week.weekNumber }}
+            {{ t('gantt_chart.week') }} {{ week.weekNumber }}
           </div>
         </template>
       </div>
@@ -102,7 +102,11 @@ export interface GanttChartRowProps {
   headerLabel?: string
 }
 
-const { dateRange, viewMode = 'day', headerLabel = 'Header' } = defineProps<GanttChartRowProps>()
+const {
+  dateRange,
+  viewMode = 'day',
+  headerLabel = 'gantt_chart.header',
+} = defineProps<GanttChartRowProps>()
 const { t } = useI18nLib()
 
 const isWeekView = computed(() => viewMode === 'week')
