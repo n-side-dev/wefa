@@ -4,7 +4,7 @@
     <div
       class="left-0 w-80 flex shrink-0 sticky z-50 justify-center items-center box-border border-r border-b border-surface-200 bg-surface-50 text-surface-900 font-semibold"
     >
-      {{ headerLabel }}
+      {{ t(headerLabel) }}
     </div>
     <!-- Headers -->
     <div class="flex flex-col">
@@ -48,10 +48,10 @@
             :key="`${week.weekYear}-W${week.weekNumber}-${week.start.toISOString()}`"
             class="flex-none box-border border-b border-r border-surface-200 bg-surface-0 text-surface-600 text-[11px] font-semibold h-9 flex items-center justify-center text-center leading-tight px-1"
             :style="{ width: `${columnWidthPx}px` }"
-            :title="`Week ${week.weekNumber}`"
-            :aria-label="`Week ${week.weekNumber}`"
+            :title="`${t('Week')} ${week.weekNumber}`"
+            :aria-label="`${t('Week')} ${week.weekNumber}`"
           >
-            Week {{ week.weekNumber }}
+            {{ t('Week') }} {{ week.weekNumber }}
           </div>
         </template>
         <template v-else>
@@ -60,10 +60,10 @@
             :key="`${week.weekYear}-W${week.weekNumber}`"
             class="flex-none box-border border-b border-r border-surface-200 bg-surface-0 text-surface-600 text-[11px] font-semibold h-9 flex items-center justify-center text-center leading-tight px-1"
             :style="{ width: `${week.days.length * DAY_CELL_WIDTH_PX}px` }"
-            :title="`Week ${week.weekNumber} (${week.days.length} days)`"
-            :aria-label="`Week ${week.weekNumber}`"
+            :title="`${t('Week')} ${week.weekNumber} (${week.days.length} days)`"
+            :aria-label="`${t('Week')} ${week.weekNumber}`"
           >
-            Week {{ week.weekNumber }}
+            {{ t('Week') }} {{ week.weekNumber }}
           </div>
         </template>
       </div>
@@ -86,6 +86,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { DateTime } from 'luxon'
+import { useI18nLib } from '@/locales'
 import {
   DAY_CELL_WIDTH_PX,
   WEEK_CELL_WIDTH_PX,
@@ -102,6 +103,7 @@ export interface GanttChartRowProps {
 }
 
 const { dateRange, viewMode = 'day', headerLabel = 'Header' } = defineProps<GanttChartRowProps>()
+const { t } = useI18nLib()
 
 const isWeekView = computed(() => viewMode === 'week')
 const columnWidthPx = computed(() => (isWeekView.value ? WEEK_CELL_WIDTH_PX : DAY_CELL_WIDTH_PX))

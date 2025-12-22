@@ -1,0 +1,123 @@
+import { Meta, Canvas, ArgTypes } from '@storybook/addon-docs/blocks'
+import * as GanttChartStories from './GanttChartComponent.stories'
+
+<Meta of={GanttChartStories} />
+
+# Gantt Chart
+
+A flexible, virtualized Gantt chart that supports daily and weekly views, layered activity types, and translation-ready labels.
+
+## Overview
+
+The GanttChart component renders a calendar grid with month and week headers, and a virtualized list of rows. Activities can be rendered as stripes, primary bars, or compact stacked minis. Weekly view collapses the grid to week columns and expands month headers across overlapping weeks.
+
+### Key Features
+
+- **Daily & Weekly Views**: Toggle with `viewMode`.
+- **Layered Activities**: Stripe, bar, and mini styles with overlap rules.
+- **Stacked Minis**: Overlapping minis grow row height automatically.
+- **Virtualized Rows**: Smooth scrolling for large datasets.
+- **Translation Ready**: All user-facing labels are passed through `t()`.
+
+## Basic Usage
+
+<Canvas of={GanttChartStories.Default} />
+
+```vue
+<template>
+  <GanttChartComponent :date-range="dateRange" :rows="rows" header-label="gantt.header" />
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+import GanttChartComponent from '@/components/GanttChartComponent/GanttChartComponent.vue'
+
+const dateRange = ref([new Date(2026, 0, 1), new Date(2026, 0, 2)])
+const rows = ref([
+  {
+    id: 1,
+    header: 'gantt.row.lineA',
+    activities: [
+      {
+        id: 'planned',
+        label: 'gantt.activity.planned',
+        startDate: new Date(2026, 0, 1),
+        endDate: new Date(2026, 0, 4),
+        visualType: 'stripe',
+        color: 'rgba(59, 130, 246, 0.2)',
+      },
+      {
+        id: 'optimized',
+        label: 'gantt.activity.optimized',
+        startDate: new Date(2026, 0, 2),
+        endDate: new Date(2026, 0, 8),
+        visualType: 'bar',
+        colorClass: 'bg-emerald-400/80',
+      },
+    ],
+  },
+])
+</script>
+```
+
+## Weekly View
+
+```vue
+<GanttChartComponent
+  :date-range="dateRange"
+  :rows="rows"
+  view-mode="week"
+  :show-weekend-shading="false"
+/>
+```
+
+- Weekly view renders a single week cell per column.
+- Activities fill any week they overlap (inclusive by week).
+- Month headers can span overlapping weeks.
+
+## Activity Types
+
+Activities support a `visualType`:
+
+- `stripe`: diagonal background context
+- `bar`: primary rounded bar
+- `mini`: compact bar, stacked into lanes when overlapping
+
+## Tooltips and Clicks
+
+```vue
+<GanttChartComponent
+  :date-range="dateRange"
+  :rows="rows"
+  :activity-tooltip="(activity, row) => `${row?.id}: ${activity.label}`"
+  :activity-click="(activity, row) => console.log(activity, row)"
+/>
+```
+
+## API Reference
+
+<ArgTypes of={GanttChartStories} />
+
+```ts
+export type GanttChartActivityData = {
+  id?: string | number
+  label?: string
+  startDate: Date
+  endDate: Date
+  visualType?: 'stripe' | 'bar' | 'mini'
+  color?: string
+  colorClass?: string
+}
+
+export type GanttChartRowData = {
+  id?: string | number
+  label?: string
+  header?: string
+  activities: GanttChartActivityData[]
+}
+```
+
+## Translation Notes
+
+- `headerLabel`, `row.header`, `row.label`, and `activity.label` are treated as translation keys.
+- Week labels use the key `Week` by default.

@@ -3,7 +3,7 @@
     <div
       class="left-0 p-0 w-80 flex shrink-0 sticky z-20 justify-center items-center box-border border-b border-r border-surface-200 bg-surface-0 text-surface-900 font-medium group-hover:bg-surface-50"
     >
-      {{ props.rowLabel ?? 'Row' }}
+      {{ t(props.rowLabel ?? 'Row') }}
     </div>
     <div
       class="box-border border-b border-surface-200 bg-surface-0 group-hover:bg-surface-50 relative overflow-hidden z-0"
@@ -37,7 +37,7 @@
             @click="emit('activityClick', activity, props.rowData)"
           >
             <span class="px-2 text-xs font-medium text-white truncate whitespace-nowrap">{{
-              activity.label
+              t(activity.label ?? 'Activity')
             }}</span>
           </div>
         </slot>
@@ -69,6 +69,7 @@
 import { computed } from 'vue'
 import { DateTime } from 'luxon'
 import Tooltip from 'primevue/tooltip'
+import { useI18nLib } from '@/locales'
 import {
   BAR_VERTICAL_PADDING_PX,
   BASE_ROW_HEIGHT_PX,
@@ -101,11 +102,13 @@ export interface GanttChartRowProps {
   activityTooltip?: (activity: GanttChartActivityData, rowData?: GanttChartRowData) => string
 }
 
+const { t } = useI18nLib()
+
 const defaultTooltip = (activity: GanttChartActivityData) => {
-  const label = activity.label ?? 'Activity'
+  const labelKey = activity.label ?? 'Activity'
   const start = DateTime.fromJSDate(activity.startDate).toFormat('LLL d')
   const end = DateTime.fromJSDate(activity.endDate).toFormat('LLL d')
-  return `${label}: ${start} – ${end}`
+  return `${t(labelKey)}: ${start} – ${end}`
 }
 
 const props = withDefaults(defineProps<GanttChartRowProps>(), {
@@ -210,6 +213,7 @@ const gridStyle = computed(() => {
 
 const activityPositionStyle = (activity: GanttChartActivityData) => {
   if (isWeekView.value) {
+    // Weekly view is inclusive of partial weeks: any overlap fills the whole week column.
     const columns = weekColumns.value
     const maxIndex = Math.max(0, columns.length - 1)
     const startWeek = DateTime.fromJSDate(activity.startDate).startOf('week').toISO()

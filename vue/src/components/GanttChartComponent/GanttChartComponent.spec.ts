@@ -4,6 +4,10 @@ import GanttChartComponent from './GanttChartComponent.vue'
 import { getWeekColumns } from './ganttChartLayout'
 import type { GanttChartRowData } from './ganttChartTypes'
 
+vi.mock('@/locales', () => ({
+  useI18nLib: () => ({ t: (key: string) => key }),
+}))
+
 vi.mock('@vueuse/core', async () => {
   const vue = await import('vue')
   return {

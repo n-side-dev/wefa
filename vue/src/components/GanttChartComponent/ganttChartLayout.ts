@@ -61,6 +61,7 @@ export const computeMiniLanes = <T extends GanttChartActivityLike>(
   const laneEnds: number[] = []
   const lanes: MiniLaneItem<T>[] = []
 
+  // Greedy lane assignment keeps mini bars vertically compact while avoiding overlaps.
   sorted.forEach((activity) => {
     const startMs = normalizedDayMs(activity.startDate)
     const endMs = normalizedDayMs(activity.endDate)
@@ -119,6 +120,7 @@ export const getMonthSpansForWeeks = (weeks: WeekColumn[]): MonthSpan[] => {
   const spans: MonthSpan[] = []
   let cursor = firstWeekStart
 
+  // Month headers can overlap week boundaries, so compute spans by overlap, not by week start.
   while (cursor <= lastWeekEnd) {
     const monthStart = cursor.startOf('month')
     const monthEnd = cursor.endOf('month')
