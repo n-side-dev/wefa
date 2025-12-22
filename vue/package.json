@@ -67,7 +67,7 @@
   },
   "dependencies": {
     "@primeuix/themes": "^2.0.2",
-    "@primevue/forms": "^4.4.1",
+    "@primevue/forms": "^4.5.4",
     "@tailwindcss/cli": "^4.1.18",
     "@tailwindcss/vite": "^4.1.18",
     "@tanstack/vue-query": "^5.92.1",
