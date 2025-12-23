@@ -1,5 +1,6 @@
 import { type Meta, type StoryObj } from '@storybook/vue3-vite'
 import { expect, within } from 'storybook/test'
+import { ref } from 'vue'
 
 import GanttChartComponent from './GanttChartComponent.vue'
 import type { GanttChartActivityData, GanttChartRowData } from './ganttChartTypes'
@@ -142,4 +143,32 @@ export const Default: Story = {
     const canvas = within(canvasElement)
     await expect(canvas.getByText(args.headerLabel ?? 'Header')).toBeInTheDocument()
   },
+}
+
+export const CustomTooltipAndClick: Story = {
+  name: 'Custom Tooltip + Click',
+  render: (args) => ({
+    components: { GanttChartComponent },
+    setup() {
+      const lastClick = ref('Click an activity')
+      const activityTooltip = (
+        activity: (typeof args.rows)[number]['activities'][number],
+        row: (typeof args.rows)[number]
+      ) => `${row.header ?? row.label}: ${activity.label ?? 'gantt_chart.activity'}`
+      const activityClick = (
+        activity: (typeof args.rows)[number]['activities'][number],
+        row: (typeof args.rows)[number]
+      ) => {
+        lastClick.value = `${row.header ?? row.label}: ${activity.label ?? 'gantt_chart.activity'}`
+      }
+
+      return { args, lastClick, activityTooltip, activityClick }
+    },
+    template: `
+      <div class="bg-slate-50 p-4" style="height: 700px;">
+        <div class="mb-3 text-sm text-surface-600">Last click: {{ lastClick }}</div>
+        <GanttChartComponent v-bind="args" :activity-tooltip="activityTooltip" :activity-click="activityClick" />
+      </div>
+    `,
+  }),
 }
