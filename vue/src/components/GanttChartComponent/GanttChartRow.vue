@@ -132,8 +132,11 @@ const vTooltip = Tooltip
 
 const WEEK_DAYS = 7
 
+// Switches layout math for day vs week column widths.
 const isWeekView = computed(() => props.viewMode === 'week')
+// Lane assignment for stacked mini activities.
 const miniLayout = computed(() => computeMiniLanes(props.activities, props.stackMiniActivities))
+// Row height grows with overlapping minis.
 const rowHeightPx = computed(() => {
   if (props.rowHeightPx !== undefined) {
     return props.rowHeightPx
@@ -143,7 +146,9 @@ const rowHeightPx = computed(() => {
   return BASE_ROW_HEIGHT_PX + extraHeight
 })
 
+// Pixel width for each column (day or week).
 const columnWidthPx = computed(() => (isWeekView.value ? WEEK_CELL_WIDTH_PX : DAY_CELL_WIDTH_PX))
+// Week column boundaries used for weekly view layout.
 const weekColumns = computed(() => {
   if (props.dateRange.length === 0) {
     return []
@@ -151,17 +156,20 @@ const weekColumns = computed(() => {
 
   return getWeekColumns(props.dateRange[0]!, props.dateRange[props.dateRange.length - 1]!)
 })
+// Fast lookup: week start ISO -> column index.
 const weekIndexByStart = computed(
   () =>
     new Map(
       weekColumns.value.map((week, index) => [DateTime.fromJSDate(week.start).toISO(), index])
     )
 )
+// Total grid width in pixels.
 const lineWidth = computed(() => {
   const count = isWeekView.value ? weekColumns.value.length : props.dateRange.length
   return `${count * columnWidthPx.value}px`
 })
 
+// Weekend shading pattern (disabled in weekly view).
 const weekPattern = computed(() => {
   if (isWeekView.value || !props.showWeekendShading) {
     return ''
@@ -181,6 +189,7 @@ const weekPattern = computed(() => {
   return `linear-gradient(90deg, ${stops.join(', ')})`
 })
 
+// Grid background style with optional weekend shading.
 const gridStyle = computed(() => {
   const firstDate = props.dateRange[0]
   const weekStart = firstDate
@@ -211,6 +220,7 @@ const gridStyle = computed(() => {
   return baseStyle
 })
 
+// Computes the CSS position and size for an activity bar/stripe/mini.
 const activityPositionStyle = (activity: GanttChartActivityData) => {
   if (isWeekView.value) {
     // Weekly view is inclusive of partial weeks: any overlap fills the whole week column.
