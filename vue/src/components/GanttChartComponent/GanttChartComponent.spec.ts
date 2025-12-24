@@ -62,6 +62,21 @@ const baseRows: GanttChartRowData[] = [
       },
     ],
   },
+  {
+    id: 2,
+    label: 'Row 2',
+    header: 'Line B',
+    activities: [
+      {
+        id: 'bar-2',
+        label: 'Optimized',
+        startDate: new Date(2026, 0, 5),
+        endDate: new Date(2026, 0, 7),
+        visualType: 'bar',
+        colorClass: 'bg-emerald-400/80',
+      },
+    ],
+  },
 ]
 
 describe('GanttChartComponent', () => {
@@ -107,6 +122,25 @@ describe('GanttChartComponent', () => {
     const payload = emitted?.[0] as Array<{ label?: string; id?: number }>
     expect(payload?.[0]?.label).toBe('Optimized')
     expect(payload?.[1]?.id).toBe(1)
+  })
+
+  it('renders link paths when links are provided', () => {
+    const wrapper = mount(GanttChartComponent, {
+      props: {
+        dateRange: buildDateRange(new Date(2026, 0, 1), new Date(2026, 0, 7)),
+        rows: baseRows,
+        links: [{ fromId: 'bar-1', toId: 'bar-2' }],
+      },
+      global: {
+        directives: {
+          tooltip: () => {
+            /* no-op */
+          },
+        },
+      },
+    })
+
+    expect(wrapper.find('[data-link-id="bar-1-bar-2"]').exists()).toBe(true)
   })
 
   it('renders weekly headers with month spans across overlapping weeks', () => {

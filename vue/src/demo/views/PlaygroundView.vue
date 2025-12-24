@@ -1,5 +1,10 @@
 <template>
-  <GanttChartComponent :date-range="dateRange" :rows="rows" header-label="gantt_chart.header" />
+  <GanttChartComponent
+    :date-range="dateRange"
+    :rows="rows"
+    :links="links"
+    header-label="gantt_chart.header"
+  />
 </template>
 
 <script setup lang="ts">
@@ -29,7 +34,7 @@ const rows = computed<GanttChartRowData[]>(() =>
     const baseDate = new Date(2026, 0, 1 + startDay)
     const baseActivities: GanttChartActivityData[] = [
       {
-        id: 'planned',
+        id: `planned-${index}`,
         label: 'Planned',
         startDate: new Date(baseDate),
         endDate: new Date(2026, 0, 6 + startDay),
@@ -37,7 +42,7 @@ const rows = computed<GanttChartRowData[]>(() =>
         color: 'rgba(59, 130, 246, 0.2)',
       },
       {
-        id: 'optimized',
+        id: `optimized-${index}`,
         label: 'Optimized',
         startDate: new Date(2026, 0, 3 + startDay),
         endDate: new Date(2026, 0, 9 + startDay),
@@ -45,7 +50,7 @@ const rows = computed<GanttChartRowData[]>(() =>
         colorClass: 'bg-emerald-400/80',
       },
       {
-        id: 'desired',
+        id: `desired-${index}`,
         label: 'Desired',
         startDate: new Date(2026, 0, 5 + startDay),
         endDate: new Date(2026, 0, 12 + startDay),
@@ -57,7 +62,7 @@ const rows = computed<GanttChartRowData[]>(() =>
       index % 3 === 0
         ? [
             {
-              id: 'desired-2',
+              id: `desired-2-${index}`,
               label: 'Alt',
               startDate: new Date(2026, 0, 7 + startDay),
               endDate: new Date(2026, 0, 10 + startDay),
@@ -75,4 +80,16 @@ const rows = computed<GanttChartRowData[]>(() =>
     }
   })
 )
+
+const links = computed(() => {
+  const linkPairs = []
+  for (let index = 0; index < rows.value.length - 1; index += 4) {
+    const from = rows.value[index]?.activities.find((activity) => activity.visualType === 'bar')
+    const to = rows.value[index + 1]?.activities.find((activity) => activity.visualType === 'bar')
+    if (from?.id && to?.id) {
+      linkPairs.push({ fromId: from.id, toId: to.id })
+    }
+  }
+  return linkPairs
+})
 </script>

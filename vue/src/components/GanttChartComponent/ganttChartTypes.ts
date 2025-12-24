@@ -14,3 +14,11 @@ export type GanttChartRowData = {
   header?: string
   activities: GanttChartActivityData[]
 }
+
+export type GanttChartLinkData = {
+  id?: string | number
+  fromId: string | number
+  toId: string | number
+  type?: 'finish-start' | 'start-start'
+  color?: string
+}

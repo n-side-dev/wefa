@@ -1,12 +1,12 @@
 <template>
-  <div class="flex flex-row w-full group relative z-0" :style="{ height: `${rowHeightPx}px` }">
+  <div class="flex flex-row w-full group relative" :style="{ height: `${rowHeightPx}px` }">
     <div
-      class="left-0 p-0 w-80 flex shrink-0 sticky z-20 justify-center items-center box-border border-b border-r border-surface-200 bg-surface-0 text-surface-900 font-medium group-hover:bg-surface-50"
+      class="left-0 p-0 w-80 flex shrink-0 sticky z-50 justify-center items-center box-border border-b border-r border-surface-200 bg-surface-0 text-surface-900 font-medium group-hover:bg-surface-50"
     >
       {{ t(props.rowLabel ?? 'gantt_chart.row') }}
     </div>
     <div
-      class="box-border border-b border-surface-200 bg-surface-0 group-hover:bg-surface-50 relative overflow-hidden z-0"
+      class="box-border border-b border-surface-200 bg-surface-0 group-hover:bg-surface-50 relative overflow-hidden"
       :style="gridStyle"
     >
       <template
@@ -31,7 +31,7 @@
         <slot name="activity" :activity="activity" :style="barStyle(activity)" :visual-type="'bar'">
           <div
             v-tooltip="tooltipForActivity(activity)"
-            class="absolute z-10 rounded-lg overflow-hidden cursor-pointer"
+            class="absolute z-20 rounded-lg overflow-hidden cursor-pointer"
             :class="activity.colorClass ?? props.activityColorClass"
             :style="barStyle(activity)"
             @click="emit('activityClick', activity, props.rowData)"
@@ -54,7 +54,7 @@
         >
           <div
             v-tooltip="tooltipForActivity(item.activity)"
-            class="absolute z-20 rounded-md overflow-hidden cursor-pointer"
+            class="absolute z-30 rounded-md overflow-hidden cursor-pointer"
             :class="item.activity.colorClass ?? props.activityColorClass"
             :style="miniStyle(item)"
             @click="emit('activityClick', item.activity, props.rowData)"
@@ -79,6 +79,7 @@ import {
   STRIPE_SIZE_PX,
   WEEK_CELL_WIDTH_PX,
   computeMiniLanes,
+  getActivitySpanPx,
   getWeekColumns,
   type GanttChartActivityType,
   type GanttChartViewMode,
@@ -156,13 +157,6 @@ const weekColumns = computed(() => {
 
   return getWeekColumns(props.dateRange[0]!, props.dateRange[props.dateRange.length - 1]!)
 })
-// Fast lookup: week start ISO -> column index.
-const weekIndexByStart = computed(
-  () =>
-    new Map(
-      weekColumns.value.map((week, index) => [DateTime.fromJSDate(week.start).toISO(), index])
-    )
-)
 // Total grid width in pixels.
 const lineWidth = computed(() => {
   const count = isWeekView.value ? weekColumns.value.length : props.dateRange.length
@@ -222,34 +216,18 @@ const gridStyle = computed(() => {
 
 // Computes the CSS position and size for an activity bar/stripe/mini.
 const activityPositionStyle = (activity: GanttChartActivityData) => {
-  if (isWeekView.value) {
-    // Weekly view is inclusive of partial weeks: any overlap fills the whole week column.
-    const columns = weekColumns.value
-    const maxIndex = Math.max(0, columns.length - 1)
-    const startWeek = DateTime.fromJSDate(activity.startDate).startOf('week').toISO()
-    const endWeek = DateTime.fromJSDate(activity.endDate).startOf('week').toISO()
-    const rawStart = weekIndexByStart.value.get(startWeek) ?? 0
-    const rawEnd = weekIndexByStart.value.get(endWeek) ?? maxIndex
-    const startIndex = Math.min(maxIndex, Math.max(0, rawStart))
-    const endIndex = Math.min(maxIndex, Math.max(startIndex, rawEnd))
-
-    return {
-      left: `${startIndex * columnWidthPx.value}px`,
-      width: `${(endIndex - startIndex + 1) * columnWidthPx.value}px`,
-    }
-  }
-
-  const rangeStart = props.dateRange[0]
-    ? DateTime.fromJSDate(props.dateRange[0]).startOf('day')
-    : DateTime.now().startOf('day')
-  const activityStart = DateTime.fromJSDate(activity.startDate).startOf('day')
-  const activityEnd = DateTime.fromJSDate(activity.endDate).startOf('day')
-  const offsetDays = Math.max(0, Math.floor(activityStart.diff(rangeStart, 'days').days))
-  const spanDays = Math.max(1, Math.floor(activityEnd.diff(activityStart, 'days').days) + 1)
+  // Weekly view is inclusive of partial weeks: any overlap fills the whole week column.
+  const span = getActivitySpanPx(
+    activity,
+    props.dateRange,
+    props.viewMode ?? 'day',
+    columnWidthPx.value,
+    weekColumns.value
+  )
 
   return {
-    left: `${offsetDays * DAY_CELL_WIDTH_PX}px`,
-    width: `${spanDays * DAY_CELL_WIDTH_PX}px`,
+    left: `${span.left}px`,
+    width: `${span.width}px`,
   }
 }
 

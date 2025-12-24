@@ -29,12 +29,19 @@ export type MonthSpan = {
   endIndex: number
 }
 
+// Pixel width for a single day column in day view.
 export const DAY_CELL_WIDTH_PX = 40
+// Pixel width for a single week column in week view.
 export const WEEK_CELL_WIDTH_PX = 40
+// Default row height before mini stacking expands it.
 export const BASE_ROW_HEIGHT_PX = 30
+// Vertical padding to keep bar activities off row edges.
 export const BAR_VERTICAL_PADDING_PX = 4
+// Height of mini activities (stacked lanes).
 export const MINI_HEIGHT_PX = 12
+// Gap between stacked mini activity lanes.
 export const MINI_GAP_PX = 2
+// Stripe thickness for the diagonal pattern.
 export const STRIPE_SIZE_PX = 8
 
 const normalizedDayMs = (date: Date) => DateTime.fromJSDate(date).startOf('day').toMillis()
@@ -108,6 +115,47 @@ export const getWeekColumns = (startDate: Date, endDate: Date): WeekColumn[] => 
   }
 
   return weeks
+}
+
+export const getActivitySpanPx = (
+  activity: GanttChartActivityLike,
+  dateRange: Date[],
+  viewMode: GanttChartViewMode,
+  columnWidthPx: number,
+  weekColumns: WeekColumn[]
+) => {
+  if (dateRange.length === 0) {
+    return { left: 0, width: 0 }
+  }
+
+  if (viewMode === 'week') {
+    const maxIndex = Math.max(0, weekColumns.length - 1)
+    const startWeek = DateTime.fromJSDate(activity.startDate).startOf('week').toISO()
+    const endWeek = DateTime.fromJSDate(activity.endDate).startOf('week').toISO()
+    const indexByWeek = new Map(
+      weekColumns.map((week, index) => [DateTime.fromJSDate(week.start).toISO(), index])
+    )
+    const rawStart = indexByWeek.get(startWeek) ?? 0
+    const rawEnd = indexByWeek.get(endWeek) ?? maxIndex
+    const startIndex = Math.min(maxIndex, Math.max(0, rawStart))
+    const endIndex = Math.min(maxIndex, Math.max(startIndex, rawEnd))
+
+    return {
+      left: startIndex * columnWidthPx,
+      width: (endIndex - startIndex + 1) * columnWidthPx,
+    }
+  }
+
+  const rangeStart = DateTime.fromJSDate(dateRange[0]!).startOf('day')
+  const activityStart = DateTime.fromJSDate(activity.startDate).startOf('day')
+  const activityEnd = DateTime.fromJSDate(activity.endDate).startOf('day')
+  const offsetDays = Math.max(0, Math.floor(activityStart.diff(rangeStart, 'days').days))
+  const spanDays = Math.max(1, Math.floor(activityEnd.diff(activityStart, 'days').days) + 1)
+
+  return {
+    left: offsetDays * columnWidthPx,
+    width: spanDays * columnWidthPx,
+  }
 }
 
 export const getMonthSpansForWeeks = (weeks: WeekColumn[]): MonthSpan[] => {
