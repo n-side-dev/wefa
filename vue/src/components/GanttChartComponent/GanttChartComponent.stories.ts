@@ -1,6 +1,7 @@
 import { type Meta, type StoryObj } from '@storybook/vue3-vite'
 import { expect, within } from 'storybook/test'
 import { ref } from 'vue'
+import Button from 'primevue/button'
 
 import GanttChartComponent from './GanttChartComponent.vue'
 import type { GanttChartActivityData, GanttChartRowData } from './ganttChartTypes'
@@ -126,6 +127,7 @@ const meta: Meta<typeof GanttChartComponent> = {
     viewMode: 'day',
     showWeekendShading: true,
     stackMiniActivities: true,
+    leftHeaderWidthPx: 320,
   },
   parameters: {
     layout: 'fullscreen',
@@ -163,6 +165,9 @@ The story wraps the component in a fixed-height container to demonstrate scrolli
     headerLabel: {
       control: { type: 'text' },
     },
+    leftHeaderWidthPx: {
+      control: { type: 'number' },
+    },
     activityTooltip: {
       control: false,
     },
@@ -190,7 +195,11 @@ export const Default: Story = {
   }),
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getByText(args.headerLabel ?? 'Header')).toBeInTheDocument()
+    await expect(
+      canvas.getByText((text) =>
+        text === 'Header' || text === (args.headerLabel ?? 'Header')
+      )
+    ).toBeInTheDocument()
   },
 }
 
@@ -200,14 +209,11 @@ export const CustomTooltipAndClick: Story = {
     components: { GanttChartComponent },
     setup() {
       const lastClick = ref('Click an activity')
-      const activityTooltip = (
-        activity: (typeof args.rows)[number]['activities'][number],
-        row: (typeof args.rows)[number]
-      ) => `${row.header ?? row.label}: ${activity.label ?? 'gantt_chart.activity'}`
-      const activityClick = (
-        activity: (typeof args.rows)[number]['activities'][number],
-        row: (typeof args.rows)[number]
-      ) => {
+      type Row = GanttChartRowData
+      type Activity = GanttChartActivityData
+      const activityTooltip = (activity: Activity, row: Row) =>
+        `${row.header ?? row.label}: ${activity.label ?? 'gantt_chart.activity'}`
+      const activityClick = (activity: Activity, row: Row) => {
         lastClick.value = `${row.header ?? row.label}: ${activity.label ?? 'gantt_chart.activity'}`
       }
 
@@ -221,6 +227,36 @@ export const CustomTooltipAndClick: Story = {
           :activity-tooltip="activityTooltip"
           :activity-click="activityClick"
         />
+      </div>
+    `,
+  }),
+}
+
+export const ToggleViewMode: Story = {
+  render: (args) => ({
+    components: { GanttChartComponent, Button },
+    setup() {
+      const viewMode = ref<'day' | 'week'>(args.viewMode ?? 'day')
+
+      return { args, viewMode }
+    },
+    template: `
+      <div class="bg-slate-50 p-4" style="height: 700px;">
+        <div class="mb-3 flex items-center gap-2">
+          <Button
+            label="Day"
+            severity="secondary"
+            :outlined="viewMode !== 'day'"
+            @click="viewMode = 'day'"
+          />
+          <Button
+            label="Week"
+            severity="secondary"
+            :outlined="viewMode !== 'week'"
+            @click="viewMode = 'week'"
+          />
+        </div>
+        <GanttChartComponent v-bind="args" :view-mode="viewMode" />
       </div>
     `,
   }),

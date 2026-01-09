@@ -1,11 +1,14 @@
 <template>
   <div class="flex flex-row w-full group relative" :style="{ height: `${rowHeightPx}px` }">
     <div
-      class="left-0 p-0 w-80 flex shrink-0 sticky z-50 justify-center items-center box-border border-b border-r border-surface-200 bg-surface-0 text-surface-900 font-medium group-hover:bg-surface-50"
+      v-if="props.showRowLabel"
+      class="left-0 p-0 flex shrink-0 sticky z-50 justify-center items-center box-border border-b border-r border-surface-200 bg-surface-0 text-surface-900 font-medium group-hover:bg-surface-50"
+      :style="{ width: `${props.leftHeaderWidthPx}px` }"
     >
       {{ t(props.rowLabel ?? 'gantt_chart.row') }}
     </div>
     <div
+      v-if="props.showGrid"
       class="box-border border-b border-surface-200 bg-surface-0 group-hover:bg-surface-50 relative overflow-hidden"
       :style="gridStyle"
     >
@@ -101,6 +104,9 @@ export interface GanttChartRowProps {
   rowHeightPx?: number
   rowData?: GanttChartRowData
   activityTooltip?: (activity: GanttChartActivityData, rowData?: GanttChartRowData) => string
+  leftHeaderWidthPx?: number
+  showRowLabel?: boolean
+  showGrid?: boolean
 }
 
 const { t } = useI18nLib()
@@ -123,6 +129,9 @@ const props = withDefaults(defineProps<GanttChartRowProps>(), {
   rowHeightPx: undefined,
   rowData: undefined,
   activityTooltip: undefined,
+  leftHeaderWidthPx: 320,
+  showRowLabel: true,
+  showGrid: true,
 })
 
 const emit = defineEmits<{
@@ -136,7 +145,9 @@ const WEEK_DAYS = 7
 // Switches layout math for day vs week column widths.
 const isWeekView = computed(() => props.viewMode === 'week')
 // Lane assignment for stacked mini activities.
-const miniLayout = computed(() => computeMiniLanes(props.activities, props.stackMiniActivities))
+const miniLayout = computed(() =>
+  computeMiniLanes(props.activities, props.stackMiniActivities, props.viewMode ?? 'day')
+)
 // Row height grows with overlapping minis.
 const rowHeightPx = computed(() => {
   if (props.rowHeightPx !== undefined) {

@@ -44,15 +44,15 @@ export const MINI_GAP_PX = 2
 // Stripe thickness for the diagonal pattern.
 export const STRIPE_SIZE_PX = 8
 
-const normalizedDayMs = (date: Date) => DateTime.fromJSDate(date).startOf('day').toMillis()
-
-const resolveType = (activity: GanttChartActivityLike) => activity.visualType ?? 'bar'
-
+// Computes mini activity lane assignments (height index) and total lane count.
+// If stacking is disabled, all mini activities are assigned to lane 0.
+// Uses a greedy algorithm to minimize lane count while avoiding overlaps if stacking is enabled.
 export const computeMiniLanes = <T extends GanttChartActivityLike>(
   activities: T[],
-  stackMiniActivities: boolean
+  stackMiniActivities: boolean,
+  viewMode: GanttChartViewMode = 'day'
 ): { lanes: MiniLaneItem<T>[]; laneCount: number } => {
-  const minis = activities.filter((activity) => resolveType(activity) === 'mini')
+  const minis = activities.filter((activity) => (activity.visualType ?? 'bar') === 'mini')
 
   if (minis.length === 0) {
     return { lanes: [], laneCount: 1 }
@@ -62,16 +62,23 @@ export const computeMiniLanes = <T extends GanttChartActivityLike>(
     return { lanes: minis.map((activity) => ({ activity, laneIndex: 0 })), laneCount: 1 }
   }
 
-  const sorted = [...minis].sort(
-    (a, b) => normalizedDayMs(a.startDate) - normalizedDayMs(b.startDate)
-  )
+  const normalizeStart = (activity: T) =>
+    DateTime.fromJSDate(activity.startDate)
+      .startOf(viewMode === 'week' ? 'week' : 'day')
+      .toMillis()
+  const normalizeEnd = (activity: T) =>
+    DateTime.fromJSDate(activity.endDate)
+      .startOf(viewMode === 'week' ? 'week' : 'day')
+      .toMillis()
+
+  const sorted = [...minis].sort((a, b) => normalizeStart(a) - normalizeStart(b))
   const laneEnds: number[] = []
   const lanes: MiniLaneItem<T>[] = []
 
   // Greedy lane assignment keeps mini bars vertically compact while avoiding overlaps.
   sorted.forEach((activity) => {
-    const startMs = normalizedDayMs(activity.startDate)
-    const endMs = normalizedDayMs(activity.endDate)
+    const startMs = normalizeStart(activity)
+    const endMs = normalizeEnd(activity)
     let laneIndex = laneEnds.findIndex((laneEnd) => startMs > laneEnd)
 
     if (laneIndex === -1) {
@@ -87,15 +94,18 @@ export const computeMiniLanes = <T extends GanttChartActivityLike>(
   return { lanes, laneCount: laneEnds.length }
 }
 
+// Computes the required row height based on mini activity max stacking.
 export const getRowHeight = <T extends GanttChartActivityLike>(
   activities: T[],
-  stackMiniActivities: boolean
+  stackMiniActivities: boolean,
+  viewMode: GanttChartViewMode = 'day'
 ) => {
-  const { laneCount } = computeMiniLanes(activities, stackMiniActivities)
+  const { laneCount } = computeMiniLanes(activities, stackMiniActivities, viewMode)
   const extraHeight = Math.max(0, laneCount - 1) * (MINI_HEIGHT_PX + MINI_GAP_PX)
   return BASE_ROW_HEIGHT_PX + extraHeight
 }
 
+// Generates week columns covering the specified date range.
 export const getWeekColumns = (startDate: Date, endDate: Date): WeekColumn[] => {
   const start = DateTime.fromJSDate(startDate).startOf('week')
   const end = DateTime.fromJSDate(endDate).startOf('week')
@@ -117,6 +127,7 @@ export const getWeekColumns = (startDate: Date, endDate: Date): WeekColumn[] => 
   return weeks
 }
 
+// Computes the pixel left offset and width for an activity in the Gantt chart.
 export const getActivitySpanPx = (
   activity: GanttChartActivityLike,
   dateRange: Date[],
@@ -158,6 +169,7 @@ export const getActivitySpanPx = (
   }
 }
 
+// Computes month spans (start and end week indices) for the given week columns.
 export const getMonthSpansForWeeks = (weeks: WeekColumn[]): MonthSpan[] => {
   if (weeks.length === 0) {
     return []

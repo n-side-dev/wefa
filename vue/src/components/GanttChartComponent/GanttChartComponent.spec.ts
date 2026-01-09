@@ -1,7 +1,8 @@
 import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import GanttChartComponent from './GanttChartComponent.vue'
-import { getWeekColumns } from './ganttChartLayout'
+import GanttChartRow from './GanttChartRow.vue'
+import { BASE_ROW_HEIGHT_PX, MINI_GAP_PX, MINI_HEIGHT_PX, getWeekColumns } from './ganttChartLayout'
 import type { GanttChartRowData } from './ganttChartTypes'
 
 vi.mock('@/locales', () => ({
@@ -188,5 +189,71 @@ describe('GanttChartComponent', () => {
     })
 
     expect(wrapper.html()).not.toContain('Thu Jan 01 2026')
+  })
+
+  it('stacks mini activities by week when in weekly view', () => {
+    const dateRange = buildDateRange(new Date(2026, 0, 1), new Date(2026, 0, 7))
+    const miniRows: GanttChartRowData[] = [
+      {
+        id: 1,
+        header: 'Line A',
+        activities: [
+          {
+            id: 'mini-1',
+            label: 'Mini',
+            startDate: new Date(2026, 0, 1),
+            endDate: new Date(2026, 0, 2),
+            visualType: 'mini',
+            colorClass: 'bg-amber-400/80',
+          },
+          {
+            id: 'mini-2',
+            label: 'Mini',
+            startDate: new Date(2026, 0, 3),
+            endDate: new Date(2026, 0, 4),
+            visualType: 'mini',
+            colorClass: 'bg-amber-400/80',
+          },
+        ],
+      },
+    ]
+
+    const dayWrapper = mount(GanttChartComponent, {
+      props: {
+        dateRange,
+        rows: miniRows,
+        viewMode: 'day',
+        stackMiniActivities: true,
+      },
+      global: {
+        directives: {
+          tooltip: () => {
+            /* no-op */
+          },
+        },
+      },
+    })
+    const weekWrapper = mount(GanttChartComponent, {
+      props: {
+        dateRange,
+        rows: miniRows,
+        viewMode: 'week',
+        stackMiniActivities: true,
+      },
+      global: {
+        directives: {
+          tooltip: () => {
+            /* no-op */
+          },
+        },
+      },
+    })
+
+    const [dayRow] = dayWrapper.findAllComponents(GanttChartRow)
+    const [weekRow] = weekWrapper.findAllComponents(GanttChartRow)
+
+    expect(dayRow?.attributes('style')).toContain(`height: ${BASE_ROW_HEIGHT_PX}px`)
+    const expectedWeekHeight = BASE_ROW_HEIGHT_PX + MINI_HEIGHT_PX + MINI_GAP_PX
+    expect(weekRow?.attributes('style')).toContain(`height: ${expectedWeekHeight}px`)
   })
 })
