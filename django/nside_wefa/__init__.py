@@ -5,4 +5,4 @@ This package provides Django applications and utilities for web development,
 with a focus on Legal Consent compliance, data protection, authentication.
 """
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
