@@ -40,7 +40,7 @@ The lib provide utils and helpers to handle communications with a backend (ReST 
    1. Attach axios to the "client"
    2. Ensure TanStack wrappers are up and running
 4. Create your OpenAPI-based API Client, if applicable
-   1. Attach axios to the "client"
+   1. Attach axios to the "client" (defaults to the axios singleton)
    2. Ensure TanStack wrappers are up and running
 5. Initialize the backendStore
    1. Attach the reactive interceptors on the axios Instance, for authentication
@@ -100,11 +100,18 @@ If your backend exposes an OpenAPI schema, you can leverage it by auto-generatin
 
 - From your OpenAPI specs, generate a typed SDK : `npx @hey-api/openapi-ts --input ./path/to/openapi.yaml --output ./src/openapi --client @hey-api/client-axios`
 - Link the typedApiClient to the SDK, in main.ts :
+
   ```ts
   import { client } from '@/openapi/client.gen'
   import { typedApiClient } from '@nside/wefa/network'
+
+  // By default, it will use the axios singleton from @nside/wefa/network
   typedApiClient.setupOpenApiClient(client)
+
+  // Or you can provide a custom axios instance
+  typedApiClient.setupOpenApiClient(client, myCustomAxiosInstance)
   ```
+
 - Use the wrappers anywhere :
 
   ```ts
