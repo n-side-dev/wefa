@@ -27,7 +27,8 @@ The GanttChart component renders a calendar grid with month and week headers, an
 ```vue
 <template>
   <GanttChartComponent
-    :date-range="dateRange"
+    :start-date="startDate"
+    :end-date="endDate"
     :rows="rows"
     :links="links"
     header-label="gantt_chart.header"
@@ -38,7 +39,8 @@ The GanttChart component renders a calendar grid with month and week headers, an
 import { ref } from 'vue'
 import GanttChartComponent from '@/components/GanttChartComponent/GanttChartComponent.vue'
 
-const dateRange = ref([new Date(2026, 0, 1), new Date(2026, 0, 2)])
+const startDate = ref(new Date(2026, 0, 1))
+const endDate = ref(new Date(2026, 0, 2))
 const rows = ref([
   {
     id: 1,
@@ -71,7 +73,8 @@ const links = ref([{ fromId: 'planned', toId: 'optimized' }])
 
 ```vue
 <GanttChartComponent
-  :date-range="dateRange"
+  :start-date="startDate"
+  :end-date="endDate"
   :rows="rows"
   view-mode="week"
   :show-weekend-shading="false"
@@ -94,7 +97,8 @@ Activities support a `visualType`:
 
 ```vue
 <GanttChartComponent
-  :date-range="dateRange"
+  :start-date="startDate"
+  :end-date="endDate"
   :rows="rows"
   :links="links"
   :activity-tooltip="(activity, row) => `${row?.id}: ${activity.label}`"

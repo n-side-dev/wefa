@@ -1,15 +1,6 @@
 <template>
   <div class="flex flex-row sticky top-0 z-60 bg-surface-0 h-full">
-    <!-- Header Placeholder -->
-    <div
-      v-if="props.showLeftHeader"
-      class="left-0 flex shrink-0 sticky z-60 justify-center items-center box-border border-r border-b border-surface-200 bg-surface-50 text-surface-900 font-semibold h-full"
-      :style="{ width: `${props.leftHeaderWidthPx}px` }"
-    >
-      {{ t(props.headerLabel) }}
-    </div>
-    <!-- Headers -->
-    <div v-if="props.showGrid" class="flex flex-col">
+    <div class="flex flex-col">
       <!-- Months header -->
       <div class="flex flex-row w-full">
         <template v-if="isWeekView">
@@ -72,7 +63,7 @@
       <!-- Days row -->
       <div v-if="!isWeekView" class="flex flex-row w-full">
         <div
-          v-for="date in props.dateRange"
+          v-for="date in dateRange"
           :key="date.toISOString()"
           class="flex-none box-border border-b border-r border-surface-200 bg-surface-0 text-center py-2 text-xs text-surface-700 select-none"
           :style="{ width: `${DAY_CELL_WIDTH_PX}px` }"
@@ -98,32 +89,22 @@ import {
   type MonthSpan,
 } from '@/components/GanttChartComponent/ganttChartLayout'
 
-export interface GanttChartRowProps {
+export interface GanttChartHeaderGridProps {
   dateRange: Date[]
   viewMode?: GanttChartViewMode
-  headerLabel?: string
-  leftHeaderWidthPx?: number
-  showLeftHeader?: boolean
-  showGrid?: boolean
 }
 
-const props = withDefaults(defineProps<GanttChartRowProps>(), {
-  viewMode: 'day',
-  headerLabel: 'gantt_chart.header',
-  leftHeaderWidthPx: 320,
-  showLeftHeader: true,
-  showGrid: true,
-})
+const { dateRange, viewMode = 'day' } = defineProps<GanttChartHeaderGridProps>()
 const { t } = useI18nLib()
 
-const isWeekView = computed(() => props.viewMode === 'week')
+const isWeekView = computed(() => viewMode === 'week')
 const columnWidthPx = computed(() => (isWeekView.value ? WEEK_CELL_WIDTH_PX : DAY_CELL_WIDTH_PX))
 const weekColumns = computed(() => {
-  if (props.dateRange.length === 0) {
+  if (dateRange.length === 0) {
     return []
   }
 
-  return getWeekColumns(props.dateRange[0]!, props.dateRange[props.dateRange.length - 1]!)
+  return getWeekColumns(dateRange[0]!, dateRange[dateRange.length - 1]!)
 })
 
 const monthSpans = computed(() =>
@@ -134,7 +115,7 @@ const weeks = computed(() => {
   type WeekGroup = { weekYear: number; weekNumber: number; days: Date[] }
   const groups: WeekGroup[] = []
 
-  props.dateRange.forEach((date) => {
+  dateRange.forEach((date) => {
     const luxonDate = DateTime.fromJSDate(date)
     const keyYear = luxonDate.weekYear
     const keyNumber = luxonDate.weekNumber
@@ -158,7 +139,7 @@ const months = computed(() => {
   type MonthGroup = { month: number; year: number; label: string; days: Date[] }
   const groups: MonthGroup[] = []
 
-  props.dateRange.forEach((date) => {
+  dateRange.forEach((date) => {
     const luxonDate = DateTime.fromJSDate(date)
     const keyYear = luxonDate.year
     const keyMonth = luxonDate.month

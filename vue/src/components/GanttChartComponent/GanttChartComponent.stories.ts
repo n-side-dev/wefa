@@ -6,18 +6,6 @@ import Button from 'primevue/button'
 import GanttChartComponent from './GanttChartComponent.vue'
 import type { GanttChartActivityData, GanttChartRowData } from './ganttChartTypes'
 
-const buildDateRange = (start: Date, end: Date) => {
-  const dates = []
-  const cursor = new Date(start)
-
-  while (cursor <= end) {
-    dates.push(new Date(cursor))
-    cursor.setDate(cursor.getDate() + 1)
-  }
-
-  return dates
-}
-
 const buildRows = (count: number): GanttChartRowData[] => {
   return Array.from({ length: count }, (_, index) => {
     const startDay = (index * 3) % 28
@@ -120,7 +108,8 @@ const meta: Meta<typeof GanttChartComponent> = {
   title: 'Components/GanttChart',
   component: GanttChartComponent,
   args: {
-    dateRange: buildDateRange(new Date(2026, 0, 1), new Date(2026, 1, 28)),
+    startDate: new Date(2026, 0, 1),
+    endDate: new Date(2026, 1, 28),
     rows: buildRows(40),
     links: buildLinks(buildRows(40)),
     headerLabel: 'gantt_chart.header',
@@ -153,8 +142,11 @@ The story wraps the component in a fixed-height container to demonstrate scrolli
     stackMiniActivities: {
       control: { type: 'boolean' },
     },
-    dateRange: {
-      control: { type: 'object' },
+    startDate: {
+      control: { type: 'date' },
+    },
+    endDate: {
+      control: { type: 'date' },
     },
     rows: {
       control: { type: 'object' },
@@ -196,9 +188,7 @@ export const Default: Story = {
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     await expect(
-      canvas.getByText((text) =>
-        text === 'Header' || text === (args.headerLabel ?? 'Header')
-      )
+      canvas.getByText((text) => text === 'Header' || text === (args.headerLabel ?? 'Header'))
     ).toBeInTheDocument()
   },
 }

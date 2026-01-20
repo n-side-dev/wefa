@@ -1,6 +1,7 @@
 <template>
   <GanttChartComponent
-    :date-range="dateRange"
+    :start-date="startDate"
+    :end-date="endDate"
     :rows="rows"
     :links="links"
     header-label="gantt_chart.header"
@@ -15,18 +16,8 @@ import type {
   GanttChartRowData,
 } from '@/components/GanttChartComponent/ganttChartTypes'
 
-const dateRange = computed<Date[]>(() => {
-  const dates = []
-  const currentDate = new Date(2026, 0, 1)
-  const endDate = new Date(2026, 1, 28)
-
-  while (currentDate <= endDate) {
-    dates.push(new Date(currentDate))
-    currentDate.setDate(currentDate.getDate() + 1)
-  }
-
-  return dates
-})
+const startDate = new Date(2026, 0, 1)
+const endDate = new Date(2026, 1, 28)
 
 const rows = computed<GanttChartRowData[]>(() =>
   Array.from({ length: 30 }, (_, index) => {

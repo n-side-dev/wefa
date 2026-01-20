@@ -1,4 +1,5 @@
 <template>
+  <!-- Base activity links are drawn in a lower z-layer with individual arrow markers. -->
   <svg
     class="absolute inset-y-0 pointer-events-none z-10"
     :style="{ left: `${leftHeaderWidthPx}px` }"
@@ -7,9 +8,11 @@
     :viewBox="`0 0 ${gridWidthPx} ${virtualHeightPx}`"
   >
     <defs>
+      <!-- Clip to the virtualized viewport so paths don't bleed outside. -->
       <clipPath id="gantt-link-clip">
         <rect x="0" y="0" :width="gridWidthPx" :height="virtualHeightPx" />
       </clipPath>
+      <!-- Each link gets its own marker so color matches the stroke. -->
       <marker
         v-for="link in linkLayers.base"
         :id="`gantt-link-arrow-${link.id}`"
@@ -25,6 +28,7 @@
       </marker>
     </defs>
     <g clip-path="url(#gantt-link-clip)">
+      <!-- Paths are precomputed in useGanttLinks (row offsets + column widths). -->
       <path
         v-for="link in linkLayers.base"
         :key="link.id"
@@ -39,6 +43,7 @@
       />
     </g>
   </svg>
+  <!-- Mini activity links render above bars to avoid being obscured. -->
   <svg
     class="absolute inset-y-0 pointer-events-none"
     :style="{ left: `${leftHeaderWidthPx}px`, zIndex: 25 }"
@@ -47,9 +52,11 @@
     :viewBox="`0 0 ${gridWidthPx} ${virtualHeightPx}`"
   >
     <defs>
+      <!-- Clip to the virtualized viewport so paths don't bleed outside. -->
       <clipPath id="gantt-link-clip-mini">
         <rect x="0" y="0" :width="gridWidthPx" :height="virtualHeightPx" />
       </clipPath>
+      <!-- Each link gets its own marker so color matches the stroke. -->
       <marker
         v-for="link in linkLayers.mini"
         :id="`gantt-link-arrow-mini-${link.id}`"

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import GanttChartComponent from './GanttChartComponent.vue'
-import GanttChartRow from './GanttChartRow.vue'
+import GanttChartRowGrid from './GanttChartRowGrid.vue'
 import { BASE_ROW_HEIGHT_PX, MINI_GAP_PX, MINI_HEIGHT_PX, getWeekColumns } from './ganttChartLayout'
 import type { GanttChartRowData } from './ganttChartTypes'
 
@@ -36,16 +36,6 @@ vi.mock('@vueuse/core', async () => {
     },
   }
 })
-
-const buildDateRange = (start: Date, end: Date) => {
-  const dates = []
-  const cursor = new Date(start)
-  while (cursor <= end) {
-    dates.push(new Date(cursor))
-    cursor.setDate(cursor.getDate() + 1)
-  }
-  return dates
-}
 
 const baseRows: GanttChartRowData[] = [
   {
@@ -84,7 +74,8 @@ describe('GanttChartComponent', () => {
   it('renders top-left header label and row headers', () => {
     const wrapper = mount(GanttChartComponent, {
       props: {
-        dateRange: buildDateRange(new Date(2026, 0, 1), new Date(2026, 0, 7)),
+        startDate: new Date(2026, 0, 1),
+        endDate: new Date(2026, 0, 7),
         rows: baseRows,
         headerLabel: 'Line',
       },
@@ -104,7 +95,8 @@ describe('GanttChartComponent', () => {
   it('emits activityClick with activity and row data', async () => {
     const wrapper = mount(GanttChartComponent, {
       props: {
-        dateRange: buildDateRange(new Date(2026, 0, 1), new Date(2026, 0, 7)),
+        startDate: new Date(2026, 0, 1),
+        endDate: new Date(2026, 0, 7),
         rows: baseRows,
       },
       global: {
@@ -128,7 +120,8 @@ describe('GanttChartComponent', () => {
   it('renders link paths when links are provided', () => {
     const wrapper = mount(GanttChartComponent, {
       props: {
-        dateRange: buildDateRange(new Date(2026, 0, 1), new Date(2026, 0, 7)),
+        startDate: new Date(2026, 0, 1),
+        endDate: new Date(2026, 0, 7),
         rows: baseRows,
         links: [{ fromId: 'bar-1', toId: 'bar-2' }],
       },
@@ -147,12 +140,12 @@ describe('GanttChartComponent', () => {
   it('renders weekly headers with month spans across overlapping weeks', () => {
     const start = new Date(2026, 0, 25)
     const end = new Date(2026, 1, 10)
-    const dateRange = buildDateRange(start, end)
     const expectedWeeks = getWeekColumns(start, end).length
 
     const wrapper = mount(GanttChartComponent, {
       props: {
-        dateRange,
+        startDate: start,
+        endDate: end,
         rows: baseRows,
         viewMode: 'week',
       },
@@ -172,10 +165,12 @@ describe('GanttChartComponent', () => {
   })
 
   it('hides day headers in weekly view', () => {
-    const dateRange = buildDateRange(new Date(2026, 0, 1), new Date(2026, 0, 7))
+    const startDate = new Date(2026, 0, 1)
+    const endDate = new Date(2026, 0, 7)
     const wrapper = mount(GanttChartComponent, {
       props: {
-        dateRange,
+        startDate,
+        endDate,
         rows: baseRows,
         viewMode: 'week',
       },
@@ -192,7 +187,8 @@ describe('GanttChartComponent', () => {
   })
 
   it('stacks mini activities by week when in weekly view', () => {
-    const dateRange = buildDateRange(new Date(2026, 0, 1), new Date(2026, 0, 7))
+    const startDate = new Date(2026, 0, 1)
+    const endDate = new Date(2026, 0, 7)
     const miniRows: GanttChartRowData[] = [
       {
         id: 1,
@@ -220,7 +216,8 @@ describe('GanttChartComponent', () => {
 
     const dayWrapper = mount(GanttChartComponent, {
       props: {
-        dateRange,
+        startDate,
+        endDate,
         rows: miniRows,
         viewMode: 'day',
         stackMiniActivities: true,
@@ -235,7 +232,8 @@ describe('GanttChartComponent', () => {
     })
     const weekWrapper = mount(GanttChartComponent, {
       props: {
-        dateRange,
+        startDate,
+        endDate,
         rows: miniRows,
         viewMode: 'week',
         stackMiniActivities: true,
@@ -249,8 +247,8 @@ describe('GanttChartComponent', () => {
       },
     })
 
-    const [dayRow] = dayWrapper.findAllComponents(GanttChartRow)
-    const [weekRow] = weekWrapper.findAllComponents(GanttChartRow)
+    const [dayRow] = dayWrapper.findAllComponents(GanttChartRowGrid)
+    const [weekRow] = weekWrapper.findAllComponents(GanttChartRowGrid)
 
     expect(dayRow?.attributes('style')).toContain(`height: ${BASE_ROW_HEIGHT_PX}px`)
     const expectedWeekHeight = BASE_ROW_HEIGHT_PX + MINI_HEIGHT_PX + MINI_GAP_PX
