@@ -37,6 +37,10 @@
 </template>
 
 <script setup lang="ts">
+// This component provides the overall grid structure for the Gantt chart,
+// including the header and body sections, as well as the left and right parts.
+// It manages the scrolling synchronization between the header and body sections.
+// And it handles the hidden parts when scrolling.
 import { ref } from 'vue'
 
 export interface GanttChartGridProps {
