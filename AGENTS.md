@@ -21,6 +21,7 @@
 - **Component discovery**: inspect `src/components`, exported barrels (`src/components/**/index.ts`), and `@nside/wefa` type definitions before crafting new UI. Use `npm info @nside/wefa` or the local `dist/lib.d.ts` for quick lookup.
 - **PrimeVue composition**: when WeFa lacks a widget, compose PrimeVue primitives with Tailwind classes. Imports follow `import Component from 'primevue/component'` and styling sticks to utility classes or theme tokens (`bg-primary-500`, `text-surface-900`, etc.).
 - **State & data utilities**: rely on provided composables (`src/composables`), Pinia stores (`src/stores`), and network helpers (`src/network`). Prefer enhancing these layers rather than re-implementing ad-hoc logic inside components.
+- **Props definition**: use `const { prop1 = prop1Default, ... } = defineProps<YourPropsType>()` with explicit interfaces/types. Avoid the usage of `withDefault()`.
 - **Stories & docs**: every component lives with `.stories.ts`, `.mdx`, and spec files under its folder. Keep stories authoritative and update MDX docs when props/state change.
 - **Quality gates**: run `npm run lint-check`, `npm run format-check`, `npm run test:unit`, `npm run test:e2e` (when flows/routing change), `npm run build`, and regenerate Storybook (`npm run storybook` or `npm run build-storybook`) before handing work off.
 

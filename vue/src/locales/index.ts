@@ -31,7 +31,6 @@ export function loadTranslations(
     if (matched && matched.length > 2) {
       const locale = matched[1]
       const rootField = matched[2]
-      /* eslint-disable security/detect-object-injection */
       const moduleData = modules[path]
 
       // Ensure we have valid locale, rootField, and moduleData before proceeding
@@ -42,7 +41,6 @@ export function loadTranslations(
         }
         messages[locale][rootField] = moduleData.default
       }
-      /* eslint-enable security/detect-object-injection */
     }
   }
   return messages
@@ -61,7 +59,6 @@ export function createLibI18n(options: I18nOptions = {}) {
   const mergedMessages: LocaleMessages<LocaleMessageValue> = {}
 
   // Safe local assignation. No safeguard needed.
-  /* eslint-disable security/detect-object-injection */
   for (const locale in defaultMessages) {
     mergedMessages[locale] = { ...defaultMessages[locale] }
     if (options.messages?.[locale]) {
@@ -78,7 +75,6 @@ export function createLibI18n(options: I18nOptions = {}) {
       }
     }
   }
-  /* eslint-enable security/detect-object-injection */
 
   return createI18n({
     legacy: false, // Use Composition API

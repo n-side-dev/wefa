@@ -1,0 +1,288 @@
+<template>
+  <div class="flex flex-row w-full group relative" :style="{ height: `${resolvedRowHeightPx}px` }">
+    <div
+      class="box-border border-b border-surface-200 bg-surface-0 group-hover:bg-surface-50 relative overflow-hidden"
+      :style="gridStyle"
+    >
+      <template
+        v-for="(activity, index) in stripeActivities"
+        :key="activity.id ?? `${activity.startDate.toISOString()}-${index}`"
+      >
+        <slot
+          name="activity"
+          :activity="activity"
+          :style="stripeStyle(activity)"
+          :visual-type="'stripe'"
+        >
+          <div
+            v-tooltip="tooltipForActivity(activity)"
+            class="absolute z-0 cursor-pointer"
+            :style="stripeStyle(activity)"
+            @click="emit('activityClick', activity, rowData)"
+          />
+        </slot>
+      </template>
+      <template v-for="(activity, index) in barActivities" :key="activity.id ?? `bar-${index}`">
+        <slot name="activity" :activity="activity" :style="barStyle(activity)" :visual-type="'bar'">
+          <div
+            v-tooltip="tooltipForActivity(activity)"
+            class="absolute z-20 rounded-lg overflow-hidden cursor-pointer"
+            :class="activity.colorClass ?? activityColorClass"
+            :style="barStyle(activity)"
+            @click="emit('activityClick', activity, rowData)"
+          >
+            <span class="px-2 text-xs font-medium text-white truncate whitespace-nowrap">{{
+              t(activity.label ?? 'gantt_chart.activity')
+            }}</span>
+          </div>
+        </slot>
+      </template>
+      <template
+        v-for="(item, index) in miniLayout.lanes"
+        :key="item.activity.id ?? `mini-${index}`"
+      >
+        <slot
+          name="activity"
+          :activity="item.activity"
+          :style="miniStyle(item)"
+          :visual-type="'mini'"
+        >
+          <div
+            v-tooltip="tooltipForActivity(item.activity)"
+            class="absolute z-30 rounded-md overflow-hidden cursor-pointer"
+            :class="item.activity.colorClass ?? activityColorClass"
+            :style="miniStyle(item)"
+            @click="emit('activityClick', item.activity, rowData)"
+          />
+        </slot>
+      </template>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { computed } from 'vue'
+import { DateTime } from 'luxon'
+import Tooltip from 'primevue/tooltip'
+import { useI18nLib } from '@/locales'
+import {
+  BAR_VERTICAL_PADDING_PX,
+  BASE_ROW_HEIGHT_PX,
+  DAY_CELL_WIDTH_PX,
+  MINI_GAP_PX,
+  MINI_HEIGHT_PX,
+  STRIPE_SIZE_PX,
+  WEEK_CELL_WIDTH_PX,
+  computeMiniLanes,
+  getActivitySpanPx,
+  getWeekColumns,
+  type GanttChartActivityType,
+  type GanttChartViewMode,
+} from '@/components/GanttChartComponent/ganttChartLayout'
+import type {
+  GanttChartActivityData,
+  GanttChartRowData,
+} from '@/components/GanttChartComponent/ganttChartTypes'
+
+export interface GanttChartRowGridProps {
+  dateRange: Date[]
+  viewMode?: GanttChartViewMode
+  activities?: GanttChartActivityData[]
+  activityColorClass?: string
+  stripeColor?: string
+  showWeekendShading?: boolean
+  stackMiniActivities?: boolean
+  rowHeightPx?: number
+  rowData?: GanttChartRowData
+  activityTooltip?: (activity: GanttChartActivityData, rowData?: GanttChartRowData) => string
+}
+
+const { t } = useI18nLib()
+
+const defaultTooltip = (activity: GanttChartActivityData) => {
+  const labelKey = activity.label ?? 'gantt_chart.activity'
+  const start = DateTime.fromJSDate(activity.startDate).toFormat('LLL d')
+  const end = DateTime.fromJSDate(activity.endDate).toFormat('LLL d')
+  return `${t(labelKey)}: ${start} – ${end}`
+}
+
+const {
+  dateRange,
+  viewMode = 'day',
+  activities = [],
+  activityColorClass = 'bg-emerald-400/80',
+  stripeColor = 'rgba(59, 130, 246, 0.2)',
+  showWeekendShading = true,
+  stackMiniActivities = true,
+  rowHeightPx = undefined,
+  rowData = undefined,
+  activityTooltip = undefined,
+} = defineProps<GanttChartRowGridProps>()
+
+const emit = defineEmits<{
+  (event: 'activityClick', activity: GanttChartActivityData, rowData?: GanttChartRowData): void
+}>()
+
+const vTooltip = Tooltip
+
+const WEEK_DAYS = 7
+
+// Switches layout math for day vs week column widths.
+const isWeekView = computed(() => viewMode === 'week')
+// Lane assignment for stacked mini activities.
+const miniLayout = computed(() => computeMiniLanes(activities, stackMiniActivities, viewMode))
+// Row height grows with overlapping minis.
+const resolvedRowHeightPx = computed(() => {
+  if (rowHeightPx !== undefined) {
+    return rowHeightPx
+  }
+
+  const extraHeight = Math.max(0, miniLayout.value.laneCount - 1) * (MINI_HEIGHT_PX + MINI_GAP_PX)
+  return BASE_ROW_HEIGHT_PX + extraHeight
+})
+
+// Pixel width for each column (day or week).
+const columnWidthPx = computed(() => (isWeekView.value ? WEEK_CELL_WIDTH_PX : DAY_CELL_WIDTH_PX))
+// Week column boundaries used for weekly view layout.
+const weekColumns = computed(() => {
+  if (dateRange.length === 0) {
+    return []
+  }
+
+  return getWeekColumns(dateRange[0]!, dateRange[dateRange.length - 1]!)
+})
+// Total grid width in pixels.
+const lineWidth = computed(() => {
+  const count = isWeekView.value ? weekColumns.value.length : dateRange.length
+  return `${count * columnWidthPx.value}px`
+})
+
+// Weekend shading pattern (disabled in weekly view).
+const weekPattern = computed(() => {
+  if (isWeekView.value || !showWeekendShading) {
+    return ''
+  }
+
+  const base = dateRange[0]
+    ? DateTime.fromJSDate(dateRange[0]).startOf('week')
+    : DateTime.now().startOf('week')
+  const stops = Array.from({ length: WEEK_DAYS }, (_, index) => {
+    const day = base.plus({ days: index })
+    const color = day.isWeekend ? 'rgb(248 250 252)' : 'transparent'
+    const start = index * DAY_CELL_WIDTH_PX
+    const end = (index + 1) * DAY_CELL_WIDTH_PX
+    return `${color} ${start}px ${end}px`
+  })
+
+  return `linear-gradient(90deg, ${stops.join(', ')})`
+})
+
+// Grid background style with optional weekend shading.
+const gridStyle = computed(() => {
+  const firstDate = dateRange[0]
+  const weekStart = firstDate
+    ? DateTime.fromJSDate(firstDate).startOf('week')
+    : DateTime.now().startOf('week')
+  const offsetDays = firstDate
+    ? Math.floor(DateTime.fromJSDate(firstDate).diff(weekStart, 'days').days)
+    : 0
+  const offsetPx = offsetDays * DAY_CELL_WIDTH_PX
+  const columnWidth = columnWidthPx.value
+  const gridLines = `repeating-linear-gradient(90deg, transparent 0, transparent ${
+    columnWidth - 1
+  }px, rgb(226 232 240) ${columnWidth - 1}px, rgb(226 232 240) ${columnWidth}px)`
+  const baseStyle: Record<string, string> = {
+    width: lineWidth.value,
+    backgroundImage: gridLines,
+    backgroundSize: `${columnWidth}px 100%`,
+    backgroundRepeat: 'repeat-x',
+  }
+
+  if (weekPattern.value) {
+    baseStyle.backgroundImage = `${gridLines}, ${weekPattern.value}`
+    baseStyle.backgroundSize = `${columnWidth}px 100%, ${DAY_CELL_WIDTH_PX * WEEK_DAYS}px 100%`
+    baseStyle.backgroundPosition = `0 0, -${offsetPx}px 0`
+    baseStyle.backgroundRepeat = 'repeat-x, repeat-x'
+  }
+
+  return baseStyle
+})
+
+// Computes the CSS position and size for an activity bar/stripe/mini.
+const activityPositionStyle = (activity: GanttChartActivityData) => {
+  // Weekly view is inclusive of partial weeks: any overlap fills the whole week column.
+  const span = getActivitySpanPx(
+    activity,
+    dateRange,
+    viewMode,
+    columnWidthPx.value,
+    weekColumns.value
+  )
+
+  return {
+    left: `${span.left}px`,
+    width: `${span.width}px`,
+  }
+}
+
+const activityType = (activity: GanttChartActivityData): GanttChartActivityType =>
+  activity.visualType ?? 'bar'
+
+const stripeActivities = computed(() =>
+  activities.filter((activity) => activityType(activity) === 'stripe')
+)
+const barActivities = computed(() =>
+  activities.filter((activity) => activityType(activity) === 'bar')
+)
+const tooltipForActivity = (activity: GanttChartActivityData) => {
+  const content = (activityTooltip ?? defaultTooltip)(activity, rowData)
+  return {
+    value: content,
+    disabled: !content,
+  }
+}
+
+const stripeStyle = (activity: GanttChartActivityData) => {
+  const color = activity.color ?? stripeColor
+  return {
+    ...activityPositionStyle(activity),
+    top: '0px',
+    height: `${resolvedRowHeightPx.value}px`,
+    backgroundImage: `repeating-linear-gradient(135deg, transparent 0 ${STRIPE_SIZE_PX}px, ${color} ${STRIPE_SIZE_PX}px ${
+      STRIPE_SIZE_PX * 2
+    }px)`,
+  }
+}
+
+const barStyle = (activity: GanttChartActivityData) => {
+  const height = Math.max(0, resolvedRowHeightPx.value - BAR_VERTICAL_PADDING_PX * 2)
+  const style: Record<string, string> = {
+    ...activityPositionStyle(activity),
+    top: `${BAR_VERTICAL_PADDING_PX}px`,
+    height: `${height}px`,
+  }
+
+  if (activity.color) {
+    style.backgroundColor = activity.color
+  }
+
+  return style
+}
+
+const miniStyle = (item: { activity: GanttChartActivityData; laneIndex: number }) => {
+  const laneCount = miniLayout.value.laneCount
+  const stackHeight = laneCount * MINI_HEIGHT_PX + (laneCount - 1) * MINI_GAP_PX
+  const topStart = Math.max(BAR_VERTICAL_PADDING_PX, (resolvedRowHeightPx.value - stackHeight) / 2)
+  const style: Record<string, string> = {
+    ...activityPositionStyle(item.activity),
+    top: `${topStart + item.laneIndex * (MINI_HEIGHT_PX + MINI_GAP_PX)}px`,
+    height: `${MINI_HEIGHT_PX}px`,
+  }
+
+  if (item.activity.color) {
+    style.backgroundColor = item.activity.color
+  }
+
+  return style
+}
+</script>
