@@ -32,14 +32,12 @@ export function applyTranslations<T>(
       if (i === keys.length - 1) {
         return { parent, lastKey: key }
       }
-      /* eslint-disable security/detect-object-injection */
       if (!target[key] || typeof target[key] !== 'object') {
         return { parent: null, lastKey: null }
       }
       target[key] = { ...target[key] } as Record<string, unknown>
       parent = target
       target = target[key] as Record<string, unknown>
-      /* eslint-enable security/detect-object-injection */
       i++
     }
     return { parent: null, lastKey: null }
@@ -49,13 +47,11 @@ export function applyTranslations<T>(
     const keys = path.split('.')
     const { parent, lastKey } = traversePath(result, keys)
 
-    /* eslint-disable security/detect-object-injection */
     if (parent && lastKey && typeof parent[lastKey] === 'string') {
       const translationKey = parent[lastKey]
       const translated = t(translationKey)
       parent[lastKey] = translated !== translationKey ? translated : translationKey
     }
-    /* eslint-enable security/detect-object-injection */
   }
 
   return result as T

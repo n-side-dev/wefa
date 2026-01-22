@@ -72,7 +72,9 @@
     "@tailwindcss/vite": "^4.1.18",
     "@tanstack/vue-query": "^5.92.8",
     "@vee-validate/zod": "^4.15.1",
+    "@vueuse/core": "^14.1.0",
     "axios": "^1.13.2",
+    "luxon": "^3.7.2",
     "marked": "^17.0.1",
     "pinia": "^3.0.4",
     "plotly.js-dist-min": "^3.3.1",
@@ -94,9 +96,10 @@
     "@storybook/addon-vitest": "^10.1.11",
     "@storybook/vue3-vite": "^10.1.11",
     "@tsconfig/node22": "^22.0.5",
-    "@types/eslint-plugin-security": "^3.0.0",
+    "@types/eslint-plugin-security": "^3.0.1",
     "@types/jsdom": "^27.0.0",
-    "@types/node": "^25.0.9",
+    "@types/luxon": "^3.7.1",
+    "@types/node": "^25.0.10",
     "@types/plotly.js-dist-min": "^2.3.4",
     "@vitejs/plugin-vue": "^6.0.3",
     "@vitest/browser": "4.0.17",
@@ -131,7 +134,7 @@
     "vite-plugin-dts": "^4.5.4",
     "vite-plugin-vue-devtools": "^8.0.5",
     "vitest": "^4.0.2",
-    "vue-tsc": "^3.2.0"
+    "vue-tsc": "^3.2.2"
   },
   "bundlesize": [
     {
