@@ -31,6 +31,15 @@ describe('network/typedApiClient', () => {
     expect(setConfig).toHaveBeenCalledExactlyOnceWith({ axios: axiosInstance })
   })
 
+  it('setupOpenApiClient should attach custom axios instance when provided', () => {
+    const setConfig = vi.fn()
+    const client = { setConfig }
+    const customAxios = { custom: true } as any
+    typedApiClient.setupOpenApiClient(client, customAxios)
+    expect(setConfig).toHaveBeenCalledTimes(1)
+    expect(setConfig).toHaveBeenCalledExactlyOnceWith({ axios: customAxios })
+  })
+
   describe('query()', () => {
     it('configures useQuery with callable name and options ref; enabled guard; unwraps data', async () => {
       // Define a named callable to check queryKey uses callable.name

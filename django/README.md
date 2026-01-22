@@ -33,7 +33,7 @@ pip install nside-wefa
 Or add it to your dependency file (e.g. `requirements.txt`):
 
 ```
-nside-wefa>=0.2.0
+nside-wefa>=0.3.0
 ```
 
 ## Included Apps
