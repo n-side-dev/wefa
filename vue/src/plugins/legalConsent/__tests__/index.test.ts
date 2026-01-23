@@ -50,7 +50,13 @@ function createMockRoute(name: string, path: string = `/${name}`): RouteLocation
 // Mock the backend store and router imports
 vi.mock('@/demo/backendStore.ts', () => {
   const mockStore = {
+    authenticationType: 'TOKEN',
     authenticated: ref(false),
+    login: vi.fn().mockResolvedValue({}),
+    logout: vi.fn().mockResolvedValue(undefined),
+    checkSession: vi.fn().mockResolvedValue(false),
+    fetchUserInfo: vi.fn().mockResolvedValue(null),
+    axiosInstance: axiosInstance,
     // Expose a method to modify the value from tests
     setAuthenticated: (value: boolean) => {
       mockStore.authenticated.value = value
@@ -109,10 +115,13 @@ describe('legalConsent Plugin', () => {
 
     // Mock backend store
     mockBackendStore = {
+      authenticationType: 'TOKEN',
       authenticated: ref(false),
       axiosInstance: axiosInstance,
       login: vi.fn().mockResolvedValue({}),
-      logout: vi.fn(),
+      logout: vi.fn().mockResolvedValue(undefined),
+      checkSession: vi.fn().mockResolvedValue(false),
+      fetchUserInfo: vi.fn().mockResolvedValue(null),
       setPostLogin: vi.fn(),
       setPostLogout: vi.fn(),
       setupAuthRouteGuard: vi.fn(),

@@ -166,18 +166,18 @@ describe('Token Backend Store', () => {
       backendStore.authenticated = true
     })
 
-    it('should clear authentication state on logout', () => {
-      backendStore.logout()
+    it('should clear authentication state on logout', async () => {
+      await backendStore.logout()
 
       expect(backendStore.authenticated).toBe(false)
       expect(localStorage.getItem('authenticationToken')).toBeNull()
     })
 
-    it('should call postLogout callback after logout', () => {
+    it('should call postLogout callback after logout', async () => {
       const postLogoutMock = vi.fn()
       backendStore.setPostLogout(postLogoutMock)
 
-      backendStore.logout()
+      await backendStore.logout()
 
       expect(postLogoutMock).toHaveBeenCalled()
     })

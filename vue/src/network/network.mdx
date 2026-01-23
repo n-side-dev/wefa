@@ -74,6 +74,56 @@ try {
 }
 ```
 
+## BFF authentication (Keycloak via proxy)
+
+When using the BFF authentication mode, all HTTP calls must include credentials so the session cookie is sent.
+The backend store configures the axios singleton with the fetch adapter and CORS credentials:
+
+- `adapter: 'fetch'`
+- `fetchOptions: { mode: 'cors', credentials: 'include' }`
+- `withCredentials: true`
+
+### Setup
+
+```ts
+import { configureBackendStore, useBackendStore } from '@nside/wefa/stores'
+
+configureBackendStore({
+  authenticationType: 'BFF',
+  bff: {
+    endpoints: {
+      login: '/proxy/api/auth/login',
+      logout: '/proxy/api/auth/logout',
+      session: '/proxy/api/auth/session',
+      userInfo: '/proxy/api/auth/userinfo',
+    },
+    flow: {
+      loginRedirect: true,
+      logoutRedirect: true,
+      logoutRedirectUrl: '/auth/login',
+      sessionExpiredRedirectToLogin: true,
+    },
+  },
+})
+
+const backendStore = useBackendStore()
+```
+
+### Flows
+
+- `backendStore.login()` calls the login endpoint. If `loginRedirect` is enabled, it redirects to the URL returned by the BFF.
+- `backendStore.logout()` calls the logout endpoint and clears the auth state.
+- `backendStore.checkSession()` calls the session endpoint and updates `authenticated`.
+- `backendStore.fetchUserInfo()` fetches the user profile and updates `authenticated`.
+
+The default login/logout views in the library consume the same `bff.flow` configuration to decide whether to auto-run and redirect.
+
+### Quick demo test
+
+1. Update `vue/src/demo/backendStore.ts` to use `authenticationType: 'BFF'` and the BFF options above.
+2. Add the auth routes in `vue/src/demo/router.ts` using `libRouteRecords.login` and `libRouteRecords.logout`.
+3. Run `npm run dev` and visit `/auth/login` to trigger the flow.
+
 ## URL API Client
 
 This first API Client provides a layer of state management around URL-based API calls.

@@ -11,12 +11,13 @@ import axiosInstance from '@/network/axios'
  * - 'TOKEN': Authentication is performed using a token-based system.
  * - 'JWT': Authentication is performed using JSON Web Tokens.
  * - 'SESSION': Authentication is managed using session-based mechanisms.
+ * - 'BFF': Authentication is managed through a Backend-for-Frontend proxy.
  *
  * Note: Future enhancement could include more flexible procedures registration
  * (postLogin, postLogout) to allow different actors to register their procedures
  * on some collection.
  */
-export type AuthenticationType = 'TOKEN' | 'JWT' | 'SESSION'
+export type AuthenticationType = 'TOKEN' | 'JWT' | 'SESSION' | 'BFF'
 
 /**
  * Represents a set of credentials consisting of a username and password.
@@ -27,19 +28,53 @@ export interface Credentials {
   password: string
 }
 
+export interface UserInfos {
+  email: string
+  email_verified: boolean
+  family_name: string
+  given_name: string
+  name: string
+  preferred_username: string
+  sub: string
+}
+
+export interface BffAuthEndpoints {
+  login: string
+  logout: string
+  session: string
+  userInfo: string
+}
+
+export interface BffAuthFlowOptions {
+  loginRedirect: boolean
+  logoutRedirect: boolean
+  logoutRedirectUrl: string
+  sessionExpiredRedirectToLogin: boolean
+}
+
+export interface BffAuthOptions {
+  endpoints?: Partial<BffAuthEndpoints>
+  flow?: Partial<BffAuthFlowOptions>
+}
+
 export interface BackendStore {
+  authenticationType: AuthenticationType
   authenticated: Ref<boolean>
   axiosInstance: AxiosInstance
-  login: (credentials: Credentials) => Promise<AxiosResponse>
-  logout: () => void
+  login: (credentials?: Credentials) => Promise<AxiosResponse>
+  logout: () => Promise<void>
+  checkSession: () => Promise<boolean>
+  fetchUserInfo: () => Promise<UserInfos | null>
   setPostLogin: (fn: () => void) => void
   setPostLogout: (fn: () => void) => void
   setupAuthRouteGuard: (router: Router) => void
   unsetAuthRouteGuard: () => void
+  bffOptions?: BffAuthOptions
 }
 
 export interface BackendStoreOptions {
   authenticationType: AuthenticationType
+  bff?: BffAuthOptions
 }
 
 /**
@@ -57,11 +92,23 @@ const localStorageKey = 'authenticationToken'
 const jwtAccessTokenKey = 'jwtAccessToken'
 const jwtRefreshTokenKey = 'jwtRefreshToken'
 
+let defaultBackendStoreOptions: BackendStoreOptions | null = null
+
+export const configureBackendStore = (options: BackendStoreOptions) => {
+  defaultBackendStoreOptions = options
+}
+
 export const useBackendStore = (
-  options: BackendStoreOptions,
+  options?: BackendStoreOptions,
   piniaInstance: Pinia | null = null
 ) => {
-  return defineBackendStore(options)(piniaInstance)
+  const resolvedOptions = options ?? defaultBackendStoreOptions
+  if (!resolvedOptions) {
+    throw new Error(
+      'Backend store options are required. Call configureBackendStore(options) or pass options to useBackendStore.'
+    )
+  }
+  return defineBackendStore(resolvedOptions)(piniaInstance)
 }
 
 export const defineBackendStore = (backendStoreOptions: BackendStoreOptions): StoreDefinition => {
@@ -79,6 +126,8 @@ function getBackendStoreSetup(backendStoreOptions: BackendStoreOptions): Backend
       return tokenAuthenticationBackendStoreSetup()
     case 'JWT':
       return jwtAuthenticationBackendStoreSetup()
+    case 'BFF':
+      return bffAuthenticationBackendStoreSetup(backendStoreOptions.bff)
     default:
       throw new Error(`Unknown authentication type: ${backendStoreOptions.authenticationType}`)
   }
@@ -239,7 +288,10 @@ function tokenAuthenticationBackendStoreSetup(): BackendStore {
    * @param credentials - The user's login credentials, typically including a username and password.
    * @returns A promise that resolves to the Axios response object returned from the authentication request.
    */
-  async function login(credentials: Credentials): Promise<AxiosResponse> {
+  async function login(credentials?: Credentials): Promise<AxiosResponse> {
+    if (!credentials) {
+      throw new Error('Credentials are required for TOKEN authentication.')
+    }
     const response = await axiosInstance.post('/api/token-auth/', credentials)
     if (response.status === 200) {
       authenticated.value = true
@@ -256,18 +308,31 @@ function tokenAuthenticationBackendStoreSetup(): BackendStore {
    * - Resets the stored authentication token to null.
    * - Executes any additional post-logout logic defined in the application.
    */
-  function logout(): void {
+  async function logout(): Promise<void> {
     localStorage.removeItem(localStorageKey)
     authenticated.value = false
     _token.value = null
     _postLogout.value()
   }
 
+  async function checkSession(): Promise<boolean> {
+    console.error('checkSession is not applicable for TOKEN authentication.')
+    return authenticated.value
+  }
+
+  async function fetchUserInfo(): Promise<UserInfos | null> {
+    console.error('fetchUserInfo is not applicable for TOKEN authentication.')
+    return null
+  }
+
   return {
+    authenticationType: 'TOKEN',
     axiosInstance,
     authenticated,
     login,
     logout,
+    checkSession,
+    fetchUserInfo,
     setPostLogin: commonAuth.setPostLogin,
     setPostLogout: commonAuth.setPostLogout,
     setupAuthRouteGuard: commonAuth.setupAuthRouteGuard,
@@ -413,7 +478,10 @@ function jwtAuthenticationBackendStoreSetup(): BackendStore {
    * @param credentials - The user's login credentials, typically including a username and password.
    * @returns A promise that resolves to the Axios response object returned from the authentication request.
    */
-  async function login(credentials: Credentials): Promise<AxiosResponse> {
+  async function login(credentials?: Credentials): Promise<AxiosResponse> {
+    if (!credentials) {
+      throw new Error('Credentials are required for JWT authentication.')
+    }
     const response = await axiosInstance.post('/api/token/', credentials)
     if (response.status === 200) {
       authenticated.value = true
@@ -431,7 +499,7 @@ function jwtAuthenticationBackendStoreSetup(): BackendStore {
    * - Resets the stored authentication tokens to null.
    * - Executes any additional post-logout logic defined in the application.
    */
-  function logout(): void {
+  async function logout(): Promise<void> {
     localStorage.removeItem(jwtAccessTokenKey)
     localStorage.removeItem(jwtRefreshTokenKey)
     authenticated.value = false
@@ -440,14 +508,170 @@ function jwtAuthenticationBackendStoreSetup(): BackendStore {
     _postLogout.value()
   }
 
+  async function checkSession(): Promise<boolean> {
+    console.error('checkSession is not applicable for JWT authentication.')
+    return authenticated.value
+  }
+
+  async function fetchUserInfo(): Promise<UserInfos | null> {
+    console.error('fetchUserInfo is not applicable for JWT authentication.')
+    return null
+  }
+
   return {
+    authenticationType: 'JWT',
     axiosInstance,
     authenticated,
     login,
     logout,
+    checkSession,
+    fetchUserInfo,
     setPostLogin: commonAuth.setPostLogin,
     setPostLogout: commonAuth.setPostLogout,
     setupAuthRouteGuard: commonAuth.setupAuthRouteGuard,
     unsetAuthRouteGuard: commonAuth.unsetAuthRouteGuard,
+  }
+}
+
+const defaultBffEndpoints: BffAuthEndpoints = {
+  login: '/proxy/api/auth/login',
+  logout: '/proxy/api/auth/logout',
+  session: '/proxy/api/auth/session',
+  userInfo: '/proxy/api/auth/userinfo',
+}
+
+const defaultBffFlowOptions: BffAuthFlowOptions = {
+  loginRedirect: true,
+  logoutRedirect: true,
+  logoutRedirectUrl: '/auth/login',
+  sessionExpiredRedirectToLogin: true,
+}
+
+function normalizeBffOptions(options?: BffAuthOptions): BffAuthOptions & {
+  endpoints: BffAuthEndpoints
+  flow: BffAuthFlowOptions
+} {
+  return {
+    endpoints: {
+      ...defaultBffEndpoints,
+      ...(options?.endpoints ?? {}),
+    },
+    flow: {
+      ...defaultBffFlowOptions,
+      ...(options?.flow ?? {}),
+    },
+  }
+}
+
+function resolveLoginRedirectUrl(response: AxiosResponse): string | null {
+  const data = response.data as unknown
+  if (typeof data === 'string') {
+    return data
+  }
+  if (!data || typeof data !== 'object') {
+    return null
+  }
+  const record = data as Record<string, unknown>
+  const candidate =
+    (record.url as string | undefined) ??
+    (record.redirectUrl as string | undefined) ??
+    (record.loginUrl as string | undefined)
+  return typeof candidate === 'string' ? candidate : null
+}
+
+function redirectTo(url: string) {
+  if (typeof window !== 'undefined' && window.location) {
+    window.location.assign(url)
+  }
+}
+
+function bffAuthenticationBackendStoreSetup(options?: BffAuthOptions): BackendStore {
+  const authenticated = ref(false)
+  const _postLogout: Ref<() => void> = ref(() => {})
+  const _postLogin: Ref<() => void> = ref(() => {})
+  const bffOptions = normalizeBffOptions(options)
+
+  const commonAuth = createCommonAuthFunctions(authenticated, _postLogin, _postLogout)
+
+  const axiosDefaults = axiosInstance.defaults as typeof axiosInstance.defaults & {
+    fetchOptions?: RequestInit
+    adapter?: string
+  }
+  axiosDefaults.adapter = 'fetch'
+  axiosDefaults.fetchOptions = {
+    mode: 'cors',
+    credentials: 'include',
+  }
+  axiosInstance.defaults.withCredentials = true
+  axiosInstance.defaults.headers.common['Content-Type'] = 'application/json'
+
+  let handlingSessionExpiration = false
+
+  async function handleSessionExpiration(): Promise<void> {
+    if (handlingSessionExpiration) return
+    handlingSessionExpiration = true
+    authenticated.value = false
+    _postLogout.value()
+    if (bffOptions.flow.sessionExpiredRedirectToLogin) {
+      await login()
+    }
+    handlingSessionExpiration = false
+  }
+
+  axiosInstance.interceptors.response.use(
+    (response) => response,
+    async (error) => {
+      if ([401, 403].includes(error.response?.status)) {
+        await handleSessionExpiration()
+      }
+      return Promise.reject(error)
+    }
+  )
+
+  async function login(): Promise<AxiosResponse> {
+    const response = await axiosInstance.get(bffOptions.endpoints.login)
+    const redirectUrl = resolveLoginRedirectUrl(response)
+    if (bffOptions.flow.loginRedirect && redirectUrl) {
+      redirectTo(redirectUrl)
+    }
+    _postLogin.value()
+    return response
+  }
+
+  async function logout(): Promise<void> {
+    await axiosInstance.get(bffOptions.endpoints.logout)
+    authenticated.value = false
+    _postLogout.value()
+  }
+
+  async function checkSession(): Promise<boolean> {
+    const response = await axiosInstance.get(bffOptions.endpoints.session)
+    const hasSession = Boolean((response.data as { session?: boolean })?.session)
+    authenticated.value = hasSession
+    if (!hasSession && bffOptions.flow.sessionExpiredRedirectToLogin) {
+      await login()
+    }
+    return hasSession
+  }
+
+  async function fetchUserInfo(): Promise<UserInfos | null> {
+    const response = await axiosInstance.get(bffOptions.endpoints.userInfo)
+    authenticated.value = true
+    return response.data as UserInfos
+  }
+
+  return {
+    authenticationType: 'BFF',
+    axiosInstance,
+    authenticated,
+    login,
+    logout,
+    checkSession,
+    fetchUserInfo,
+    setPostLogin: commonAuth.setPostLogin,
+    setPostLogout: commonAuth.setPostLogout,
+    setupAuthRouteGuard: commonAuth.setupAuthRouteGuard,
+    unsetAuthRouteGuard: commonAuth.unsetAuthRouteGuard,
+    bffOptions,
   }
 }

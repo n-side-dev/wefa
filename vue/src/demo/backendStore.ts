@@ -1,11 +1,12 @@
 import pinia from '@/demo/pinia'
-import { useBackendStore, type BackendStore } from '@/stores'
+import { configureBackendStore, useBackendStore, type BackendStore } from '@/stores'
 
-const backendStore: BackendStore = useBackendStore(
-  {
-    authenticationType: 'TOKEN',
-  },
-  pinia
-) as unknown as BackendStore
+const backendStoreOptions = {
+  authenticationType: 'TOKEN',
+}
+
+configureBackendStore(backendStoreOptions)
+
+const backendStore: BackendStore = useBackendStore(backendStoreOptions, pinia) as BackendStore
 
 export { backendStore }

@@ -106,6 +106,31 @@ Types live under the `@nside/wefa/types` export:
 import type { WefaButtonProps } from '@nside/wefa/types';
 ```
 
+### Authentication
+
+WeFa exposes a backend store that manages authentication flows and configures the shared axios instance.
+
+```ts
+import { configureBackendStore, useBackendStore } from '@nside/wefa/stores';
+
+configureBackendStore({
+  authenticationType: 'BFF',
+  bff: {
+    flow: {
+      loginRedirect: true,
+      logoutRedirect: true,
+      logoutRedirectUrl: '/auth/login',
+      sessionExpiredRedirectToLogin: true,
+    },
+  },
+});
+
+const backendStore = useBackendStore();
+```
+
+For BFF + Keycloak, configure `BACKEND_BASE_URL` to point at your proxy host and keep `/proxy` relative URLs.
+See `src/network/network.mdx` for endpoint and flow details.
+
 ### Icons and the registry helper
 
 WeFa uses [Iconify](https://iconify.design/) under the hood. Bundled icon collections are registered automatically by calling `setupDefaultIcons()` inside `src/iconRegistry.ts`. If you need extra icons offline:
