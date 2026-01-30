@@ -16,6 +16,7 @@ import skipFormatting from '@vue/eslint-config-prettier/skip-formatting'
 // configureVueProject({ scriptLangs: ['ts', 'tsx'] })
 // More info at https://github.com/vuejs/eslint-config-typescript/#advanced-setup
 
+
 export default defineConfigWithVueTs(
   {
     name: 'app/files-to-lint',
@@ -27,6 +28,7 @@ export default defineConfigWithVueTs(
   pluginVue.configs['flat/recommended'],
   vueTsConfigs.recommended,
   pluginSecurity.configs.recommended,
+  // @ts-expect-error Type mismatch from vendor as of 3.0.6
   sonarjs.configs.recommended,
   jsdoc.configs['flat/recommended-typescript'],
   storybook.configs['flat/recommended'],
@@ -42,22 +44,29 @@ export default defineConfigWithVueTs(
   skipFormatting,
   {
     rules: {
-      "vue/block-order": ["error", {
-        "order": [ "template", "script", "style" ] // Enforce this precise order in component definition!
-      }],
-      "vitest/prefer-called-exactly-once-with": "off", // Exactly once is not always possible
-      "sonarjs/todo-tag": "warn", // TODOs can refer to issues that are not yet fixed
-      "security/detect-object-injection": "off" // False positives are common with this rule in TS projects
-    }
+      'vue/block-order': [
+        'error',
+        {
+          order: ['template', 'script', 'style'], // Enforce this precise order in component definition!
+        },
+      ],
+      'vitest/prefer-called-exactly-once-with': 'off', // Exactly once is not always possible
+      'sonarjs/todo-tag': 'warn', // TODOs can refer to issues that are not yet fixed
+      'security/detect-object-injection': 'off', // False positives are common with this rule in TS projects
+    },
   },
   {
     // Disable JSDoc and other requirements in test files (unit and e2e) and stories.
-    files: ['src/**/__tests__/**/*', 'src/**/*.{test,spec,stories}.{js,ts,jsx,tsx}', 'e2e/**/*.{test,spec}.{js,ts,jsx,tsx}'],
+    files: [
+      'src/**/__tests__/**/*',
+      'src/**/*.{test,spec,stories}.{js,ts,jsx,tsx}',
+      'e2e/**/*.{test,spec}.{js,ts,jsx,tsx}',
+    ],
     rules: {
       'jsdoc/require-jsdoc': 'off',
       'jsdoc/require-param-description': 'off',
       'jsdoc/require-returns': 'off',
-      'security/detect-object-injection': 'off'
-    }
+      'security/detect-object-injection': 'off',
+    },
   }
 )
