@@ -83,7 +83,7 @@
     "tailwindcss-primeui": "^0.6.1",
     "vue": "^3.5.27",
     "vue-i18n": "^11.2.8",
-    "vue-router": "^4.6.4"
+    "vue-router": "^5.0.1"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^5.0.0",
