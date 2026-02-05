@@ -88,7 +88,7 @@
   "devDependencies": {
     "@chromatic-com/storybook": "^5.0.0",
     "@hey-api/openapi-ts": "^0.89.2",
-    "@playwright/test": "^1.57.0",
+    "@playwright/test": "^1.58.1",
     "@storybook/addon-a11y": "^10.2.0",
     "@storybook/addon-docs": "^10.2.0",
     "@storybook/addon-onboarding": "^10.2.0",
