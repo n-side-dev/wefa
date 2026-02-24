@@ -7,3 +7,5 @@ export {
   type LegalConsent,
   type LegalConsentOptions,
 } from './legalConsent'
+
+export { default as bffAuthPlugin, type BffAuthOptions } from './bffAuth'

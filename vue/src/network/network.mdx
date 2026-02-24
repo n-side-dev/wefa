@@ -118,6 +118,34 @@ const backendStore = useBackendStore()
 
 The default login/logout views in the library consume the same `bff.flow` configuration to decide whether to auto-run and redirect.
 
+### Buttons for layout usage
+
+If you do not want dedicated login/logout pages, you can drop buttons into your layout. These buttons adapt to the configured authentication mode:
+
+```vue
+<script setup lang="ts">
+import { LoginButton, LogoutButton } from '@nside/wefa'
+</script>
+
+<template>
+  <LoginButton />
+  <LogoutButton />
+</template>
+```
+
+### Full auto mode
+
+To automatically trigger login when a user reaches a protected route while unauthenticated, install the plugin:
+
+```ts
+import router from '@/router'
+import { bffAuthPlugin } from '@nside/wefa'
+
+app.use(bffAuthPlugin, { router, backendStore })
+```
+
+This calls `checkSession()` and, if needed, starts the login flow.
+
 ### Quick demo test
 
 1. Update `vue/src/demo/backendStore.ts` to use `authenticationType: 'BFF'` and the BFF options above.

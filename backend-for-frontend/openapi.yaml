@@ -1,0 +1,277 @@
+openapi: 3.0.3
+info:
+  title: BFF Flask API
+  version: "1.0.0"
+  description: |
+    OpenAPI spec for the Flask BFF app. This surface proxies auth and REST
+    calls and relies on a session cookie set during login.
+servers:
+  - url: /
+components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: SESSION_COOKIE_NAME
+      description: |
+        Signed session cookie name is configured at runtime via
+        SESSION_COOKIE_NAME in the app environment.
+  schemas:
+    LoginResponse:
+      type: object
+      properties:
+        redirect:
+          type: string
+          description: Authorization server URL to redirect the user to.
+      required: [redirect]
+    LogoutResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      required: [message]
+    SessionResponse:
+      type: object
+      properties:
+        session:
+          type: boolean
+          description: True if the session cookie exists and tokens are valid.
+      required: [session]
+paths:
+  /proxy/api/auth/login:
+    get:
+      summary: Start login flow
+      description: Creates a PKCE authorization URL and stores verifier/state in the session cookie.
+      responses:
+        "200":
+          description: Auth server redirect URL.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+  /proxy/api/auth/callback:
+    get:
+      summary: OAuth callback
+      description: Exchanges the authorization code for tokens and stores them in the session.
+      responses:
+        "302":
+          description: Redirects to frontend after successful or failed state check.
+  /proxy/api/auth/logout:
+    get:
+      summary: Logout and revoke tokens
+      security:
+        - sessionCookie: []
+      responses:
+        "200":
+          description: Logout successful.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LogoutResponse"
+  /proxy/api/auth/userinfo:
+    get:
+      summary: Fetch user info
+      security:
+        - sessionCookie: []
+      responses:
+        "200":
+          description: User info from the auth server.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    type: string
+                  email_verified:
+                    type: boolean
+                  family_name:
+                    type: string
+                  given_name:
+                    type: string
+                  name:
+                    type: string
+                  preferred_username:
+                    type: string
+                  sub:
+                    type: string
+                required:
+                  - email
+                  - email_verified
+                  - family_name
+                  - given_name
+                  - name
+                  - preferred_username
+                  - sub
+              examples:
+                default:
+                  value:
+                    email: olivia.diaz@embergenpower.demo
+                    email_verified: true
+                    family_name: Diaz
+                    given_name: Olivia
+                    name: Olivia Diaz
+                    preferred_username: olivia.diaz@embergenpower.demo
+                    sub: 8b8135af-4555-455c-bf84-567f99ff9e96
+  /proxy/api/auth/session:
+    get:
+      summary: Check session validity
+      security:
+        - sessionCookie: []
+      responses:
+        "200":
+          description: Session state.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionResponse"
+  /proxy/request/{rest_of_url}:
+    parameters:
+      - name: rest_of_url
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Path segment appended to the backend base URL.
+    delete:
+      summary: Proxy REST request
+      security:
+        - sessionCookie: []
+      requestBody:
+        description: REST payload, forwarded as-is.
+        required: false
+        content:
+          "*/*":
+            schema:
+              type: string
+              format: binary
+      responses:
+        "200":
+          description: Proxied response from REST backend.
+          content:
+            "*/*":
+              schema:
+                type: string
+                format: binary
+        "204":
+          description: Preflight response.
+        "502":
+          description: Upstream connection error.
+    get:
+      summary: Proxy REST request
+      security:
+        - sessionCookie: []
+      responses:
+        "200":
+          description: Proxied response from REST backend.
+          content:
+            "*/*":
+              schema:
+                type: string
+                format: binary
+        "204":
+          description: Preflight response.
+        "502":
+          description: Upstream connection error.
+    head:
+      summary: Proxy REST request
+      security:
+        - sessionCookie: []
+      responses:
+        "200":
+          description: Proxied response from REST backend.
+        "204":
+          description: Preflight response.
+        "502":
+          description: Upstream connection error.
+    options:
+      summary: REST preflight
+      responses:
+        "204":
+          description: Preflight response.
+    patch:
+      summary: Proxy REST request
+      security:
+        - sessionCookie: []
+      requestBody:
+        description: REST payload, forwarded as-is.
+        required: false
+        content:
+          "*/*":
+            schema:
+              type: string
+              format: binary
+      responses:
+        "200":
+          description: Proxied response from REST backend.
+          content:
+            "*/*":
+              schema:
+                type: string
+                format: binary
+        "204":
+          description: Preflight response.
+        "502":
+          description: Upstream connection error.
+    post:
+      summary: Proxy REST request
+      security:
+        - sessionCookie: []
+      requestBody:
+        description: REST payload, forwarded as-is.
+        required: false
+        content:
+          "*/*":
+            schema:
+              type: string
+              format: binary
+      responses:
+        "200":
+          description: Proxied response from REST backend.
+          content:
+            "*/*":
+              schema:
+                type: string
+                format: binary
+        "204":
+          description: Preflight response.
+        "502":
+          description: Upstream connection error.
+    put:
+      summary: Proxy REST request
+      security:
+        - sessionCookie: []
+      requestBody:
+        description: REST payload, forwarded as-is.
+        required: false
+        content:
+          "*/*":
+            schema:
+              type: string
+              format: binary
+      responses:
+        "200":
+          description: Proxied response from REST backend.
+          content:
+            "*/*":
+              schema:
+                type: string
+                format: binary
+        "204":
+          description: Preflight response.
+        "502":
+          description: Upstream connection error.
+  /ping:
+    get:
+      summary: Health check
+      responses:
+        "200":
+          description: Pong response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                required: [message]

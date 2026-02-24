@@ -1,0 +1,46 @@
+
+# ============================================================================================= #
+#                                             Version                                           #
+# ============================================================================================= #
+
+.compute-bff-version:
+  script:
+    - |
+      compute_version "BFF application" "mms-applications/backend-for-frontend/*" "*.gitlab-ci*"
+
+# ============================================================================================= #
+#                                     Conditional execution                                     #
+# ============================================================================================= #
+
+# Rule: create job on frontend sources change
+.on-bff-change:
+  rules:
+    - if: $CI_COMMIT_BRANCH
+      changes:
+        - 'mms-applications/backend-for-frontend/**/*'
+
+# Rules for building Frontend applications
+.rules-bff:
+  rules:
+    - !reference [ .on-tag                              , rules ]
+    - !reference [ .on-gitlab-config-change             , rules ]
+    - !reference [ .on-bff-change                       , rules ]
+    - !reference [ .stop-if-advanced-versioning-enabled , rules ]
+    # Next rules are only applied if the basic versioning system is used.
+    - !reference [ .on-any-change                       , rules ]
+
+# ============================================================================================= #
+#                                       BFF application                                         #
+# ============================================================================================= #
+
+bff-docker:
+  extends:
+    - .docker_build_push_with_git_tagging_policy
+    - .rules-bff
+  stage: publish
+  dependencies: ['compute_version']
+  variables:
+    QUAY_EXPIRATION: '4w'
+    DOCKER_CONTEXT_PATH: "mms-applications/backend-for-frontend/"
+    DOCKER_IMAGE: "quay.io/n-side/mms-bff"
+    DOCKERFILE_PATH: "mms-applications/backend-for-frontend/Dockerfile"

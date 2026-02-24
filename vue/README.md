@@ -130,6 +130,9 @@ const backendStore = useBackendStore();
 
 For BFF + Keycloak, configure `BACKEND_BASE_URL` to point at your proxy host and keep `/proxy` relative URLs.
 See `src/network/network.mdx` for endpoint and flow details.
+For automatic login on protected routes, install the `bffAuthPlugin`.
+
+You can place login/logout buttons directly in your app layout instead of routing to login views.
 
 ### Icons and the registry helper
 

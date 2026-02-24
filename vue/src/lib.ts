@@ -8,6 +8,7 @@ export { PrimeVue as PrimeVueLibConfig }
 
 // Export your library components, functions and props in this file
 export * from '@/components/AutoroutedBreadcrumb'
+export * from '@/components/AuthButton'
 export * from '@/components/ControlBarComponent'
 export * from '@/components/GanttChartComponent'
 export * from '@/components/DashboardComponent'
