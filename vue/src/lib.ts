@@ -16,6 +16,7 @@ export * from '@/components/NetworkButton'
 export * from '@/components/NotFound'
 export * from '@/components/PlotlyComponent'
 export * from '@/components/TableComponent'
+export * from '@/theme'
 
 // Export stores
 export * from '@/stores/darkMode'
