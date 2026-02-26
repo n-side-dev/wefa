@@ -17,7 +17,7 @@
  * Supports relaunchable functionality for both success and error states.
  */
 import Button from 'primevue/button'
-import { computed } from 'vue'
+import { computed, unref } from 'vue'
 import { useI18nLib } from '@/locales'
 import { type ApiQueryButtonProps } from './types'
 
@@ -47,7 +47,7 @@ const { t } = useI18nLib()
  * Computed property that safely accesses the loading state
  */
 const isLoading = computed(() => {
-  return query?.isLoading?.value ?? false
+  return unref(query?.isLoading) ?? false
 })
 
 /**
@@ -55,8 +55,10 @@ const isLoading = computed(() => {
  */
 const currentButtonConfig = computed(() => {
   // Safely access reactive values with defensive checks
-  const hasResult = query?.data?.value !== undefined && query?.data?.value !== null
-  const hasError = query?.error?.value !== undefined && query?.error?.value !== null
+  const data = unref(query?.data)
+  const error = unref(query?.error)
+  const hasResult = data !== undefined && data !== null
+  const hasError = error !== undefined && error !== null
 
   // Loading state - highest priority
   if (isLoading.value) {
