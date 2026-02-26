@@ -150,13 +150,18 @@ describe('LegalConsent.vue', () => {
       throw new Error('fail')
     })
 
-    const wrapper = await mountComponent()
-    await wrapper.get('input[type="checkbox"]').setValue(true)
-    await wrapper.findAll('button')[0]!.trigger('click')
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+    try {
+      const wrapper = await mountComponent()
+      await wrapper.get('input[type="checkbox"]').setValue(true)
+      await wrapper.findAll('button')[0]!.trigger('click')
 
-    expect(toastAddSpy).toHaveBeenCalled()
-    const toastArg = toastAddSpy.mock.calls.pop()![0] as { severity: string }
-    expect(toastArg.severity).toBe('error')
+      expect(toastAddSpy).toHaveBeenCalled()
+      const toastArg = toastAddSpy.mock.calls.pop()![0] as { severity: string }
+      expect(toastArg.severity).toBe('error')
+    } finally {
+      consoleErrorSpy.mockRestore()
+    }
   })
 
   it('on cancel, opens confirm dialog and accepts -> logs out and shows warn toast', async () => {
