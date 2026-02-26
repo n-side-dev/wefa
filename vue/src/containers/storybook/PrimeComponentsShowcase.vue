@@ -26,7 +26,7 @@
 
       <div class="flex flex-wrap items-center justify-between gap-4">
         <Breadcrumb :home="breadcrumbHome" :model="breadcrumbItems" class="max-w-full" />
-        <Steps :model="steps" :activeStep="1" class="min-w-[280px]" />
+        <Steps :model="steps" :active-step="1" class="min-w-[280px]" />
       </div>
 
       <div class="grid gap-4 lg:grid-cols-3">
@@ -39,7 +39,7 @@
                 <div class="text-3xl font-semibold">42</div>
                 <div class="text-xs text-surface-500">12% above baseline</div>
               </div>
-              <Knob v-model="orderCompletion" :size="80" :strokeWidth="8" :min="0" :max="100" />
+              <Knob v-model="orderCompletion" :size="80" :stroke-width="8" :min="0" :max="100" />
             </div>
             <Divider class="my-4" />
             <div class="flex items-center justify-between text-xs text-surface-600">
@@ -72,7 +72,7 @@
               <Tag value="Balanced" severity="success" />
             </div>
             <div class="mt-4 flex items-center gap-2">
-              <ProgressSpinner class="h-8 w-8" strokeWidth="6" />
+              <ProgressSpinner class="h-8 w-8" stroke-width="6" />
               <span class="text-xs text-surface-500">Syncing roster</span>
             </div>
           </template>
@@ -107,7 +107,7 @@
       <div class="grid gap-6 lg:grid-cols-3">
         <div class="flex flex-col gap-6 lg:col-span-2">
           <Panel header="Work Orders" class="border border-surface-200 shadow-sm">
-            <DataTable :value="workOrders" paginator :rows="5" stripedRows class="text-sm">
+            <DataTable :value="workOrders" paginator :rows="5" striped-rows class="text-sm">
               <Column field="id" header="ID" />
               <Column field="title" header="Title" />
               <Column field="owner" header="Owner" />
@@ -137,40 +137,54 @@
                 <TabPanel :value="0">
                   <div class="grid gap-4 md:grid-cols-2">
                     <div class="flex flex-col gap-2">
-                      <label class="text-xs font-semibold text-surface-600" for="title">Title</label>
+                      <label class="text-xs font-semibold text-surface-600" for="title"
+                        >Title</label
+                      >
                       <InputText id="title" v-model="form.title" placeholder="Calibration sweep" />
                     </div>
                     <div class="flex flex-col gap-2">
-                      <label class="text-xs font-semibold text-surface-600" for="code">Work code</label>
+                      <label class="text-xs font-semibold text-surface-600" for="code"
+                        >Work code</label
+                      >
                       <InputMask id="code" v-model="form.code" mask="AA-999" placeholder="WF-301" />
                     </div>
                     <div class="flex flex-col gap-2">
                       <label class="text-xs font-semibold text-surface-600">Priority</label>
-                      <Select v-model="form.priority" :options="priorityOptions" optionLabel="label" placeholder="Select" />
+                      <Select
+                        v-model="form.priority"
+                        :options="priorityOptions"
+                        option-label="label"
+                        placeholder="Select"
+                      />
                     </div>
                     <div class="flex flex-col gap-2">
                       <label class="text-xs font-semibold text-surface-600">Assignee</label>
                       <AutoComplete
                         v-model="form.assignee"
                         :suggestions="filteredAssignees"
-                        @complete="onAssigneeComplete"
                         placeholder="Search team"
+                        @complete="onAssigneeComplete"
                       />
                     </div>
                     <div class="flex flex-col gap-2">
                       <label class="text-xs font-semibold text-surface-600">Due date</label>
-                      <Calendar v-model="form.dueDate" showIcon dateFormat="M dd, yy" />
+                      <Calendar v-model="form.dueDate" show-icon date-format="M dd, yy" />
                     </div>
                     <div class="flex flex-col gap-2">
                       <label class="text-xs font-semibold text-surface-600">Budget</label>
-                      <InputNumber v-model="form.budget" mode="currency" currency="USD" locale="en-US" />
+                      <InputNumber
+                        v-model="form.budget"
+                        mode="currency"
+                        currency="USD"
+                        locale="en-US"
+                      />
                     </div>
                     <div class="flex flex-col gap-2">
                       <label class="text-xs font-semibold text-surface-600">Teams</label>
                       <MultiSelect
                         v-model="form.teams"
                         :options="teamOptions"
-                        optionLabel="label"
+                        option-label="label"
                         placeholder="Assign teams"
                       />
                     </div>
@@ -197,13 +211,15 @@
                       <ColorPicker v-model="form.color" format="hex" />
                     </div>
                     <div class="flex items-center gap-2">
-                      <Checkbox v-model="form.notify" :binary="true" inputId="notify" />
-                      <label class="text-xs text-surface-600" for="notify">Notify stakeholders</label>
+                      <Checkbox v-model="form.notify" :binary="true" input-id="notify" />
+                      <label class="text-xs text-surface-600" for="notify"
+                        >Notify stakeholders</label
+                      >
                     </div>
                     <div class="flex items-center gap-2">
-                      <RadioButton v-model="form.urgency" inputId="urgent" value="urgent" />
+                      <RadioButton v-model="form.urgency" input-id="urgent" value="urgent" />
                       <label class="text-xs text-surface-600" for="urgent">Urgent</label>
-                      <RadioButton v-model="form.urgency" inputId="standard" value="standard" />
+                      <RadioButton v-model="form.urgency" input-id="standard" value="standard" />
                       <label class="text-xs text-surface-600" for="standard">Standard</label>
                     </div>
                     <div class="flex items-center gap-2">
@@ -214,19 +230,31 @@
                 </TabPanel>
                 <TabPanel :value="1">
                   <div class="flex flex-col gap-4">
-                    <Message severity="info">Ready to submit when validations are complete.</Message>
-                    <InlineMessage severity="success">All required fields are filled.</InlineMessage>
+                    <Message severity="info"
+                      >Ready to submit when validations are complete.</Message
+                    >
+                    <InlineMessage severity="success"
+                      >All required fields are filled.</InlineMessage
+                    >
                     <Accordion :value="['0']" multiple>
                       <AccordionPanel value="0">
                         <AccordionHeader>Checklist</AccordionHeader>
                         <AccordionContent>
                           <div class="flex flex-col gap-2 text-sm">
                             <div class="flex items-center gap-2">
-                              <Checkbox v-model="form.checklist" value="brief" inputId="check-brief" />
+                              <Checkbox
+                                v-model="form.checklist"
+                                value="brief"
+                                input-id="check-brief"
+                              />
                               <label for="check-brief">Brief attached</label>
                             </div>
                             <div class="flex items-center gap-2">
-                              <Checkbox v-model="form.checklist" value="resources" inputId="check-resources" />
+                              <Checkbox
+                                v-model="form.checklist"
+                                value="resources"
+                                input-id="check-resources"
+                              />
                               <label for="check-resources">Resources confirmed</label>
                             </div>
                           </div>
@@ -236,7 +264,8 @@
                         <AccordionHeader>Risk Summary</AccordionHeader>
                         <AccordionContent>
                           <div class="text-sm text-surface-600">
-                            Low exposure. Equipment redundancy verified and vendor response within 4 hours.
+                            Low exposure. Equipment redundancy verified and vendor response within 4
+                            hours.
                           </div>
                         </AccordionContent>
                       </AccordionPanel>
@@ -257,7 +286,7 @@
             <Listbox
               v-model="selectedQueue"
               :options="queueOptions"
-              optionLabel="label"
+              option-label="label"
               class="w-full"
             />
             <Divider class="my-4" />
@@ -285,11 +314,15 @@
             </div>
             <div class="flex flex-col gap-2">
               <label class="text-xs font-semibold text-surface-600">Access</label>
-              <Password v-model="controls.accessKey" toggleMask placeholder="Enter access key" />
+              <Password v-model="controls.accessKey" toggle-mask placeholder="Enter access key" />
             </div>
             <div class="flex flex-col gap-2">
               <label class="text-xs font-semibold text-surface-600">Regions</label>
-              <MultiSelect v-model="controls.regions" :options="regionOptions" optionLabel="label" />
+              <MultiSelect
+                v-model="controls.regions"
+                :options="regionOptions"
+                option-label="label"
+              />
             </div>
             <div class="flex flex-col gap-2">
               <label class="text-xs font-semibold text-surface-600">Tags</label>
@@ -309,7 +342,7 @@
         <Panel header="Notes & Files" class="border border-surface-200 shadow-sm">
           <div class="flex flex-col gap-4">
             <Textarea v-model="notes" rows="4" placeholder="Add operational notes" />
-            <FileUpload mode="basic" name="files[]" chooseLabel="Attach" />
+            <FileUpload mode="basic" name="files[]" choose-label="Attach" />
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
                 <Tag value="Draft" severity="info" />
@@ -383,12 +416,7 @@ const breadcrumbItems = [
   { label: 'Prime Showcase' },
 ]
 
-const steps = [
-  { label: 'Brief' },
-  { label: 'Design' },
-  { label: 'Build' },
-  { label: 'Launch' },
-]
+const steps = [{ label: 'Brief' }, { label: 'Design' }, { label: 'Build' }, { label: 'Launch' }]
 
 const splitButtonItems = [
   { label: 'Duplicate', icon: 'pi pi-clone' },
@@ -443,12 +471,48 @@ const assignees = ['Alex Morgan', 'Kai Santos', 'Jo Lee', 'Tariq Reed', 'Rina Pa
 const filteredAssignees = ref<string[]>([])
 
 const workOrders = ref([
-  { id: 'WO-1042', title: 'Sensor calibration sweep', owner: 'Alex M.', status: 'In Review', progress: 62 },
-  { id: 'WO-1047', title: 'Packaging quality audit', owner: 'Jo L.', status: 'Queued', progress: 28 },
-  { id: 'WO-1051', title: 'Line 4 throughput test', owner: 'Rina P.', status: 'In Progress', progress: 74 },
-  { id: 'WO-1059', title: 'Cooling module retrofit', owner: 'Kai S.', status: 'Blocked', progress: 15 },
-  { id: 'WO-1063', title: 'Safety signage refresh', owner: 'Devon H.', status: 'Complete', progress: 100 },
-  { id: 'WO-1068', title: 'Dock scheduling update', owner: 'Tariq R.', status: 'In Review', progress: 46 },
+  {
+    id: 'WO-1042',
+    title: 'Sensor calibration sweep',
+    owner: 'Alex M.',
+    status: 'In Review',
+    progress: 62,
+  },
+  {
+    id: 'WO-1047',
+    title: 'Packaging quality audit',
+    owner: 'Jo L.',
+    status: 'Queued',
+    progress: 28,
+  },
+  {
+    id: 'WO-1051',
+    title: 'Line 4 throughput test',
+    owner: 'Rina P.',
+    status: 'In Progress',
+    progress: 74,
+  },
+  {
+    id: 'WO-1059',
+    title: 'Cooling module retrofit',
+    owner: 'Kai S.',
+    status: 'Blocked',
+    progress: 15,
+  },
+  {
+    id: 'WO-1063',
+    title: 'Safety signage refresh',
+    owner: 'Devon H.',
+    status: 'Complete',
+    progress: 100,
+  },
+  {
+    id: 'WO-1068',
+    title: 'Dock scheduling update',
+    owner: 'Tariq R.',
+    status: 'In Review',
+    progress: 46,
+  },
 ])
 
 const queueOptions = [
@@ -501,9 +565,7 @@ const notes = ref('Dock 7 retrofit scheduled for next week. Coordinate vendor ac
 
 const onAssigneeComplete = (event: { query: string }) => {
   const query = event.query.toLowerCase()
-  filteredAssignees.value = assignees.filter((assignee) =>
-    assignee.toLowerCase().includes(query)
-  )
+  filteredAssignees.value = assignees.filter((assignee) => assignee.toLowerCase().includes(query))
 }
 
 const statusSeverity = (status: string) => {

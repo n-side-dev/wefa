@@ -4,10 +4,9 @@ import { definePreset, palette } from '@primeuix/themes'
 const SCALE_KEYS = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950] as const
 type ScaleKey = (typeof SCALE_KEYS)[number]
 
-const mergeScale = (
-  base: Record<ScaleKey, string>,
-  overrides: Partial<Record<ScaleKey, string>>
-) =>
+// Ensures a full Tailwind-like scale (50–950) by overlaying explicit brand steps
+// on top of a generated palette while keeping every scale key present.
+const mergeScale = (base: Record<ScaleKey, string>, overrides: Partial<Record<ScaleKey, string>>) =>
   SCALE_KEYS.reduce<Record<ScaleKey, string>>(
     (acc, key) => {
       acc[key] = overrides[key] ?? base[key]
