@@ -17,7 +17,7 @@
  * Supports relaunchable functionality for both success and error states.
  */
 import Button from 'primevue/button'
-import { computed } from 'vue'
+import { computed, unref } from 'vue'
 import { useI18nLib } from '@/locales'
 import { type ApiMutationButtonProps } from './types'
 
@@ -48,7 +48,7 @@ const { t } = useI18nLib()
  * Computed property that safely accesses the loading state
  */
 const isLoading = computed(() => {
-  return mutation?.isPending?.value ?? false
+  return unref(mutation?.isPending) ?? false
 })
 
 /**
@@ -56,8 +56,10 @@ const isLoading = computed(() => {
  */
 const currentButtonConfig = computed(() => {
   // Safely access reactive values with defensive checks
-  const hasResult = mutation?.data?.value !== undefined && mutation?.data?.value !== null
-  const hasError = mutation?.error?.value !== undefined && mutation?.error?.value !== null
+  const data = unref(mutation?.data)
+  const error = unref(mutation?.error)
+  const hasResult = data !== undefined && data !== null
+  const hasError = error !== undefined && error !== null
 
   // Loading state - highest priority
   if (isLoading.value) {
@@ -110,7 +112,7 @@ const currentButtonConfig = computed(() => {
 const handleClick = () => {
   // Only trigger action if button is not disabled
   if (!currentButtonConfig.value.disabled) {
-    mutation.mutate(mutationBody.value)
+    mutation.mutate(unref(mutationBody))
   }
 }
 </script>

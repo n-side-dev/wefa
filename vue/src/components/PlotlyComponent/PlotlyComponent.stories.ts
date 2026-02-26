@@ -51,6 +51,20 @@ const meta: Meta<typeof PlotlyComponent> = {
 export default meta
 type Story = StoryObj<typeof meta>
 
+const canUseWebGL = () => {
+  if (typeof window === 'undefined' || typeof document === 'undefined') {
+    return false
+  }
+  try {
+    const canvas = document.createElement('canvas')
+    return !!(canvas.getContext('webgl') || canvas.getContext('experimental-webgl'))
+  } catch {
+    return false
+  }
+}
+
+const shouldUseWebGL = import.meta.env.MODE !== 'test' && canUseWebGL()
+
 // Sample data for different chart types
 const lineChartData: Data[] = [
   {
@@ -363,54 +377,69 @@ export const InteractiveChart: Story = {
  */
 export const Advanced3DSurfacePlot: Story = {
   args: {
-    data: [
-      {
-        z: Array.from({ length: 50 }, (_, i) =>
-          Array.from({ length: 50 }, (_, j) => {
-            const x = (i - 25) / 5
-            const y = (j - 25) / 5
-            return (
-              Math.sin(Math.sqrt(x * x + y * y)) * Math.exp(-Math.sqrt(x * x + y * y) / 10) * 10 +
-              Math.cos(x * 2) * Math.sin(y * 2) * 5 +
-              Math.random() * 2
-            )
-          })
-        ),
-        type: 'surface',
-        colorscale: [
-          [0, '#FF00FF'], // Magenta
-          [0.1, '#FF0080'], // Hot Pink
-          [0.2, '#FF4000'], // Red Orange
-          [0.3, '#FF8000'], // Orange
-          [0.4, '#FFFF00'], // Yellow
-          [0.5, '#80FF00'], // Lime
-          [0.6, '#00FF00'], // Green
-          [0.7, '#00FF80'], // Spring Green
-          [0.8, '#00FFFF'], // Cyan
-          [0.9, '#0080FF'], // Sky Blue
-          [1, '#8000FF'], // Purple
-        ],
-        showscale: true,
-        lighting: {
-          ambient: 0.8,
-          diffuse: 0.9,
-          fresnel: 0.1,
-          specular: 2,
-          roughness: 0.05,
-        },
-        contours: {
-          z: {
-            show: true,
-            usecolormap: true,
-            highlightcolor: '#42f462',
-            project: { z: true },
+    data: shouldUseWebGL
+      ? [
+          {
+            z: Array.from({ length: 50 }, (_, i) =>
+              Array.from({ length: 50 }, (_, j) => {
+                const x = (i - 25) / 5
+                const y = (j - 25) / 5
+                return (
+                  Math.sin(Math.sqrt(x * x + y * y)) *
+                    Math.exp(-Math.sqrt(x * x + y * y) / 10) *
+                    10 +
+                  Math.cos(x * 2) * Math.sin(y * 2) * 5 +
+                  Math.random() * 2
+                )
+              })
+            ),
+            type: 'surface',
+            colorscale: [
+              [0, '#FF00FF'], // Magenta
+              [0.1, '#FF0080'], // Hot Pink
+              [0.2, '#FF4000'], // Red Orange
+              [0.3, '#FF8000'], // Orange
+              [0.4, '#FFFF00'], // Yellow
+              [0.5, '#80FF00'], // Lime
+              [0.6, '#00FF00'], // Green
+              [0.7, '#00FF80'], // Spring Green
+              [0.8, '#00FFFF'], // Cyan
+              [0.9, '#0080FF'], // Sky Blue
+              [1, '#8000FF'], // Purple
+            ],
+            showscale: true,
+            lighting: {
+              ambient: 0.8,
+              diffuse: 0.9,
+              fresnel: 0.1,
+              specular: 2,
+              roughness: 0.05,
+            },
+            contours: {
+              z: {
+                show: true,
+                usecolormap: true,
+                highlightcolor: '#42f462',
+                project: { z: true },
+              },
+            } as Record<string, unknown>,
+          } as Record<string, unknown>,
+        ]
+      : [
+          {
+            x: [1, 2, 3, 4, 5, 6],
+            y: [10, 15, 13, 17, 20, 18],
+            type: 'scatter',
+            mode: 'lines+markers',
+            name: 'WebGL unavailable',
+            line: { color: '#1f77b4' },
           },
-        } as Record<string, unknown>,
-      } as Record<string, unknown>,
-    ],
+        ],
     layout: {
       title: {
-        text: 'Advanced 3D Energy Surface Analysis',
+        text: shouldUseWebGL
+          ? 'Advanced 3D Energy Surface Analysis'
+          : 'Advanced Surface (WebGL unavailable)',
         font: { size: 24, color: '#FF00FF', family: 'Arial Black' },
       },
       scene: {
