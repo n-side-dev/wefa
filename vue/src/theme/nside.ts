@@ -121,7 +121,7 @@ export const NsideTheme = definePreset(Aura, {
 
 :root,
 :host {
-  font-size: 12.25px;
+  font-size: 14px;
   font-family: 'Poppins', sans-serif;
   --nside-gradient-teal-purple: linear-gradient(135deg, #00ACC2 0%, #807FBD 100%);
   --nside-gradient-orange-pink: linear-gradient(135deg, #F4A74F 0%, #EE4D9B 100%);
