@@ -19,7 +19,7 @@ export * from '@/components/TableComponent'
 export * from '@/theme'
 
 // Export stores
-export * from '@/stores/darkMode'
+export * from '@/stores'
 
 // Export plugins
 export * from '@/plugins'
