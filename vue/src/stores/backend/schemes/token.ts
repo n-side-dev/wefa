@@ -13,6 +13,7 @@ import type { BackendStore, BackendStoreOptions, Credentials } from '../types.ts
  * It also provides helper functions for handling authentication processes, like login, logout,
  * and post-login/logout callbacks. Additionally, it enables the setting of route guards to
  * respond to authentication status changes in a Vue.js application.
+ * @param backendStoreOptions
  * @returns An object containing authentication state, API client instance, and helper functions:
  * - `axiosInstance`: Pre-configured axios instance with authentication support
  * - `authenticated`: Reactive flag representing the authentication status
@@ -37,8 +38,7 @@ export function tokenAuthenticationBackendStoreSetup(
   const _postLogout: Ref<() => void> = ref(() => {})
   const _postLogin: Ref<() => void> = ref(() => {})
   const _fromLocalStorage = localStorage.getItem(localStorageKey)
-  const loginEndpoint =
-    backendStoreOptions.endpoints?.token?.loginEndpoint ?? tokenLoginEndpoint
+  const loginEndpoint = backendStoreOptions.endpoints?.token?.loginEndpoint ?? tokenLoginEndpoint
 
   // Create common authentication functions
   const commonAuth = createCommonAuthFunctions(authenticated, _postLogin, _postLogout)

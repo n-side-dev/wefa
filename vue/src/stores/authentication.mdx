@@ -52,6 +52,22 @@ const backendStore = useBackendStore({
 })
 ```
 
+You can override the token error detection to match non-SimpleJWT backends:
+
+```ts
+const backendStore = useBackendStore({
+  authenticationType: 'JWT',
+  endpoints: {
+    jwt: {
+      isTokenError: (error, { accessToken, refreshToken }) => {
+        if (!accessToken || !refreshToken) return true
+        return error.response?.status === 401
+      },
+    },
+  },
+})
+```
+
 ### OAuth (Backend-for-Frontend (BFF) Session)
 
 Use this when your app relies on a Backend-for-Frontend (BFF) that manages OAuth login/logout and sets session cookies.

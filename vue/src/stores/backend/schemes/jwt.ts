@@ -20,6 +20,7 @@ import type { BackendStore, BackendStoreOptions, Credentials } from '../types.ts
  * respond to authentication status changes in a Vue.js application.
  *
  * This implementation is designed to work with a backend offering JWT mechanism.
+ * @param backendStoreOptions
  * @returns An object containing authentication state, API client instance, and helper functions:
  * - `axiosInstance`: Pre-configured axios instance with authentication support
  * - `authenticated`: Reactive flag representing the authentication status
@@ -46,10 +47,8 @@ export function jwtAuthenticationBackendStoreSetup(
   const _postLogin: Ref<() => void> = ref(() => {})
   const _accessTokenFromLocalStorage = localStorage.getItem(jwtAccessTokenKey)
   const _refreshTokenFromLocalStorage = localStorage.getItem(jwtRefreshTokenKey)
-  const loginEndpoint =
-    backendStoreOptions.endpoints?.jwt?.loginEndpoint ?? jwtLoginEndpoint
-  const refreshUrl =
-    backendStoreOptions.endpoints?.jwt?.refreshEndpoint ?? jwtRefreshEndpoint
+  const loginEndpoint = backendStoreOptions.endpoints?.jwt?.loginEndpoint ?? jwtLoginEndpoint
+  const refreshUrl = backendStoreOptions.endpoints?.jwt?.refreshEndpoint ?? jwtRefreshEndpoint
 
   // Create common authentication functions
   const commonAuth = createCommonAuthFunctions(authenticated, _postLogin, _postLogout)
@@ -86,15 +85,24 @@ export function jwtAuthenticationBackendStoreSetup(
    * @param error - The Axios error to check for token-related issues
    * @returns True if the error is related to token authentication, false otherwise
    */
-  function isTokenError(error: AxiosError): boolean {
+  function defaultIsTokenError(
+    error: AxiosError,
+    accessToken: string | null,
+    refreshToken: string | null
+  ): boolean {
     return !!(
       error.response &&
       [401, 403].includes(error.response.status) &&
       ((error.response?.data as { code?: string })?.code === 'token_not_valid' ||
-        !_accessToken.value ||
-        !_refreshToken.value)
+        !accessToken ||
+        !refreshToken)
     )
   }
+
+  const isTokenError =
+    backendStoreOptions.endpoints?.jwt?.isTokenError ??
+    ((error: AxiosError, context: { accessToken: string | null; refreshToken: string | null }) =>
+      defaultIsTokenError(error, context.accessToken, context.refreshToken))
 
   /**
    * Attempts to refresh the JWT token and retry the original request
@@ -125,7 +133,12 @@ export function jwtAuthenticationBackendStoreSetup(
   axiosInstance.interceptors.response.use(
     (response) => response,
     async (error) => {
-      if (!isTokenError(error)) {
+      if (
+        !isTokenError(error, {
+          accessToken: _accessToken.value,
+          refreshToken: _refreshToken.value,
+        })
+      ) {
         return Promise.reject(error)
       }
 

@@ -1,5 +1,5 @@
 import type { Ref } from 'vue'
-import type { AxiosInstance, AxiosResponse } from 'axios'
+import type { AxiosError, AxiosInstance, AxiosResponse } from 'axios'
 import type { Router } from 'vue-router'
 
 /**
@@ -52,6 +52,14 @@ export interface TokenEndpoints {
 export interface JwtEndpoints {
   loginEndpoint?: string
   refreshEndpoint?: string
+  /**
+   * Optional hook to detect token-related errors (e.g., SimpleJWT or custom backend behavior).
+   * When omitted, a default SimpleJWT-compatible check is used.
+   */
+  isTokenError?: (
+    error: AxiosError,
+    context: { accessToken: string | null; refreshToken: string | null }
+  ) => boolean
 }
 
 /**
