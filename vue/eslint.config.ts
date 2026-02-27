@@ -53,6 +53,9 @@ export default defineConfigWithVueTs(
       'vitest/prefer-called-exactly-once-with': 'off', // Exactly once is not always possible
       'sonarjs/todo-tag': 'warn', // TODOs can refer to issues that are not yet fixed
       'security/detect-object-injection': 'off', // False positives are common with this rule in TS projects
+      // eslint-plugin-security rules below rely on context.getSourceCode, removed in ESLint 10.
+      'security/detect-unsafe-regex': 'off',
+      'security/detect-no-csrf-before-method-override': 'off',
     },
   },
   {
