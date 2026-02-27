@@ -141,5 +141,8 @@
       "path": "./dist/**/*.js",
       "maxSize": "2 MB"
     }
-  ]
+  ],
+  "overrides": {
+    "minimatch": "10.2.3"
+  }
 }
