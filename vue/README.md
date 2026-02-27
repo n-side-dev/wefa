@@ -106,6 +106,21 @@ Types live under the `@nside/wefa/types` export:
 import type { WefaButtonProps } from '@nside/wefa/types';
 ```
 
+### Theme preset
+
+To apply the NSIDE Prime theme preset in your app:
+
+```ts
+import PrimeVue from 'primevue/config'
+import { createNsideTheme } from '@nside/wefa'
+
+app.use(PrimeVue, {
+  theme: {
+    preset: createNsideTheme('green'),
+  },
+})
+```
+
 ### Icons and the registry helper
 
 WeFa uses [Iconify](https://iconify.design/) under the hood. Bundled icon collections are registered automatically by calling `setupDefaultIcons()` inside `src/iconRegistry.ts`. If you need extra icons offline:
