@@ -1,0 +1,107 @@
+import { Meta } from '@storybook/addon-docs/blocks'
+
+<Meta title='Stores/Authentication' />
+
+# Authentication Store
+
+## Overview
+
+WeFa exposes a backend store (`useBackendStore`) that standardizes authentication flows across projects. The store:
+
+- tracks authentication state through a reactive `authenticated` ref
+- provides `login` and `logout` actions
+- exposes `setPostLogin` and `setPostLogout` callbacks for app-specific side effects
+- offers `setupAuthRouteGuard` to trigger route guard reevaluation on auth changes
+
+The store is configured through `BackendStoreOptions.authenticationType`.
+
+## Authentication Types
+
+### Token
+
+Use this when your backend issues a single token and expects `Authorization: Token <token>`.
+
+```ts
+import { useBackendStore } from '@nside/wefa'
+
+const backendStore = useBackendStore({
+  authenticationType: 'TOKEN',
+})
+```
+
+### JWT
+
+Use this when your backend issues access and refresh tokens. The store refreshes tokens on 401/403 responses and retries requests.
+
+```ts
+import { useBackendStore } from '@nside/wefa'
+
+const backendStore = useBackendStore({
+  authenticationType: 'JWT',
+})
+```
+
+### OAuth (BFF Session)
+
+Use this when your app relies on a BFF that manages OAuth login/logout and sets session cookies.
+The store checks the session endpoint on initialization and triggers the login endpoint if no session exists.
+
+```ts
+import { useBackendStore } from '@nside/wefa'
+
+const backendStore = useBackendStore({
+  authenticationType: 'OAUTH',
+  oauth: {
+    loginEndpoint: 'http://localhost:5022/proxy/api/auth/login',
+    logoutEndpoint: 'http://localhost:5022/proxy/api/auth/logout',
+    sessionEndpoint: 'http://localhost:5022/proxy/api/auth/session',
+  },
+})
+```
+
+The login endpoint must return JSON containing a `redirect` URL. The store will redirect the browser to that URL.
+
+## Optional Hooks
+
+### Post-login and post-logout callbacks
+
+Use these to run app-specific effects after a successful login or logout.
+
+```ts
+backendStore.setPostLogin(() => {
+  // for example, reload the SPA after the login redirect returns
+  router.go(0)
+})
+
+backendStore.setPostLogout(() => {
+  // for example, clear app-level caches
+})
+```
+
+### Auth route guard reevaluation
+
+Call `setupAuthRouteGuard` once in your root component to ensure route guards re-run on auth changes.
+
+```ts
+import router from '@/router'
+
+backendStore.setupAuthRouteGuard(router)
+```
+
+## OAuth Redirect Handler
+
+When using OAuth, you can intercept redirects for testing or custom navigation logic:
+
+```ts
+const backendStore = useBackendStore({
+  authenticationType: 'OAUTH',
+  oauth: {
+    loginEndpoint: '/proxy/api/auth/login',
+    logoutEndpoint: '/proxy/api/auth/logout',
+    sessionEndpoint: '/proxy/api/auth/session',
+    redirectHandler: (url) => {
+      window.location.assign(url)
+    },
+  },
+})
+```
