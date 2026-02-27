@@ -10,9 +10,7 @@
           @click="navigate"
         >
           <span v-if="item.icon" :class="[item.icon, 'text-color']" />
-          <span v-if="item.label" class="text-primary font-semibold">{{
-            $t(item.label as string)
-          }}</span>
+          <span v-if="item.label">{{ $t(item.label as string) }}</span>
         </a>
       </router-link>
     </template>
