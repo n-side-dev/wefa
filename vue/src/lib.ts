@@ -18,7 +18,7 @@ export * from '@/components/PlotlyComponent'
 export * from '@/components/TableComponent'
 
 // Export stores
-export * from '@/stores/darkMode'
+export * from '@/stores'
 
 // Export plugins
 export * from '@/plugins'
