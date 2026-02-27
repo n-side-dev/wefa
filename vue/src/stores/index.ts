@@ -5,6 +5,4 @@ export {
   type AuthenticationType,
 } from './backend.ts'
 
-export {
-  useDarkModeStore,
-} from './darkMode.ts'
+export { useDarkModeStore } from './darkMode.ts'
