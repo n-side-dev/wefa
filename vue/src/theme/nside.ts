@@ -94,29 +94,32 @@ const surfaceDark = {
   ...mergeScale(palette('#162950') as Record<ScaleKey, string>, {}),
 }
 
-export const NsideTheme = definePreset(Aura, {
-  primitive: {
-    borderRadius: {
-      none: '0',
-      xs: '3px',
-      sm: '6px',
-      md: '8px',
-      lg: '10px',
-      xl: '14px',
+export type NsidePrimaryColor = 'green' | 'orange' | 'blue'
+
+export const createNsideTheme = (primary: NsidePrimaryColor = 'green') =>
+  definePreset(Aura, {
+    primitive: {
+      borderRadius: {
+        none: '0',
+        xs: '3px',
+        sm: '6px',
+        md: '8px',
+        lg: '10px',
+        xl: '14px',
+      },
+      green: greenPalette,
+      teal: tealPalette,
+      cyan: tealPalette,
+      blue: tealPalette,
+      sky: tealPalette,
+      yellow: orangePalette,
+      orange: orangePalette,
+      red: redPalette,
+      pink: pinkPalette,
+      purple: purplePalette,
+      gray: grayPalette,
     },
-    green: greenPalette,
-    teal: tealPalette,
-    cyan: tealPalette,
-    blue: tealPalette,
-    sky: tealPalette,
-    yellow: orangePalette,
-    orange: orangePalette,
-    red: redPalette,
-    pink: pinkPalette,
-    purple: purplePalette,
-    gray: grayPalette,
-  },
-  css: `
+    css: `
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
 
 :root,
@@ -128,29 +131,27 @@ export const NsideTheme = definePreset(Aura, {
   --nside-gradient-green-blue: linear-gradient(135deg, #8CBB13 0%, #71CFEC 100%);
 }
 `,
-  semantic: {
-    primary: palette('{green}'),
-    colorScheme: {
-      light: {
-        surface: surfaceLight,
-        text: {
-          color: '#535F6B',
-          hoverColor: '#162950',
-          mutedColor: '#66728C',
-          hoverMutedColor: '#535F6B',
+    semantic: {
+      primary: palette(`{${primary}}`),
+      colorScheme: {
+        light: {
+          surface: surfaceLight,
+          text: {
+            color: '#535F6B',
+            hoverColor: '#162950',
+            mutedColor: '#66728C',
+            hoverMutedColor: '#535F6B',
+          },
         },
-      },
-      dark: {
-        surface: surfaceDark,
-        text: {
-          color: '#E7EBF5',
-          hoverColor: '#FFFFFF',
-          mutedColor: '#A5BEDB',
-          hoverMutedColor: '#E7EBF5',
+        dark: {
+          surface: surfaceDark,
+          text: {
+            color: '#E7EBF5',
+            hoverColor: '#FFFFFF',
+            mutedColor: '#A5BEDB',
+            hoverMutedColor: '#E7EBF5',
+          },
         },
       },
     },
-  },
-})
-
-export default NsideTheme
+  })

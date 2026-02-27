@@ -3,7 +3,7 @@ import { setup } from '@storybook/vue3-vite'
 import { createRouter, createWebHistory } from 'vue-router'
 import type { App } from 'vue'
 import PrimeVue from 'primevue/config'
-import { NsideTheme } from '../src/theme'
+import { createNsideTheme } from '../src/theme'
 import { VueQueryPlugin, QueryClient } from '@tanstack/vue-query'
 import { createLibI18n } from '../src/locales'
 import '../src/assets/main.css'
@@ -127,7 +127,7 @@ setup((app: App) => {
   app.use(router)
   app.use(PrimeVue, {
     theme: {
-      preset: NsideTheme,
+      preset: createNsideTheme('green'),
     },
   })
   // Provide TanStack Query client for components/stories using useQuery/useMutation

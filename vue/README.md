@@ -112,11 +112,11 @@ To apply the NSIDE Prime theme preset in your app:
 
 ```ts
 import PrimeVue from 'primevue/config'
-import { NsideTheme } from '@nside/wefa'
+import { createNsideTheme } from '@nside/wefa'
 
 app.use(PrimeVue, {
   theme: {
-    preset: NsideTheme,
+    preset: createNsideTheme('green'),
   },
 })
 ```

@@ -58,10 +58,10 @@ app.use(cookiesPlugin, { cookies: cookies })
 
 // Primevue
 import PrimeVue from 'primevue/config'
-import { NsideTheme } from '@/theme'
+import { createNsideTheme } from '@/theme'
 app.use(PrimeVue, {
   theme: {
-    preset: NsideTheme,
+    preset: createNsideTheme('green'),
   },
 })
 
