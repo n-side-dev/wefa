@@ -9,7 +9,7 @@ import type { Router } from 'vue-router'
  * - 'TOKEN': Authentication is performed using a token-based system.
  * - 'JWT': Authentication is performed using JSON Web Tokens.
  * - 'SESSION': Authentication is managed using session-based mechanisms (reserved, not yet implemented).
- * - 'OAUTH': Authentication is managed by a BFF using OAuth session cookies.
+ * - 'OAUTH': Authentication is managed by a Backend-for-Frontend (BFF) using OAuth session cookies.
  *
  * Note: Future enhancement could include more flexible procedures registration
  * (postLogin, postLogout) to allow different actors to register their procedures
@@ -40,6 +40,30 @@ export interface OAuthEndpoints {
 }
 
 /**
+ * Endpoint configuration for token authentication.
+ */
+export interface TokenEndpoints {
+  loginEndpoint?: string
+}
+
+/**
+ * Endpoint configuration for JWT authentication.
+ */
+export interface JwtEndpoints {
+  loginEndpoint?: string
+  refreshEndpoint?: string
+}
+
+/**
+ * Optional per-scheme endpoint overrides for authentication flows.
+ */
+export interface AuthenticationEndpoints {
+  token?: TokenEndpoints
+  jwt?: JwtEndpoints
+  oauth?: OAuthEndpoints
+}
+
+/**
  * Contract for the backend store returned by `useBackendStore`.
  * Provides authentication state, auth actions, and optional router guard helpers.
  */
@@ -60,5 +84,5 @@ export interface BackendStore {
  */
 export interface BackendStoreOptions {
   authenticationType: AuthenticationType
-  oauth?: OAuthEndpoints
+  endpoints?: AuthenticationEndpoints
 }

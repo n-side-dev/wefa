@@ -6,14 +6,14 @@ import { oauthLoginEndpoint, oauthLogoutEndpoint, oauthSessionEndpoint } from '.
 import type { BackendStore, BackendStoreOptions } from '../types.ts'
 
 /**
- * Response shape returned by the BFF session endpoint.
+ * Response shape returned by the Backend-for-Frontend (BFF) session endpoint.
  */
 interface OAuthSessionStatus {
   session: boolean
 }
 
 /**
- * Response shape returned by the BFF login endpoint.
+ * Response shape returned by the Backend-for-Frontend (BFF) login endpoint.
  */
 interface OAuthLoginResponse {
   redirect?: string
@@ -22,7 +22,7 @@ interface OAuthLoginResponse {
 /**
  * Configures and sets up an OAuth session-based authentication backend store.
  *
- * This implementation expects a BFF to manage OAuth login/logout flows and session cookies.
+ * This implementation expects a Backend-for-Frontend (BFF) to manage OAuth login/logout flows and session cookies.
  * It checks session state on initialization, initiates login when no session exists, and
  * ensures axios requests include credentials.
  *
@@ -40,13 +40,14 @@ export function oauthAuthenticationBackendStoreSetup(
 
   const commonAuth = createCommonAuthFunctions(authenticated, _postLogin, _postLogout)
 
+  const oauthOverrides = backendStoreOptions.endpoints?.oauth
   const oauthEndpoints = {
-    login: backendStoreOptions.oauth?.loginEndpoint ?? oauthLoginEndpoint,
-    logout: backendStoreOptions.oauth?.logoutEndpoint ?? oauthLogoutEndpoint,
-    session: backendStoreOptions.oauth?.sessionEndpoint ?? oauthSessionEndpoint,
+    login: oauthOverrides?.loginEndpoint ?? oauthLoginEndpoint,
+    logout: oauthOverrides?.logoutEndpoint ?? oauthLogoutEndpoint,
+    session: oauthOverrides?.sessionEndpoint ?? oauthSessionEndpoint,
   }
   const redirectHandler =
-    backendStoreOptions.oauth?.redirectHandler ??
+    oauthOverrides?.redirectHandler ??
     ((url: string) => {
       if (typeof window === 'undefined') {
         return
@@ -75,9 +76,9 @@ export function oauthAuthenticationBackendStoreSetup(
   }
 
   /**
-   * Calls the BFF session endpoint to determine whether a valid session exists.
+   * Calls the Backend-for-Frontend (BFF) session endpoint to determine whether a valid session exists.
    * On failure, it forces an unauthenticated state and returns `{ session: false }`.
-   * @returns Session status payload from the BFF.
+   * @returns Session status payload from the Backend-for-Frontend (BFF).
    */
   async function checkSessionStatus(): Promise<OAuthSessionStatus> {
     return axiosInstance
@@ -91,7 +92,7 @@ export function oauthAuthenticationBackendStoreSetup(
   }
 
   /**
-   * Initiates the OAuth login flow via the BFF login endpoint.
+   * Initiates the OAuth login flow via the Backend-for-Frontend (BFF) login endpoint.
    * Expects a JSON payload containing a `redirect` URL and navigates to it.
    * Runs the post-login callback after a redirect URL is received.
    * @returns Axios response from the login endpoint for chaining/testing.
@@ -109,7 +110,7 @@ export function oauthAuthenticationBackendStoreSetup(
   }
 
   /**
-   * Starts the OAuth login flow. Credentials are ignored because the BFF handles login.
+   * Starts the OAuth login flow. Credentials are ignored because the Backend-for-Frontend (BFF) handles login.
    * @returns Axios response from the login endpoint for chaining/testing.
    */
   async function login(): Promise<AxiosResponse> {
@@ -117,7 +118,7 @@ export function oauthAuthenticationBackendStoreSetup(
   }
 
   /**
-   * Logs out via the BFF logout endpoint and clears local authentication state.
+   * Logs out via the Backend-for-Frontend (BFF) logout endpoint and clears local authentication state.
    * Post-logout callbacks are executed after the request completes (success or failure).
    */
   function logout(): void {

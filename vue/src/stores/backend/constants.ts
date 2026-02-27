@@ -13,6 +13,10 @@ export const localStorageKey = 'authenticationToken'
 export const jwtAccessTokenKey = 'jwtAccessToken'
 export const jwtRefreshTokenKey = 'jwtRefreshToken'
 
+export const tokenLoginEndpoint = '/api/token-auth/'
+export const jwtLoginEndpoint = '/api/token/'
+export const jwtRefreshEndpoint = '/api/token/refresh/'
+
 export const oauthLoginEndpoint = '/proxy/api/auth/login'
 export const oauthLogoutEndpoint = '/proxy/api/auth/logout'
 export const oauthSessionEndpoint = '/proxy/api/auth/session'

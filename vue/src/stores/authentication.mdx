@@ -26,6 +26,11 @@ import { useBackendStore } from '@nside/wefa'
 
 const backendStore = useBackendStore({
   authenticationType: 'TOKEN',
+  endpoints: {
+    token: {
+      loginEndpoint: '/api/token-auth/',
+    },
+  },
 })
 ```
 
@@ -38,12 +43,18 @@ import { useBackendStore } from '@nside/wefa'
 
 const backendStore = useBackendStore({
   authenticationType: 'JWT',
+  endpoints: {
+    jwt: {
+      loginEndpoint: '/api/token/',
+      refreshEndpoint: '/api/token/refresh/',
+    },
+  },
 })
 ```
 
-### OAuth (BFF Session)
+### OAuth (Backend-for-Frontend (BFF) Session)
 
-Use this when your app relies on a BFF that manages OAuth login/logout and sets session cookies.
+Use this when your app relies on a Backend-for-Frontend (BFF) that manages OAuth login/logout and sets session cookies.
 The store checks the session endpoint on initialization and triggers the login endpoint if no session exists.
 
 ```ts
@@ -51,10 +62,12 @@ import { useBackendStore } from '@nside/wefa'
 
 const backendStore = useBackendStore({
   authenticationType: 'OAUTH',
-  oauth: {
-    loginEndpoint: 'http://localhost:5022/proxy/api/auth/login',
-    logoutEndpoint: 'http://localhost:5022/proxy/api/auth/logout',
-    sessionEndpoint: 'http://localhost:5022/proxy/api/auth/session',
+  endpoints: {
+    oauth: {
+      loginEndpoint: 'http://localhost:5022/proxy/api/auth/login',
+      logoutEndpoint: 'http://localhost:5022/proxy/api/auth/logout',
+      sessionEndpoint: 'http://localhost:5022/proxy/api/auth/session',
+    },
   },
 })
 ```
@@ -95,12 +108,14 @@ When using OAuth, you can intercept redirects for testing or custom navigation l
 ```ts
 const backendStore = useBackendStore({
   authenticationType: 'OAUTH',
-  oauth: {
-    loginEndpoint: '/proxy/api/auth/login',
-    logoutEndpoint: '/proxy/api/auth/logout',
-    sessionEndpoint: '/proxy/api/auth/session',
-    redirectHandler: (url) => {
-      window.location.assign(url)
+  endpoints: {
+    oauth: {
+      loginEndpoint: '/proxy/api/auth/login',
+      logoutEndpoint: '/proxy/api/auth/logout',
+      sessionEndpoint: '/proxy/api/auth/session',
+      redirectHandler: (url) => {
+        window.location.assign(url)
+      },
     },
   },
 })

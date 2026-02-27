@@ -14,9 +14,11 @@ describe('OAuth Backend Store', () => {
   const backendStoreOptions = {
     backendBaseUrl: 'http://localhost:8000',
     authenticationType: 'OAUTH' as AuthenticationType,
-    oauth: {
-      redirectHandler: (url: string) => {
-        redirectHandler(url)
+    endpoints: {
+      oauth: {
+        redirectHandler: (url: string) => {
+          redirectHandler(url)
+        },
       },
     },
   }

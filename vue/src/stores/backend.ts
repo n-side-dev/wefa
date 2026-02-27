@@ -5,11 +5,14 @@ import { oauthAuthenticationBackendStoreSetup } from './backend/schemes/oauth.ts
 import { tokenAuthenticationBackendStoreSetup } from './backend/schemes/token.ts'
 
 export type {
+  AuthenticationEndpoints,
   AuthenticationType,
   BackendStore,
   BackendStoreOptions,
   Credentials,
+  JwtEndpoints,
   OAuthEndpoints,
+  TokenEndpoints,
 } from './backend/types'
 
 export const useBackendStore = (
@@ -31,9 +34,9 @@ export const defineBackendStore = (backendStoreOptions: BackendStoreOptions): St
 function getBackendStoreSetup(backendStoreOptions: BackendStoreOptions): BackendStore {
   switch (backendStoreOptions.authenticationType) {
     case 'TOKEN':
-      return tokenAuthenticationBackendStoreSetup()
+      return tokenAuthenticationBackendStoreSetup(backendStoreOptions)
     case 'JWT':
-      return jwtAuthenticationBackendStoreSetup()
+      return jwtAuthenticationBackendStoreSetup(backendStoreOptions)
     case 'OAUTH':
       return oauthAuthenticationBackendStoreSetup(backendStoreOptions)
     case 'SESSION':

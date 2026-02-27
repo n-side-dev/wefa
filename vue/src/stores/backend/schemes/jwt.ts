@@ -2,8 +2,13 @@ import { ref, watch, type Ref } from 'vue'
 import type { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import axiosInstance from '@/network/axios.ts'
 import { createCommonAuthFunctions } from '../common.ts'
-import { jwtAccessTokenKey, jwtRefreshTokenKey } from '../constants.ts'
-import type { BackendStore, Credentials } from '../types.ts'
+import {
+  jwtAccessTokenKey,
+  jwtLoginEndpoint,
+  jwtRefreshEndpoint,
+  jwtRefreshTokenKey,
+} from '../constants.ts'
+import type { BackendStore, BackendStoreOptions, Credentials } from '../types.ts'
 
 /**
  * Configures and sets up a JWT-based authentication backend store for managing API authentication.
@@ -14,7 +19,7 @@ import type { BackendStore, Credentials } from '../types.ts'
  * and post-login/logout callbacks. Additionally, it enables the setting of route guards to
  * respond to authentication status changes in a Vue.js application.
  *
- * This implementation is designed to work with a Django backend using the "Simple JWT" library.
+ * This implementation is designed to work with a backend offering JWT mechanism.
  * @returns An object containing authentication state, API client instance, and helper functions:
  * - `axiosInstance`: Pre-configured axios instance with authentication support
  * - `authenticated`: Reactive flag representing the authentication status
@@ -24,7 +29,9 @@ import type { BackendStore, Credentials } from '../types.ts'
  * - `setPostLogout`: Method to set a callback function invoked after logout
  * - `setupAuthRouteGuard`: Function to set up route guard for managing authentication-driven route reevaluations
  */
-export function jwtAuthenticationBackendStoreSetup(): BackendStore {
+export function jwtAuthenticationBackendStoreSetup(
+  backendStoreOptions: BackendStoreOptions
+): BackendStore {
   /**
    * A reactive variable that indicates whether a user is authenticated or not.
    *
@@ -39,7 +46,10 @@ export function jwtAuthenticationBackendStoreSetup(): BackendStore {
   const _postLogin: Ref<() => void> = ref(() => {})
   const _accessTokenFromLocalStorage = localStorage.getItem(jwtAccessTokenKey)
   const _refreshTokenFromLocalStorage = localStorage.getItem(jwtRefreshTokenKey)
-  const refreshUrl = '/api/token/refresh/'
+  const loginEndpoint =
+    backendStoreOptions.endpoints?.jwt?.loginEndpoint ?? jwtLoginEndpoint
+  const refreshUrl =
+    backendStoreOptions.endpoints?.jwt?.refreshEndpoint ?? jwtRefreshEndpoint
 
   // Create common authentication functions
   const commonAuth = createCommonAuthFunctions(authenticated, _postLogin, _postLogout)
@@ -144,7 +154,7 @@ export function jwtAuthenticationBackendStoreSetup(): BackendStore {
    * @returns A promise that resolves to the Axios response object returned from the authentication request.
    */
   async function login(credentials: Credentials): Promise<AxiosResponse> {
-    const response = await axiosInstance.post('/api/token/', credentials)
+    const response = await axiosInstance.post(loginEndpoint, credentials)
     if (response.status === 200) {
       authenticated.value = true
       _accessToken.value = response.data.access

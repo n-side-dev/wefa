@@ -2,8 +2,8 @@ import { ref, watch, type Ref } from 'vue'
 import type { AxiosResponse } from 'axios'
 import axiosInstance from '@/network/axios.ts'
 import { createCommonAuthFunctions } from '../common.ts'
-import { localStorageKey } from '../constants.ts'
-import type { BackendStore, Credentials } from '../types.ts'
+import { localStorageKey, tokenLoginEndpoint } from '../constants.ts'
+import type { BackendStore, BackendStoreOptions, Credentials } from '../types.ts'
 
 /**
  * Configures and sets up a token-based authentication backend store for managing API authentication.
@@ -22,7 +22,9 @@ import type { BackendStore, Credentials } from '../types.ts'
  * - `setPostLogout`: Method to set a callback function invoked after logout
  * - `setupAuthRouteGuard`: Function to set up route guard for managing authentication-driven route reevaluations
  */
-export function tokenAuthenticationBackendStoreSetup(): BackendStore {
+export function tokenAuthenticationBackendStoreSetup(
+  backendStoreOptions: BackendStoreOptions
+): BackendStore {
   /**
    * A reactive variable that indicates whether a user is authenticated or not.
    *
@@ -35,6 +37,8 @@ export function tokenAuthenticationBackendStoreSetup(): BackendStore {
   const _postLogout: Ref<() => void> = ref(() => {})
   const _postLogin: Ref<() => void> = ref(() => {})
   const _fromLocalStorage = localStorage.getItem(localStorageKey)
+  const loginEndpoint =
+    backendStoreOptions.endpoints?.token?.loginEndpoint ?? tokenLoginEndpoint
 
   // Create common authentication functions
   const commonAuth = createCommonAuthFunctions(authenticated, _postLogin, _postLogout)
@@ -82,7 +86,7 @@ export function tokenAuthenticationBackendStoreSetup(): BackendStore {
    * @returns A promise that resolves to the Axios response object returned from the authentication request.
    */
   async function login(credentials: Credentials): Promise<AxiosResponse> {
-    const response = await axiosInstance.post('/api/token-auth/', credentials)
+    const response = await axiosInstance.post(loginEndpoint, credentials)
     if (response.status === 200) {
       authenticated.value = true
       _token.value = response.data.token
