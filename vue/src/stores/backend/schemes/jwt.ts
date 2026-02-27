@@ -83,6 +83,8 @@ export function jwtAuthenticationBackendStoreSetup(
   /**
    * Checks if the error is related to token authentication issues
    * @param error - The Axios error to check for token-related issues
+   * @param accessToken
+   * @param refreshToken
    * @returns True if the error is related to token authentication, false otherwise
    */
   function defaultIsTokenError(
