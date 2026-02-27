@@ -121,7 +121,7 @@
     "eslint-plugin-vue": "~10.8.0",
     "jiti": "^2.6.1",
     "jsdom": "^28.0.0",
-    "knip": "^5.82.1",
+    "knip": "^5.83.1",
     "npm-run-all2": "^8.0.4",
     "playwright": "^1.55.0",
     "postcss": "^8.5.6",

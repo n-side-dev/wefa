@@ -40,7 +40,7 @@ const vitestConfig: UserConfig = {
             // Component tests may involve complex async operations and DOM manipulation
             testTimeout: 45000, // 45 seconds for component tests
             hookTimeout: 15000, // 15 seconds for component setup/teardown
-            setupFiles: ['vitetestPlugins.setup.ts'],
+            setupFiles: ['./vitetestPlugins.setup.ts'],
           },
         },
         {
@@ -52,7 +52,7 @@ const vitestConfig: UserConfig = {
             // Network tests may involve API calls and async operations
             testTimeout: 30000, // 30 seconds for network tests
             hookTimeout: 10000, // 10 seconds for network setup/teardown
-            setupFiles: ['vitetestPlugins.setup.ts'],
+            setupFiles: ['./vitetestPlugins.setup.ts'],
           },
         },
         {
@@ -64,7 +64,7 @@ const vitestConfig: UserConfig = {
             // Store tests may involve state management and async operations
             testTimeout: 30000, // 30 seconds for store tests
             hookTimeout: 10000, // 10 seconds for store setup/teardown
-            setupFiles: ['vitetestPlugins.setup.ts'],
+            setupFiles: ['./vitetestPlugins.setup.ts'],
           },
         },
         {
@@ -76,7 +76,7 @@ const vitestConfig: UserConfig = {
             // Plugin tests may involve Vue app initialization and routing
             testTimeout: 30000, // 30 seconds for plugin tests
             hookTimeout: 10000, // 10 seconds for plugin setup/teardown
-            setupFiles: ['vitetestPlugins.setup.ts'],
+            setupFiles: ['./vitetestPlugins.setup.ts'],
           },
         },
         // Storybook tests project
@@ -113,7 +113,7 @@ const vitestConfig: UserConfig = {
                 },
               ],
             },
-            setupFiles: ['.storybook/vitest.setup.ts'],
+            setupFiles: ['./.storybook/vitest.setup.ts'],
           },
         },
       ],

@@ -4,8 +4,12 @@
     "interface": true,
     "type": true
   },
-  "ignoreFiles": ["src/*"],
+  "ignoreFiles": ["src/*", "src/demo/**", "src/demo.ts"],
   "ignoreDependencies": ["@tailwindcss/cli", "@vee-validate/zod"],
+  "ignoreUnresolved": ["^\\./vitetestPlugins\\.setup\\.ts$", "^\\./\\.storybook/vitest\\.setup\\.ts$"],
+  "ignoreIssues": {
+    "src/demo/**": ["types", "exports"]
+  },
   "tags": [
     "-lintignore"
   ],
