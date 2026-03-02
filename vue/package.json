@@ -69,7 +69,7 @@
     "@primeuix/themes": "^2.0.3",
     "@primevue/forms": "^4.5.4",
     "@tailwindcss/cli": "^4.1.18",
-    "@tailwindcss/vite": "^4.1.18",
+    "@tailwindcss/vite": "^4.2.1",
     "@tanstack/vue-query": "^5.92.9",
     "@vee-validate/zod": "^4.15.1",
     "@vueuse/core": "^14.2.1",
