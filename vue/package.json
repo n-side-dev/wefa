@@ -73,7 +73,7 @@
     "@tanstack/vue-query": "^5.92.9",
     "@vee-validate/zod": "^4.15.1",
     "@vueuse/core": "^14.2.1",
-    "axios": "^1.13.5",
+    "axios": "^1.13.6",
     "luxon": "^3.7.2",
     "marked": "^17.0.3",
     "pinia": "^3.0.4",
@@ -133,7 +133,7 @@
     "typescript": "~5.9.3",
     "vite": "^7.3.1",
     "vite-plugin-dts": "^4.5.4",
-    "vite-plugin-vue-devtools": "^8.0.6",
+    "vite-plugin-vue-devtools": "^8.0.7",
     "vitest": "^4.0.2",
     "vue-tsc": "^3.2.5"
   },
