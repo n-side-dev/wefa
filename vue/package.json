@@ -99,7 +99,7 @@
     "@types/eslint-plugin-security": "^3.0.1",
     "@types/jsdom": "^27.0.0",
     "@types/luxon": "^3.7.1",
-    "@types/node": "^25.2.3",
+    "@types/node": "^25.3.3",
     "@types/plotly.js-dist-min": "^2.3.4",
     "@vitejs/plugin-vue": "^6.0.4",
     "@vitest/browser": "4.0.18",
