@@ -114,7 +114,7 @@
     "axios-mock-adapter": "^2.1.0",
     "eslint": "^10.0.0",
     "eslint-plugin-jsdoc": "^62.7.1",
-    "eslint-plugin-playwright": "^2.5.1",
+    "eslint-plugin-playwright": "^2.8.0",
     "eslint-plugin-security": "^3.0.1",
     "eslint-plugin-sonarjs": "^4.0.0",
     "eslint-plugin-storybook": "^10.2.13",
