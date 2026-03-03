@@ -1,0 +1,63 @@
+import { Meta, Canvas, ArgTypes } from '@storybook/addon-docs/blocks'
+import * as AvatarStories from './AvatarComponent.stories'
+
+<Meta of={AvatarStories} />
+
+# AvatarComponent
+
+`AvatarComponent` is a wrapper around PrimeVue `Avatar` that standardizes avatar behavior in WeFa:
+
+- initials fallback based on `username`
+- deterministic background color for non-image avatars
+- optional explicit `label`
+- optional `imageUrl`
+- `square` and `circle` shapes
+
+## Basic Usage
+
+```vue
+<script setup lang="ts">
+import AvatarComponent from '@/components/AvatarComponent/AvatarComponent.vue'
+</script>
+
+<template>
+  <AvatarComponent username="Ada Lovelace" />
+</template>
+```
+
+## Stories
+
+### Initials Fallback
+
+<Canvas of={AvatarStories.InitialsFallback} />
+
+### Single Word Username
+
+<Canvas of={AvatarStories.SingleWordName} />
+
+### Custom Label
+
+<Canvas of={AvatarStories.CustomLabel} />
+
+### Image Avatar
+
+<Canvas of={AvatarStories.WithImage} />
+
+### Circle Shape + Custom Size
+
+<Canvas of={AvatarStories.CircleShapeCustomSize} />
+
+## Props
+
+<ArgTypes of={AvatarStories} />
+
+```ts
+export interface AvatarComponentProps {
+  username: string
+  label?: string
+  shape?: 'circle' | 'square'
+  imageUrl?: string
+  style?: StyleValue
+  class?: string | string[] | Record<string, boolean>
+}
+```

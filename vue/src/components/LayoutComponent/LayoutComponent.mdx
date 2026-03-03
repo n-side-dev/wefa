@@ -1,0 +1,136 @@
+import { Meta, Canvas, ArgTypes } from '@storybook/addon-docs/blocks'
+import * as LayoutComponentStories from './LayoutComponent.stories'
+
+<Meta of={LayoutComponentStories} />
+
+# LayoutComponent
+
+## Overview
+
+`LayoutComponent` is the shell used to render:
+
+- desktop side navigation
+- mobile drawer navigation
+- route-aware breadcrumb
+- child route content through `<router-view />`
+
+The stories below focus on router metadata setup, because navigation links are generated directly from the router tree.
+
+## Router Configurations
+
+### Legacy Route Metadata
+
+Uses `meta.showInNavigation` and `meta.section`.
+
+<Canvas of={LayoutComponentStories.LegacyMetaFields} />
+
+```ts
+{
+  path: '/products',
+  name: 'products',
+  meta: {
+    title: 'Products',
+    icon: 'pi pi-box',
+    showInNavigation: true,
+  },
+}
+```
+
+### WeFa Route Metadata Namespace
+
+Uses `meta.wefa.showInNavigation` and `meta.wefa.section`.
+
+<Canvas of={LayoutComponentStories.WefaSectionedMeta} />
+
+```ts
+{
+  path: '/dashboard',
+  name: 'Dashboard',
+  meta: {
+    title: 'Dashboard',
+    icon: 'pi pi-chart-line',
+    wefa: {
+      showInNavigation: true,
+      section: 'Insights',
+    },
+  },
+}
+```
+
+### Mixed Metadata With Nested Routes
+
+Shows a nested route path while mixing both metadata conventions.
+
+<Canvas of={LayoutComponentStories.MixedNestedRoutes} />
+
+```ts
+{
+  path: '/products',
+  name: 'products',
+  children: [
+    {
+      path: 'category/:id',
+      name: 'category',
+      children: [
+        {
+          path: 'item/:itemId',
+          name: 'item',
+        },
+      ],
+    },
+  ],
+  meta: {
+    title: 'Products',
+    wefa: { showInNavigation: true, section: 'Catalog' },
+  },
+}
+```
+
+## Props
+
+<ArgTypes of={LayoutComponentStories} />
+
+## Usage
+
+Mount `LayoutComponent` once in your root app shell (`App.vue`), like the demo:
+
+```vue
+<template>
+  <LayoutComponent project-title="My Project" />
+</template>
+
+<script setup lang="ts">
+import LayoutComponent from '@/components/LayoutComponent/LayoutComponent.vue'
+</script>
+```
+
+Then keep your application routes as regular page routes (do not use `LayoutComponent` as a route component):
+
+```ts
+const routes = [
+  {
+    path: '/home',
+    name: 'home',
+    component: HomeView,
+    meta: {
+      title: 'Home',
+      icon: 'pi pi-home',
+      wefa: {
+        showInNavigation: true,
+      },
+    },
+  },
+  {
+    path: '/showcase',
+    name: 'showcase',
+    component: ShowcaseView,
+    meta: {
+      title: 'Showcase',
+      icon: 'pi pi-bars',
+      wefa: {
+        showInNavigation: true,
+      },
+    },
+  },
+]
+```

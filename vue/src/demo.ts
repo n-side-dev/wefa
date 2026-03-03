@@ -1,10 +1,9 @@
 // CSS
 import './assets/main.css'
-import './demo/demo.css'
 
 // APP
 import { createApp } from 'vue'
-import App from './demo/DemoApp.vue'
+import App from './demo/App.vue'
 const app = createApp(App)
 
 import { type CookieConfiguration, cookiesPlugin } from '@/plugins/cookies'

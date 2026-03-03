@@ -346,6 +346,76 @@ describe('AutoroutedBreadcrumb', () => {
     expect(wrapper.find('.pi-folder').exists()).toBe(true)
   })
 
+  it('uses path-based routing when a matched route has no name', async () => {
+    const mockRoute = createMockRoute(
+      [
+        {
+          path: '/',
+          name: undefined,
+          meta: { icon: 'pi pi-home' },
+        },
+        {
+          path: '/products',
+          name: 'products',
+          meta: { title: 'Products' },
+        },
+      ],
+      '/products'
+    )
+
+    vi.mocked(useRoute).mockReturnValue(mockRoute)
+
+    const wrapper = mount(AutoroutedBreadcrumb, {
+      global: {
+        plugins: [mockRouter],
+      },
+    })
+    await flushPromises()
+
+    const items = wrapper.findAll('a')
+    expect(items.length).toBe(2)
+    expect(items[0]?.attributes('href')).toBe('/')
+  })
+
+  it('dedupes breadcrumb items when parent and child share the same path', async () => {
+    if (!mockRouter.hasRoute('duplicate-child')) {
+      mockRouter.addRoute({
+        path: '/duplicate',
+        name: 'duplicate-child',
+        component: { template: '<div>Duplicate</div>' },
+      })
+    }
+
+    const mockRoute = createMockRoute(
+      [
+        {
+          path: '/duplicate',
+          name: 'duplicate-parent',
+          meta: { title: 'Parent' },
+        },
+        {
+          path: '/duplicate',
+          name: 'duplicate-child',
+          meta: { title: 'Child' },
+        },
+      ],
+      '/duplicate'
+    )
+
+    vi.mocked(useRoute).mockReturnValue(mockRoute)
+
+    const wrapper = mount(AutoroutedBreadcrumb, {
+      global: {
+        plugins: [mockRouter],
+      },
+    })
+    await flushPromises()
+
+    const items = wrapper.findAll('a')
+    expect(items.length).toBe(1)
+    expect(items[0]?.text()).toContain('Child')
+  })
+
   // Test click navigation
   it('navigates correctly when breadcrumb items are clicked', async () => {
     // Mock route
