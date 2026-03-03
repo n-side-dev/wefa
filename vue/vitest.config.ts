@@ -25,7 +25,7 @@ const vitestConfig: UserConfig = {
         exclude: [
           ...coverageConfigDefaults.exclude,
           'dist-demo/**',
-          'src/demo.ts',
+          'src/main.ts',
           'src/demo/**'
         ]
       },

@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import DemoView from '@/demo/views/DemoView.vue'
 import ShowcaseView from '@/demo/views/ShowcaseView.vue'
 import PlaygroundView from '@/demo/views/PlaygroundView.vue'
+import DemoContent from '@/demo/views/DemoContent.vue'
 
 export interface WeFaRouteMeta {
   section?: string
@@ -11,6 +12,10 @@ export interface WeFaRouteMeta {
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    {
+      path: '/',
+      redirect: '/home',
+    },
     {
       path: '/home',
       name: 'home',
@@ -50,7 +55,7 @@ const router = createRouter({
     {
       path: '/demo',
       name: 'demo',
-      component: DemoView,
+      component: DemoContent,
       meta: {
         title: 'Demo',
         wefa: {
