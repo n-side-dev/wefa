@@ -77,7 +77,7 @@
     "luxon": "^3.7.2",
     "marked": "^17.0.3",
     "pinia": "^3.0.4",
-    "plotly.js-dist-min": "^3.3.1",
+    "plotly.js-dist-min": "^3.4.0",
     "primeicons": "^7.0.0",
     "primevue": "^4.5.4",
     "tailwindcss-primeui": "^0.6.1",
