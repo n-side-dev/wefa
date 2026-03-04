@@ -2,6 +2,10 @@
 
 This repo provides a Flask BFF that handles OAuth login/logout/session checks and proxies REST calls to a backend.
 
+For more information on the BFF architecture, see:
+- https://datatracker.ietf.org/doc/html/draft-ietf-oauth-browser-based-apps#name-backend-for-frontend-bff
+- https://auth0.com/blog/the-backend-for-frontend-pattern-bff/
+
 **Quick Start**
 1. Create `.env` from `.env.example` in the repo root (do not commit `.env`).
 2. `uv sync --dev`
