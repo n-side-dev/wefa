@@ -337,6 +337,7 @@ When making changes:
 - Update the main README if adding new features
 - Keep examples up to date
 - Update version numbers as needed
+- For monorepo releases, run version bumps from the repository root with `python3 scripts/wefa_version.py`
 
 ### API Documentation
 
