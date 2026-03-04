@@ -12,7 +12,7 @@ For more information on the BFF architecture, see:
 3. `FLASK_RUN_PORT=5022 uv run flask --app bff.py run`
 
 **Prerequisites**
-- Python 3.x
+- Python 3.12.x (per `pyproject.toml` requirement: Python >=3.12,<3.13)
 - `uv`
 
 **Environment File**
