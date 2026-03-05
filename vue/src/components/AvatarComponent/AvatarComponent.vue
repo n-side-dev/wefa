@@ -12,6 +12,7 @@
 <script setup lang="ts">
 import Avatar from 'primevue/avatar'
 import { computed, type StyleValue } from 'vue'
+import { useI18nLib } from '@/locales'
 
 const DEFAULT_COLORS = {
   background: '#E2E8F0',
@@ -37,9 +38,12 @@ export interface AvatarComponentProps {
 }
 
 const props = defineProps<AvatarComponentProps>()
+const { t } = useI18nLib()
 
 const trimmedUsername = computed(() => props.username?.trim() ?? '')
 const hasImage = computed(() => Boolean(props.imageUrl?.trim()))
+
+const ariaLabel = computed(() => trimmedUsername.value || t('avatar.user_avatar'))
 
 const resolvedImageUrl = computed(() => (hasImage.value ? props.imageUrl?.trim() : undefined))
 const resolvedLabel = computed(() => {
@@ -49,7 +53,6 @@ const resolvedLabel = computed(() => {
 
   return hasImage.value ? undefined : getInitials(trimmedUsername.value)
 })
-const ariaLabel = computed(() => trimmedUsername.value || 'User avatar')
 const resolvedShape = computed(() => props.shape ?? 'square')
 const resolvedClass = computed(() => props.class ?? 'size-10 rounded-sm text-sm font-semibold')
 

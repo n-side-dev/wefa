@@ -3,7 +3,7 @@
     <button
       type="button"
       :class="triggerClass"
-      :aria-label="`Open user menu for ${username}`"
+      :aria-label="t('navigation.open_user_menu_for', { username })"
       @click="toggleUserMenu"
     >
       <AvatarComponent class="shrink-0" :username="username" />
@@ -26,8 +26,9 @@
 <script setup lang="ts">
 import Menu from 'primevue/menu'
 import type { MenuItem } from 'primevue/menuitem'
-import { computed, ref, useTemplateRef } from 'vue'
+import { computed, type ComputedRef, useTemplateRef } from 'vue'
 import AvatarComponent from '@/components/AvatarComponent/AvatarComponent.vue'
+import { useI18nLib } from '@/locales'
 
 export interface UserMenuTriggerComponentProps {
   username: string
@@ -36,21 +37,9 @@ export interface UserMenuTriggerComponentProps {
 }
 
 const { username, email = '', mode = 'detailed' } = defineProps<UserMenuTriggerComponentProps>()
+const { t } = useI18nLib()
 
 const userMenu = useTemplateRef('user-menu')
-
-const userMenuItems = ref<MenuItem[]>([
-  {
-    label: 'Profile',
-    items: [
-      {
-        label: 'Logout',
-        icon: 'pi pi-sign-out',
-        command: () => {},
-      },
-    ],
-  },
-])
 
 const triggerClass = computed(() => {
   if (mode === 'compact') {
@@ -73,4 +62,19 @@ const triggerClass = computed(() => {
 function toggleUserMenu(event: Event) {
   userMenu.value?.toggle(event)
 }
+
+const userMenuItems: ComputedRef<MenuItem[]> = computed(() => {
+  return [
+    {
+      label: t('navigation.profile'),
+      items: [
+        {
+          label: t('navigation.logout'),
+          icon: 'pi pi-sign-out',
+          command: () => {},
+        },
+      ],
+    },
+  ]
+})
 </script>

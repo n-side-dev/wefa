@@ -7,7 +7,7 @@
         text
         rounded
         severity="secondary"
-        aria-label="Open navigation menu"
+        :aria-label="t('navigation.open_navigation_menu')"
         @click="isDrawerVisible = true"
       />
     </div>
@@ -34,12 +34,14 @@ import Drawer from 'primevue/drawer'
 import { ref } from 'vue'
 import MainComponent from '@/components/LayoutComponent/SideNavigationComponent/MainComponent/MainComponent.vue'
 import TopComponent from '@/components/LayoutComponent/SideNavigationComponent/TopComponent/TopComponent.vue'
+import { useI18nLib } from '@/locales'
 
 export interface MobileNavigationComponentProps {
   projectTitle: string
 }
 
 const { projectTitle } = defineProps<MobileNavigationComponentProps>()
+const { t } = useI18nLib()
 const isDrawerVisible = ref(false)
 
 /**
