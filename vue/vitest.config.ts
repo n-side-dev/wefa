@@ -46,6 +46,17 @@ const vitestConfig: UserConfig = {
         {
           extends: true,
           test: {
+            name: 'utils',
+            environment: 'jsdom',
+            include: ['src/utils/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+            testTimeout: 30000,
+            hookTimeout: 10000,
+            setupFiles: ['./vitetestPlugins.setup.ts'],
+          },
+        },
+        {
+          extends: true,
+          test: {
             name: 'network',
             environment: 'jsdom',
             include: ['src/network/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
