@@ -4,6 +4,11 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
+from typing import Mapping
+
+
+class SettingsValidationError(ValueError):
+    """Raised when required BFF environment configuration is missing."""
 
 
 def _env_bool(name: str, default: bool) -> bool:
@@ -42,23 +47,65 @@ class BffSettings:
     :ivar oauth_login_redirect_uri: Redirect URI handled by the BFF callback.
     :ivar frontend_redirect: Frontend URL used after login callback.
     """
-    flask_secret_key: str | None
-    session_cookie_name: str | None
+    flask_secret_key: str
+    session_cookie_name: str
     session_cookie_path: str
     session_cookie_httponly: bool
     session_cookie_secure: bool
     session_cookie_samesite: str
-    cors_allowed_origin: str | None
-    backend_endpoint: str | None
-    oauth_client_id: str | None
-    oauth_client_secret: str | None
-    oauth_oidc_scope: str | None
-    oauth_endpoint_authorization: str | None
-    oauth_endpoint_token: str | None
-    oauth_endpoint_userinfo: str | None
-    oauth_endpoint_logout: str | None
-    oauth_login_redirect_uri: str | None
-    frontend_redirect: str | None
+    cors_allowed_origin: str
+    backend_endpoint: str
+    oauth_client_id: str
+    oauth_client_secret: str
+    oauth_oidc_scope: str
+    oauth_endpoint_authorization: str
+    oauth_endpoint_token: str
+    oauth_endpoint_userinfo: str
+    oauth_endpoint_logout: str
+    oauth_login_redirect_uri: str
+    frontend_redirect: str
+
+
+REQUIRED_ENV_VARS: tuple[str, ...] = (
+    "FLASK_SECRET_KEY",
+    "SESSION_COOKIE_NAME",
+    "SESSION_COOKIE_PATH",
+    "SESSION_COOKIE_HTTPONLY",
+    "SESSION_COOKIE_SECURE",
+    "SESSION_COOKIE_SAMESITE",
+    "CORS_ALLOWED_ORIGIN",
+    "BACKEND_ENDPOINT",
+    "OAUTH_CLIENT_ID",
+    "OAUTH_CLIENT_SECRET",
+    "OAUTH_OIDC_SCOPE",
+    "OAUTH_ENDPOINT_AUTHORIZATION",
+    "OAUTH_ENDPOINT_TOKEN",
+    "OAUTH_ENDPOINT_USERINFO",
+    "OAUTH_ENDPOINT_LOGOUT",
+    "OAUTH_LOGIN_REDIRECT_URI",
+    "FRONTEND_REDIRECT",
+)
+
+
+def validate_required_env(raw_env: Mapping[str, str | None]) -> None:
+    """Validate that all required env vars exist and are non-empty.
+
+    :param raw_env:
+        Environment values keyed by variable name.
+    :raises SettingsValidationError:
+        If one or more required variables are missing/blank.
+    """
+    missing = sorted(
+        name
+        for name in REQUIRED_ENV_VARS
+        if raw_env.get(name) is None or not str(raw_env.get(name)).strip()
+    )
+    if missing:
+        missing_csv = ", ".join(missing)
+        raise SettingsValidationError(
+            "Missing required BFF environment variables: "
+            f"{missing_csv}. Configure them before starting the service."
+        )
 
 
 def load_settings_from_env() -> BffSettings:
@@ -67,22 +114,25 @@ def load_settings_from_env() -> BffSettings:
     :returns: Environment-derived application settings.
     :rtype: BffSettings
     """
+    raw_env = {name: os.getenv(name) for name in REQUIRED_ENV_VARS}
+    validate_required_env(raw_env)
+
     return BffSettings(
-        flask_secret_key=os.getenv("FLASK_SECRET_KEY"),
-        session_cookie_name=os.getenv("SESSION_COOKIE_NAME"),
+        flask_secret_key=raw_env["FLASK_SECRET_KEY"],
+        session_cookie_name=raw_env["SESSION_COOKIE_NAME"],
         session_cookie_path=os.getenv("SESSION_COOKIE_PATH", "/"),
         session_cookie_httponly=_env_bool("SESSION_COOKIE_HTTPONLY", True),
         session_cookie_secure=_env_bool("SESSION_COOKIE_SECURE", True),
         session_cookie_samesite=os.getenv("SESSION_COOKIE_SAMESITE", "Strict"),
-        cors_allowed_origin=os.getenv("CORS_ALLOWED_ORIGIN"),
-        backend_endpoint=os.getenv("BACKEND_ENDPOINT"),
-        oauth_client_id=os.getenv("OAUTH_CLIENT_ID"),
-        oauth_client_secret=os.getenv("OAUTH_CLIENT_SECRET"),
-        oauth_oidc_scope=os.getenv("OAUTH_OIDC_SCOPE"),
-        oauth_endpoint_authorization=os.getenv("OAUTH_ENDPOINT_AUTHORIZATION"),
-        oauth_endpoint_token=os.getenv("OAUTH_ENDPOINT_TOKEN"),
-        oauth_endpoint_userinfo=os.getenv("OAUTH_ENDPOINT_USERINFO"),
-        oauth_endpoint_logout=os.getenv("OAUTH_ENDPOINT_LOGOUT"),
-        oauth_login_redirect_uri=os.getenv("OAUTH_LOGIN_REDIRECT_URI"),
-        frontend_redirect=os.getenv("FRONTEND_REDIRECT"),
+        cors_allowed_origin=raw_env["CORS_ALLOWED_ORIGIN"],
+        backend_endpoint=raw_env["BACKEND_ENDPOINT"],
+        oauth_client_id=raw_env["OAUTH_CLIENT_ID"],
+        oauth_client_secret=raw_env["OAUTH_CLIENT_SECRET"],
+        oauth_oidc_scope=raw_env["OAUTH_OIDC_SCOPE"],
+        oauth_endpoint_authorization=raw_env["OAUTH_ENDPOINT_AUTHORIZATION"],
+        oauth_endpoint_token=raw_env["OAUTH_ENDPOINT_TOKEN"],
+        oauth_endpoint_userinfo=raw_env["OAUTH_ENDPOINT_USERINFO"],
+        oauth_endpoint_logout=raw_env["OAUTH_ENDPOINT_LOGOUT"],
+        oauth_login_redirect_uri=raw_env["OAUTH_LOGIN_REDIRECT_URI"],
+        frontend_redirect=raw_env["FRONTEND_REDIRECT"],
     )

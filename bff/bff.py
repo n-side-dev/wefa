@@ -11,7 +11,8 @@ from bff_app.settings import load_settings_from_env
 
 dotenv.load_dotenv()
 
-app = create_app(settings=load_settings_from_env())
+settings = load_settings_from_env()
+app = create_app(settings=settings)
 
 
 if __name__ == "__main__":

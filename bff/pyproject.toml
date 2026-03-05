@@ -11,7 +11,6 @@ dependencies = [
     "flask-smorest>=0.46.2",
     "pyyaml~=6.0",
     "python-dotenv~=1.2.1",
-    "redis",
     "requests",
 ]
 

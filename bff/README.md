@@ -1,6 +1,10 @@
-# MMS Backend-for-Frontend (BFF)
+# Backend-for-Frontend (BFF)
 
 This repo provides a Flask BFF that handles OAuth login/logout/session checks and proxies REST calls to a backend.
+
+For more information on the BFF architecture, see:
+- https://datatracker.ietf.org/doc/html/draft-ietf-oauth-browser-based-apps#name-backend-for-frontend-bff
+- https://auth0.com/blog/the-backend-for-frontend-pattern-bff/
 
 **Quick Start**
 1. Create `.env` from `.env.example` in the repo root (do not commit `.env`).
@@ -8,23 +12,29 @@ This repo provides a Flask BFF that handles OAuth login/logout/session checks an
 3. `FLASK_RUN_PORT=5022 uv run flask --app bff.py run`
 
 **Prerequisites**
-- Python 3.x
+- Python 3.12.x (per `pyproject.toml` requirement: Python >=3.12,<3.13)
 - `uv`
 
 **Environment File**
 - Location: repo root `.env` (same directory as `bff.py`)
 - Template: `.env.example`
-- Required values from your OAuth server:
+- Required values (validated at startup):
+- `FLASK_SECRET_KEY`
+- `BACKEND_ENDPOINT`
+- `CORS_ALLOWED_ORIGIN`
 - `OAUTH_CLIENT_ID`
 - `OAUTH_CLIENT_SECRET`
+- `OAUTH_OIDC_SCOPE`
 - `OAUTH_ENDPOINT_AUTHORIZATION`
 - `OAUTH_ENDPOINT_TOKEN`
 - `OAUTH_ENDPOINT_USERINFO`
-- Required values from your frontend:
+- `OAUTH_ENDPOINT_LOGOUT`
 - `FRONTEND_REDIRECT`
 - `OAUTH_LOGIN_REDIRECT_URI`
 - Session cookie configuration:
 - `SESSION_COOKIE_NAME`
+- `SESSION_COOKIE_PATH`
+- `SESSION_COOKIE_HTTPONLY`
 - `SESSION_COOKIE_SECURE`
 - `SESSION_COOKIE_SAMESITE`
 
@@ -67,4 +77,4 @@ docker-compose up --build
 
 **Notes / Common Pitfalls**
 - If you run `bff.py` directly (not `flask run`), Flask will default to port 5000 unless you explicitly set the port in code.
-- `dotenv` loads the `.env` file at process start. If the `.env` is missing or the working directory is wrong, defaults will be used.
+- `dotenv` loads the `.env` file at process start. Startup now fails fast with a validation error if required variables are missing or blank.
