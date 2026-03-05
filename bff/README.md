@@ -1,4 +1,4 @@
-# MMS Backend-for-Frontend (BFF)
+# Backend-for-Frontend (BFF)
 
 This repo provides a Flask BFF that handles OAuth login/logout/session checks and proxies REST calls to a backend.
 
