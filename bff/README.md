@@ -18,17 +18,23 @@ For more information on the BFF architecture, see:
 **Environment File**
 - Location: repo root `.env` (same directory as `bff.py`)
 - Template: `.env.example`
-- Required values from your OAuth server:
+- Required values (validated at startup):
+- `FLASK_SECRET_KEY`
+- `BACKEND_ENDPOINT`
+- `CORS_ALLOWED_ORIGIN`
 - `OAUTH_CLIENT_ID`
 - `OAUTH_CLIENT_SECRET`
+- `OAUTH_OIDC_SCOPE`
 - `OAUTH_ENDPOINT_AUTHORIZATION`
 - `OAUTH_ENDPOINT_TOKEN`
 - `OAUTH_ENDPOINT_USERINFO`
-- Required values from your frontend:
+- `OAUTH_ENDPOINT_LOGOUT`
 - `FRONTEND_REDIRECT`
 - `OAUTH_LOGIN_REDIRECT_URI`
 - Session cookie configuration:
 - `SESSION_COOKIE_NAME`
+- `SESSION_COOKIE_PATH`
+- `SESSION_COOKIE_HTTPONLY`
 - `SESSION_COOKIE_SECURE`
 - `SESSION_COOKIE_SAMESITE`
 
@@ -71,4 +77,4 @@ docker-compose up --build
 
 **Notes / Common Pitfalls**
 - If you run `bff.py` directly (not `flask run`), Flask will default to port 5000 unless you explicitly set the port in code.
-- `dotenv` loads the `.env` file at process start. If the `.env` is missing or the working directory is wrong, defaults will be used.
+- `dotenv` loads the `.env` file at process start. Startup now fails fast with a validation error if required variables are missing or blank.

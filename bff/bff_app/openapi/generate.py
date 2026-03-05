@@ -20,7 +20,7 @@ def _spec_settings() -> BffSettings:
         session_cookie_httponly=True,
         session_cookie_secure=True,
         session_cookie_samesite="Strict",
-        cors_allowed_origin=None,
+        cors_allowed_origin="http://frontend.example",
         backend_endpoint="http://backend.example/api",
         oauth_client_id="client-id",
         oauth_client_secret="client-secret",
