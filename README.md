@@ -69,7 +69,7 @@ This monorepo uses one shared version across `vue/`, `django/`, and `bff/`.
 Use the root orchestrator script for any version change:
 
 ```bash
-python3 scripts/wefa_version.py help
+python3 scripts/wefa_version.py -h
 python3 scripts/wefa_version.py show
 python3 scripts/wefa_version.py check --expect <x.y.z[-prerelease]>
 python3 scripts/wefa_version.py bump patch
