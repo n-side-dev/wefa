@@ -63,6 +63,21 @@ See the [Vue README](vue/README.md) for build scripts, Storybook, and component 
 
 The demo apps in both workspaces illustrate how to compose the packages together.
 
+## Release Versioning
+
+This monorepo uses one shared version across `vue/`, `django/`, and `bff/`.
+Use the root orchestrator script for any version change:
+
+```bash
+python3 scripts/wefa_version.py -h
+python3 scripts/wefa_version.py show
+python3 scripts/wefa_version.py check --expect <x.y.z[-prerelease]>
+python3 scripts/wefa_version.py bump patch
+python3 scripts/wefa_version.py set 1.0.0-rc.1
+```
+
+Use `--dry-run` to preview changes and `--allow-dirty-version-files` only when you intentionally need to override preflight checks.
+
 ## Contributing
 
 Contributions are welcome! Start with open issues or propose new ideas through GitHub discussions. Please read [Django CONTRIBUTE](django/CONTRIBUTE.md) and/or [Vue CONTRIBUTE](vue/CONTRIBUTE.md) for the current contribution workflow.

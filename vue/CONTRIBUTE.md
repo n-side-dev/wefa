@@ -114,7 +114,11 @@ Document deviations from these gates in the pull request summary and explain the
 Our first public release will be automated through GitHub Actions. For now follow the manual flow when testing locally:
 
 ```bash
-npm version <major|minor|patch>
+cd ..
+python3 scripts/wefa_version.py bump <major|minor|patch>
+# or:
+python3 scripts/wefa_version.py set <x.y.z[-prerelease]>
+cd vue
 npm publish --access public
 ```
 
