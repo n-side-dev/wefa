@@ -6,9 +6,9 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        PORT: ${PORT}
+        PORT: ${PORT:-5000}
     ports:
-      - "${PORT}:${PORT}"
+      - "${PORT:-5000}:${PORT:-5000}"
     env_file:
       - .env
     container_name: bff-flask
