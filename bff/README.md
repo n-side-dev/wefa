@@ -55,11 +55,11 @@ FLASK_RUN_PORT=5022 uv run flask --app bff.py run
 **Generate OpenAPI Spec**
 1. Generate or refresh the spec file.
 ```bash
-uv run python -m bff_app.openapi.generate --output openapi.yaml
+uv run python -m bff_app.openapi.generate --output bff_app/openapi/openapi.yaml
 ```
 2. Validate that the committed spec is up to date.
 ```bash
-uv run python -m bff_app.openapi.generate --check --output openapi.yaml
+uv run python -m bff_app.openapi.generate --check --output bff_app/openapi/openapi.yaml
 ```
 
 **Run with Docker**
