@@ -31,7 +31,7 @@ def refresh_access_token() -> bool:
 
     refresh_token = session.get("token", {}).get("refresh_token")
     if not refresh_token:
-        print("REFRESH TOKEN IS MISSING")
+        current_app.logger.warning("Refresh token is missing from session")
         return False
 
     try:
@@ -43,13 +43,20 @@ def refresh_access_token() -> bool:
                 "client_id": settings.oauth_client_id,
                 "client_secret": settings.oauth_client_secret,
             },
+            timeout=(
+                settings.backend_connect_timeout_seconds,
+                settings.backend_read_timeout_seconds,
+            ),
         )
     except requests.exceptions.RequestException as exc:
-        print(f"REFRESH TOKEN REQUEST FAILED: {exc}")
+        current_app.logger.warning("Refresh token request failed: %s", exc)
         return False
 
     if response.status_code != 200:
-        print(f"REFRESH TOKEN REQUEST REJECTED: {response.status_code}")
+        current_app.logger.warning(
+            "Refresh token request rejected with status %s",
+            response.status_code,
+        )
         return False
 
     session["token"] = response.json()

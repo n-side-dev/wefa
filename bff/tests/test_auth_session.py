@@ -44,6 +44,7 @@ def test_session_refreshes_and_recovers(client, monkeypatch):
 
     assert res.status_code == 200
     assert res.get_json() == {"session": True}
+    assert mock_post.call_args.kwargs["timeout"] == (3.0, 30.0)
 
 
 def test_session_false_clears_cookie_on_failure(client, monkeypatch):
@@ -63,6 +64,7 @@ def test_session_false_clears_cookie_on_failure(client, monkeypatch):
 
     assert res.status_code == 200
     assert res.get_json() == {"session": False}
+    assert mock_post.call_args.kwargs["timeout"] == (3.0, 30.0)
 
     with client.session_transaction() as sess:
         assert "token" not in sess

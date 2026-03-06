@@ -5,7 +5,7 @@ from __future__ import annotations
 import requests
 import secrets
 from authlib.integrations.requests_client import OAuth2Session
-from flask import jsonify, redirect, request, session
+from flask import current_app, jsonify, redirect, request, session
 from flask_smorest import Blueprint
 
 from bff_app.services.auth import get_settings, refresh_access_token
@@ -51,7 +51,7 @@ def login():
         ``redirect`` key.
     :rtype: flask.Response
     """
-    print("-> /proxy/api/auth/login")
+    current_app.logger.debug("Handling /proxy/api/auth/login")
     settings = get_settings()
 
     client = OAuth2Session(
@@ -98,7 +98,7 @@ def login_cb():
         Redirect response to the configured frontend URL.
     :rtype: flask.Response
     """
-    print("-> /proxy/api/auth/callback")
+    current_app.logger.debug("Handling /proxy/api/auth/callback")
     settings = get_settings()
 
     request_state = request.args.get("state")
@@ -107,20 +107,22 @@ def login_cb():
     code_verifier = session.get("cv")
 
     if not session_state or not request_state:
-        print("Missing OAuth state during callback")
+        current_app.logger.warning("Missing OAuth state during callback")
         session.clear()
         return redirect(settings.frontend_redirect, code=302)
     if request_state != session_state:
-        print("State mismatch")
+        current_app.logger.warning("OAuth callback state mismatch")
         session.clear()
         return redirect(settings.frontend_redirect, code=302)
     if not authorization_code or not code_verifier:
-        print("Missing authorization code or PKCE verifier during callback")
+        current_app.logger.warning(
+            "Missing authorization code or PKCE verifier during callback"
+        )
         session.clear()
         return redirect(settings.frontend_redirect, code=302)
 
-    print("State match !")
-    print("Performing Code Exchange")
+    current_app.logger.debug("OAuth callback state validated")
+    current_app.logger.debug("Performing OAuth code exchange")
 
     client = OAuth2Session(
         settings.oauth_client_id,
@@ -131,7 +133,7 @@ def login_cb():
     )
 
     authorization_response = request.url
-    print("Authorization Code : ", authorization_response)
+    current_app.logger.debug("OAuth authorization response received")
 
     try:
         token = client.fetch_token(
@@ -140,7 +142,7 @@ def login_cb():
             code_verifier=code_verifier,
         )
     except Exception as exc:
-        print(f"Token exchange failed: {exc}")
+        current_app.logger.warning("OAuth token exchange failed: %s", exc)
         session.clear()
         return redirect(settings.frontend_redirect, code=302)
 
@@ -177,7 +179,7 @@ def logout():
         JSON payload confirming logout success.
     :rtype: flask.Response
     """
-    print("-> /proxy/api/auth/logout")
+    current_app.logger.debug("Handling /proxy/api/auth/logout")
     settings = get_settings()
 
     requests.post(
@@ -247,7 +249,7 @@ def auth_userinfo():
         JSON object returned by the upstream userinfo endpoint.
     :rtype: dict
     """
-    print("-> /proxy/api/auth/userinfo")
+    current_app.logger.debug("Handling /proxy/api/auth/userinfo")
     settings = get_settings()
 
     token = session.get("token")
@@ -266,7 +268,7 @@ def auth_userinfo():
             ),
         )
     except requests.exceptions.RequestException as exc:
-        print(f"USERINFO REQUEST FAILED: {exc}")
+        current_app.logger.warning("Userinfo request failed: %s", exc)
         return jsonify({"message": "Upstream connection error"}), 502
 
     if userinfo.status_code in {401, 403}:
@@ -274,13 +276,16 @@ def auth_userinfo():
         return jsonify({"message": "Unauthorized"}), userinfo.status_code
 
     if userinfo.status_code != 200:
-        print(f"USERINFO REQUEST REJECTED: {userinfo.status_code}")
+        current_app.logger.warning(
+            "Userinfo request rejected with status %s",
+            userinfo.status_code,
+        )
         return jsonify({"message": "Failed to fetch user info"}), 502
 
     try:
         return jsonify(userinfo.json())
     except ValueError:
-        print("USERINFO RESPONSE WAS NOT VALID JSON")
+        current_app.logger.warning("Userinfo response was not valid JSON")
         return jsonify({"message": "Invalid upstream response"}), 502
 
 
@@ -317,7 +322,7 @@ def check_session():
         JSON object containing ``{"session": <bool>}``.
     :rtype: flask.Response
     """
-    print("-> /proxy/api/auth/session")
+    current_app.logger.debug("Handling /proxy/api/auth/session")
     settings = get_settings()
 
     is_valid_session = False

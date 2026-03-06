@@ -95,6 +95,7 @@ def test_proxy_request_retries_on_invalid_token(client, monkeypatch):
     assert res.status_code == 200
     assert res.data == b'{"ok":true}'
     assert mock_request.call_count == 2
+    assert mock_post.call_args.kwargs["timeout"] == (3.0, 30.0)
     first_call_timeout = mock_request.call_args_list[0].kwargs["timeout"]
     second_call_timeout = mock_request.call_args_list[1].kwargs["timeout"]
     assert first_call_timeout == (3.0, 30.0)

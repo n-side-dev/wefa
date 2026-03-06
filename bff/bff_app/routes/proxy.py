@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import requests
-from flask import Response, request, session
+from flask import Response, current_app, request, session
 from flask_smorest import Blueprint
 
 from bff_app.services.auth import get_settings, refresh_access_token
@@ -101,7 +101,7 @@ def proxy_request(rest_of_url: str):
           ``401`` with ``invalid_token``.
         - Drops hop-by-hop and duplicate CORS headers from upstream response.
     """
-    print("-> /proxy/api/request/" + rest_of_url)
+    current_app.logger.debug("Handling /proxy/api/request/%s", rest_of_url)
     settings = get_settings()
 
     headers = _build_upstream_headers()
@@ -110,7 +110,10 @@ def proxy_request(rest_of_url: str):
     if "token" in session and "access_token" in session["token"]:
         headers["Authorization"] = f"Bearer {session['token']['access_token']}"
     else:
-        print("ACCESS TOKEN IS MISSING")
+        current_app.logger.warning(
+            "Access token missing in session for proxied request: %s",
+            rest_of_url,
+        )
 
     target_url = f"{settings.backend_endpoint.rstrip('/')}/{rest_of_url.lstrip('/')}"
 
@@ -131,7 +134,7 @@ def proxy_request(rest_of_url: str):
     try:
         response = forward_request()
     except requests.exceptions.RequestException as exc:
-        print(f"REST proxy error: {exc}")
+        current_app.logger.warning("REST proxy error for %s: %s", rest_of_url, exc)
         return Response("Upstream connection error", status=502)
 
     www_authenticate = response.headers.get("www-authenticate", "")
@@ -141,7 +144,11 @@ def proxy_request(rest_of_url: str):
             try:
                 response = forward_request()
             except requests.exceptions.RequestException as exc:
-                print(f"REST proxy error after refresh: {exc}")
+                current_app.logger.warning(
+                    "REST proxy error after token refresh for %s: %s",
+                    rest_of_url,
+                    exc,
+                )
                 return Response("Upstream connection error", status=502)
 
     excluded_headers = [

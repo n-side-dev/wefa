@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from flask import jsonify
+from flask import current_app, jsonify
 from flask_smorest import Blueprint
 
 health_bp = Blueprint(
@@ -37,5 +37,5 @@ def ping():
     :returns: ``{"message": "pong"}``.
     :rtype: flask.Response
     """
-    print("-> /ping")
+    current_app.logger.debug("Handling /ping")
     return jsonify({"message": "pong"})
