@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 import requests
-from flask import Response, current_app, request, session
+from flask import Response, current_app, request
 from flask_smorest import Blueprint
 
-from bff_app.services.auth import get_settings, refresh_access_token
+from bff_app.services.auth import get_session_token, get_settings, refresh_access_token
 
 proxy_bp = Blueprint(
     "proxy",
@@ -107,8 +107,9 @@ def proxy_request(rest_of_url: str):
     headers = _build_upstream_headers()
     payload = request.get_data()
 
-    if "token" in session and "access_token" in session["token"]:
-        headers["Authorization"] = f"Bearer {session['token']['access_token']}"
+    session_token = get_session_token()
+    if session_token and "access_token" in session_token:
+        headers["Authorization"] = f"Bearer {session_token['access_token']}"
     else:
         current_app.logger.warning(
             "Access token missing in session for proxied request: %s",
@@ -140,7 +141,10 @@ def proxy_request(rest_of_url: str):
     www_authenticate = response.headers.get("www-authenticate", "")
     if response.status_code == 401 and "invalid_token" in www_authenticate:
         if refresh_access_token():
-            headers["Authorization"] = f"Bearer {session['token']['access_token']}"
+            refreshed_token = get_session_token()
+            if not refreshed_token or "access_token" not in refreshed_token:
+                return Response("Upstream connection error", status=502)
+            headers["Authorization"] = f"Bearer {refreshed_token['access_token']}"
             try:
                 response = forward_request()
             except requests.exceptions.RequestException as exc:

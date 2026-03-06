@@ -8,7 +8,12 @@ from authlib.integrations.requests_client import OAuth2Session
 from flask import current_app, jsonify, redirect, request, session
 from flask_smorest import Blueprint
 
-from bff_app.services.auth import get_settings, refresh_access_token
+from bff_app.services.auth import (
+    get_session_token,
+    get_settings,
+    refresh_access_token,
+    store_session_token,
+)
 
 auth_bp = Blueprint(
     "auth",
@@ -146,7 +151,7 @@ def login_cb():
         session.clear()
         return redirect(settings.frontend_redirect, code=302)
 
-    session["token"] = token
+    store_session_token(token)
     session.pop("cv", None)
     session.pop("state", None)
     return redirect(settings.frontend_redirect, code=302)
@@ -182,7 +187,7 @@ def logout():
     current_app.logger.debug("Handling /proxy/api/auth/logout")
     settings = get_settings()
 
-    token = session.get("token")
+    token = get_session_token()
     id_token = token.get("id_token") if isinstance(token, dict) else None
 
     if id_token:
@@ -271,7 +276,7 @@ def auth_userinfo():
     current_app.logger.debug("Handling /proxy/api/auth/userinfo")
     settings = get_settings()
 
-    token = session.get("token")
+    token = get_session_token()
     access_token = token.get("access_token") if isinstance(token, dict) else None
     if not access_token:
         session.clear()
@@ -346,16 +351,29 @@ def check_session():
 
     is_valid_session = False
 
-    if "token" in session:
+    token = get_session_token()
+    if token and "access_token" in token:
         userinfo = requests.get(
             settings.oauth_endpoint_userinfo,
-            headers={"Authorization": f"Bearer {session['token']['access_token']}"},
+            headers={"Authorization": f"Bearer {token['access_token']}"},
+            timeout=(
+                settings.backend_connect_timeout_seconds,
+                settings.backend_read_timeout_seconds,
+            ),
         )
         is_valid_session = userinfo.status_code == 200
         if not is_valid_session and refresh_access_token():
+            refreshed_token = get_session_token()
+            if not refreshed_token or "access_token" not in refreshed_token:
+                session.clear()
+                return jsonify({"session": False})
             userinfo = requests.get(
                 settings.oauth_endpoint_userinfo,
-                headers={"Authorization": f"Bearer {session['token']['access_token']}"},
+                headers={"Authorization": f"Bearer {refreshed_token['access_token']}"},
+                timeout=(
+                    settings.backend_connect_timeout_seconds,
+                    settings.backend_read_timeout_seconds,
+                ),
             )
             is_valid_session = userinfo.status_code == 200
 

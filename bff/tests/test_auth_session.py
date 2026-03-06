@@ -45,6 +45,11 @@ def test_session_refreshes_and_recovers(client, monkeypatch):
     assert res.status_code == 200
     assert res.get_json() == {"session": True}
     assert mock_post.call_args.kwargs["timeout"] == (3.0, 30.0)
+    with client.session_transaction() as sess:
+        encrypted_access = sess["token"]["access_token"]
+        encrypted_refresh = sess["token"]["refresh_token"]
+    assert encrypted_access.startswith(auth_service.ENCRYPTED_TOKEN_PREFIX)
+    assert encrypted_refresh.startswith(auth_service.ENCRYPTED_TOKEN_PREFIX)
 
 
 def test_session_false_clears_cookie_on_failure(client, monkeypatch):

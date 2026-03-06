@@ -6,6 +6,8 @@ import os
 from dataclasses import dataclass
 from typing import Mapping
 
+from cryptography.fernet import Fernet
+
 
 class SettingsValidationError(ValueError):
     """Raised when required BFF environment configuration is missing."""
@@ -78,6 +80,9 @@ class BffSettings:
         Connect timeout in seconds for backend proxy requests.
     :ivar backend_read_timeout_seconds:
         Read timeout in seconds for backend proxy requests.
+    :ivar session_token_encryption_key:
+        Fernet key used to encrypt/decrypt OAuth access and refresh tokens
+        stored in the signed session cookie.
     """
     flask_secret_key: str
     session_cookie_name: str
@@ -98,6 +103,7 @@ class BffSettings:
     frontend_redirect: str
     backend_connect_timeout_seconds: float = 3.0
     backend_read_timeout_seconds: float = 30.0
+    session_token_encryption_key: str = ""
 
 
 REQUIRED_ENV_VARS: tuple[str, ...] = (
@@ -107,6 +113,7 @@ REQUIRED_ENV_VARS: tuple[str, ...] = (
     "SESSION_COOKIE_HTTPONLY",
     "SESSION_COOKIE_SECURE",
     "SESSION_COOKIE_SAMESITE",
+    "SESSION_TOKEN_ENCRYPTION_KEY",
     "CORS_ALLOWED_ORIGIN",
     "BACKEND_ENDPOINT",
     "OAUTH_CLIENT_ID",
@@ -151,6 +158,14 @@ def load_settings_from_env() -> BffSettings:
     raw_env = {name: os.getenv(name) for name in REQUIRED_ENV_VARS}
     validate_required_env(raw_env)
 
+    session_token_encryption_key = raw_env["SESSION_TOKEN_ENCRYPTION_KEY"]
+    try:
+        Fernet(session_token_encryption_key.encode("utf-8"))
+    except Exception as exc:
+        raise SettingsValidationError(
+            "SESSION_TOKEN_ENCRYPTION_KEY must be a valid Fernet key."
+        ) from exc
+
     return BffSettings(
         flask_secret_key=raw_env["FLASK_SECRET_KEY"],
         session_cookie_name=raw_env["SESSION_COOKIE_NAME"],
@@ -177,4 +192,5 @@ def load_settings_from_env() -> BffSettings:
             "BACKEND_READ_TIMEOUT_SECONDS",
             30.0,
         ),
+        session_token_encryption_key=session_token_encryption_key,
     )
