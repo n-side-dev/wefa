@@ -250,11 +250,38 @@ def auth_userinfo():
     print("-> /proxy/api/auth/userinfo")
     settings = get_settings()
 
-    userinfo = requests.get(
-        settings.oauth_endpoint_userinfo,
-        headers={"Authorization": f"Bearer {session['token']['access_token']}"},
-    )
-    return userinfo.json()
+    token = session.get("token")
+    access_token = token.get("access_token") if isinstance(token, dict) else None
+    if not access_token:
+        session.clear()
+        return jsonify({"message": "Unauthorized"}), 401
+
+    try:
+        userinfo = requests.get(
+            settings.oauth_endpoint_userinfo,
+            headers={"Authorization": f"Bearer {access_token}"},
+            timeout=(
+                settings.backend_connect_timeout_seconds,
+                settings.backend_read_timeout_seconds,
+            ),
+        )
+    except requests.exceptions.RequestException as exc:
+        print(f"USERINFO REQUEST FAILED: {exc}")
+        return jsonify({"message": "Upstream connection error"}), 502
+
+    if userinfo.status_code in {401, 403}:
+        session.clear()
+        return jsonify({"message": "Unauthorized"}), userinfo.status_code
+
+    if userinfo.status_code != 200:
+        print(f"USERINFO REQUEST REJECTED: {userinfo.status_code}")
+        return jsonify({"message": "Failed to fetch user info"}), 502
+
+    try:
+        return jsonify(userinfo.json())
+    except ValueError:
+        print("USERINFO RESPONSE WAS NOT VALID JSON")
+        return jsonify({"message": "Invalid upstream response"}), 502
 
 
 @auth_bp.route("/session", methods=["GET"])
