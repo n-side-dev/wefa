@@ -36,7 +36,10 @@ const vitestConfig: UserConfig = {
           test: {
             name: 'components',
             environment: 'jsdom',
-            include: ['src/components/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+            include: [
+              'src/components/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
+              'src/containers/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
+            ],
             // Component tests may involve complex async operations and DOM manipulation
             testTimeout: 45000, // 45 seconds for component tests
             hookTimeout: 15000, // 15 seconds for component setup/teardown

@@ -36,9 +36,11 @@ function createTestRouter() {
       name: 'home',
       component: StubView,
       meta: {
-        title: 'Home',
-        icon: 'pi pi-home',
-        showInNavigation: true,
+        wefa: {
+          title: 'Home',
+          icon: 'pi pi-home',
+          showInNavigation: true,
+        },
       },
     },
     {
@@ -46,9 +48,11 @@ function createTestRouter() {
       name: 'reports',
       component: StubView,
       meta: {
-        title: 'Reports',
-        icon: 'pi pi-chart-line',
-        showInNavigation: true,
+        wefa: {
+          title: 'Reports',
+          icon: 'pi pi-chart-line',
+          showInNavigation: true,
+        },
       },
     },
     {
@@ -56,9 +60,9 @@ function createTestRouter() {
       name: 'settings',
       component: StubView,
       meta: {
-        title: 'Settings',
-        icon: 'pi pi-cog',
         wefa: {
+          title: 'Settings',
+          icon: 'pi pi-cog',
           showInNavigation: true,
           section: 'Administration',
         },
@@ -69,9 +73,9 @@ function createTestRouter() {
           name: 'users',
           component: StubView,
           meta: {
-            title: 'Users',
-            icon: 'pi pi-users',
             wefa: {
+              title: 'Users',
+              icon: 'pi pi-users',
               showInNavigation: true,
               section: 'Administration',
             },
@@ -84,7 +88,9 @@ function createTestRouter() {
       name: 'hidden',
       component: StubView,
       meta: {
-        title: 'Hidden',
+        wefa: {
+          title: 'Hidden',
+        },
       },
     },
   ]

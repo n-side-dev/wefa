@@ -5,5 +5,5 @@
 </template>
 
 <script setup lang="ts">
-import UserMenuTriggerComponent from '@/components/LayoutComponent/UserMenuTriggerComponent/UserMenuTriggerComponent.vue'
+import UserMenuTriggerComponent from '@/containers/LayoutContainer/UserMenuTriggerComponent/UserMenuTriggerComponent.vue'
 </script>

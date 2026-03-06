@@ -42,4 +42,19 @@ describe('TopComponent', () => {
 
     expect(wrapper.get('.inline-flex').text()).toBe('?')
   })
+
+  it('renders custom logo when provided', () => {
+    const wrapper = mount(TopComponent, {
+      props: {
+        projectTitle: 'North Side',
+        projectLogo: 'https://example.test/logo.svg',
+        projectLogoAlt: 'North Side logo',
+      },
+    })
+
+    const logo = wrapper.get('[data-test="project-logo"]')
+    expect(logo.attributes('src')).toBe('https://example.test/logo.svg')
+    expect(logo.attributes('alt')).toBe('North Side logo')
+    expect(wrapper.find('.inline-flex').exists()).toBe(false)
+  })
 })

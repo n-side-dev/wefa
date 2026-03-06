@@ -76,7 +76,7 @@ const items: ComputedRef<AutoroutedBreadcrumbItem[]> = computed(() => {
   }, [])
 
   return dedupedRoutes.map((route) => {
-    const meta = route.meta || {}
+    const wefaMeta = route.meta?.wefa
 
     // Filter out id and paramId from params
     const filteredParams = { ...currentRoute.params }
@@ -98,8 +98,8 @@ const items: ComputedRef<AutoroutedBreadcrumbItem[]> = computed(() => {
         }
 
     return {
-      label: (meta.title as string) || route.name?.toString() || '',
-      icon: meta.icon as string | undefined,
+      label: wefaMeta?.title || route.name?.toString() || '',
+      icon: wefaMeta?.icon,
       route: routeObj,
     }
   })

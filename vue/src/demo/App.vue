@@ -1,7 +1,7 @@
 <template>
-  <LayoutComponent project-title="WeFa" />
+  <LayoutContainer project-title="WeFa" />
 </template>
 
 <script setup lang="ts">
-import LayoutComponent from '@/components/LayoutComponent/LayoutComponent.vue'
+import LayoutContainer from '@/containers/LayoutContainer/LayoutContainer.vue'
 </script>

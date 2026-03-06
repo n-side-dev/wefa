@@ -69,32 +69,32 @@ import AutoroutedBreadcrumb from '@/components/AutoroutedBreadcrumb/AutoroutedBr
 
 ## Route Configuration
 
-For the breadcrumb to display meaningful information, your routes should include metadata with title and optionally icon properties:
+For the breadcrumb to display meaningful information, your routes should include `meta.wefa` metadata with `title` and optionally `icon`:
 
 ```javascript
 const routes = [
   {
     path: '/',
     name: 'home',
-    meta: { title: 'Home', icon: 'pi pi-home' },
+    meta: { wefa: { title: 'Home', icon: 'pi pi-home' } },
     component: HomeComponent,
   },
   {
     path: '/products',
     name: 'products',
-    meta: { title: 'Products', icon: 'pi pi-box' },
+    meta: { wefa: { title: 'Products', icon: 'pi pi-box' } },
     component: ProductsComponent,
     children: [
       {
         path: 'category/:id',
         name: 'category',
-        meta: { title: 'Category', icon: 'pi pi-tag' },
+        meta: { wefa: { title: 'Category', icon: 'pi pi-tag' } },
         component: CategoryComponent,
         children: [
           {
             path: 'item/:itemId',
             name: 'item',
-            meta: { title: 'Product Item', icon: 'pi pi-shopping-cart' },
+            meta: { wefa: { title: 'Product Item', icon: 'pi pi-shopping-cart' } },
             component: ItemComponent,
           },
         ],
@@ -111,8 +111,8 @@ The component works by:
 1. Accessing the current route using Vue Router's `useRoute()` composable
 2. Extracting the matched routes from the current route
 3. Transforming each matched route into a breadcrumb item with:
-   - Label: Uses the route's meta.title, or falls back to the route name
-   - Icon: Uses the route's meta.icon if available
+   - Label: Uses `route.meta.wefa.title`, or falls back to the route name
+   - Icon: Uses `route.meta.wefa.icon` if available
    - Route: Creates a route object with name, params, query, and hash for navigation
 
 ## Special Handling
@@ -131,5 +131,5 @@ The component uses PrimeVue's Breadcrumb component, so you can customize its app
 
 ## Edge Cases
 
-- If a route doesn't have a meta.title property, the component will fall back to using the route name
+- If a route doesn't have a `meta.wefa.title` property, the component will fall back to using the route name
 - If the current route is the same as the homeRoute, the home icon won't be displayed to avoid redundancy

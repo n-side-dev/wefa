@@ -37,8 +37,12 @@ const TopComponentStub = defineComponent({
       type: String,
       required: true,
     },
+    projectLogo: {
+      type: String,
+      default: undefined,
+    },
   },
-  template: '<div data-test="top">{{ projectTitle }}</div>',
+  template: '<div data-test="top">{{ projectTitle }}|{{ projectLogo }}</div>',
 })
 
 const MainComponentStub = defineComponent({
@@ -109,6 +113,27 @@ describe('MobileNavigationComponent', () => {
       },
     })
 
-    expect(wrapper.get('[data-test="top"]').text()).toBe('Dispatch Center')
+    expect(wrapper.get('[data-test="top"]').text()).toBe('Dispatch Center|')
+  })
+
+  it('passes custom logo to TopComponent inside the drawer', () => {
+    const wrapper = mount(MobileNavigationComponent, {
+      props: {
+        projectTitle: 'Dispatch Center',
+        projectLogo: 'https://example.test/logo.svg',
+      },
+      global: {
+        stubs: {
+          Button: ButtonStub,
+          Drawer: DrawerStub,
+          TopComponent: TopComponentStub,
+          MainComponent: MainComponentStub,
+        },
+      },
+    })
+
+    expect(wrapper.get('[data-test="top"]').text()).toBe(
+      'Dispatch Center|https://example.test/logo.svg'
+    )
   })
 })

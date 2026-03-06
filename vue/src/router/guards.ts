@@ -7,7 +7,7 @@ import type {
 import { libRouteRecords } from './libRoutes'
 
 /**
- * Checks that users are authenticated before navigating to routes with meta.requiresAuth
+ * Checks that users are authenticated before navigating to routes with meta.wefa.requiresAuth
  * If the check fails, users are redirected to the route specified in redirect
  * This is useful if you want to prevent users from accessing your app if they're not authenticated
  * @param to RouteLocationNormalized, pass as-is from router.beforeEach
@@ -24,7 +24,7 @@ export function requiresAuth(
   // TODO SOFA-292 Implement when we have an authStore
   const isAuthenticated = true
 
-  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
+  const requiresAuth = to.matched.some((record) => record.meta.wefa?.requiresAuth === true)
   if (requiresAuth) {
     if (!isAuthenticated) {
       next(redirect) // User is not authenticated, redirect
@@ -33,7 +33,7 @@ export function requiresAuth(
 }
 
 /**
- * Checks that users are unauthenticated before navigating to routes with meta.requiresUnauth
+ * Checks that users are unauthenticated before navigating to routes with meta.wefa.requiresUnauth
  * If the check fails, users are redirected to the route specified in redirect
  * This is useful e.g if you want your users to skip the login page if they're already logged in
  * @param to RouteLocationNormalized, pass as-is from router.beforeEach
@@ -50,7 +50,7 @@ export function requiresUnauth(
   // TODO SOFA-292 Implement when we have an authStore
   const isUnauthenticated = true
 
-  const requiresUnauth = to.matched.some((record) => record.meta.requiresUnauth)
+  const requiresUnauth = to.matched.some((record) => record.meta.wefa?.requiresUnauth === true)
   if (requiresUnauth) {
     if (!isUnauthenticated) {
       next(redirect) // User is not unauthenticated, redirect

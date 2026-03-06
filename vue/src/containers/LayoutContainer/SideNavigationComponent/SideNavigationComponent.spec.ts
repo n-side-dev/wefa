@@ -10,8 +10,12 @@ const TopComponentStub = defineComponent({
       type: String,
       required: true,
     },
+    projectLogo: {
+      type: String,
+      default: undefined,
+    },
   },
-  template: '<div data-test="top">{{ projectTitle }}</div>',
+  template: '<div data-test="top">{{ projectTitle }}|{{ projectLogo }}</div>',
 })
 
 const MainComponentStub = defineComponent({
@@ -50,6 +54,25 @@ describe('SideNavigationComponent', () => {
       },
     })
 
-    expect(wrapper.get('[data-test="top"]').text()).toBe('Energy Forecast')
+    expect(wrapper.get('[data-test="top"]').text()).toBe('Energy Forecast|')
+  })
+
+  it('passes custom logo to TopComponent', () => {
+    const wrapper = mount(SideNavigationComponent, {
+      props: {
+        projectTitle: 'Energy Forecast',
+        projectLogo: 'https://example.test/logo.svg',
+      },
+      global: {
+        stubs: {
+          TopComponent: TopComponentStub,
+          MainComponent: MainComponentStub,
+        },
+      },
+    })
+
+    expect(wrapper.get('[data-test="top"]').text()).toBe(
+      'Energy Forecast|https://example.test/logo.svg'
+    )
   })
 })

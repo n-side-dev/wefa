@@ -1,5 +1,5 @@
 <template>
-  <PageComponent :title="route.meta.title as string" :show-breadcrumb="true">
+  <PageComponent :title="route.meta.wefa?.title as string" :show-breadcrumb="true">
     <div
       class="size-full bg-linear-to-b from-surface-100 to-surface-0 rounded flex items-center justify-center"
     >

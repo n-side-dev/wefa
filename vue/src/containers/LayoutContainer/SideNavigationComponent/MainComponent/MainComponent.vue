@@ -30,20 +30,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { type RouteRecordRaw, useRouter } from 'vue-router'
-import NavigationLinkComponent from '@/components/LayoutComponent/SideNavigationComponent/MainComponent/NavigationLinkComponent.vue'
-
-interface RouteMetaWefaNavigation {
-  showInNavigation?: boolean
-  section?: string
-}
-
-interface RouteNavigationMeta {
-  title?: string
-  icon?: string
-  showInNavigation?: boolean
-  section?: string
-  wefa?: RouteMetaWefaNavigation
-}
+import type { WeFaRouteMeta } from '@/router'
+import NavigationLinkComponent from '@/containers/LayoutContainer/SideNavigationComponent/MainComponent/NavigationLinkComponent.vue'
 
 interface NavigationEntry {
   path: string
@@ -116,15 +104,15 @@ function routeNavigationEntries(
 
   for (const route of routes) {
     const fullPath = resolvePath(parentPath, route.path)
-    const routeMeta = (route.meta ?? {}) as RouteNavigationMeta
-    const showInNavigation = routeMeta.wefa?.showInNavigation ?? routeMeta.showInNavigation ?? false
-    const section = routeMeta.wefa?.section ?? routeMeta.section
+    const routeMeta = route.meta?.wefa as WeFaRouteMeta | undefined
+    const showInNavigation = routeMeta?.showInNavigation ?? false
+    const section = routeMeta?.section
 
     if (showInNavigation === true) {
       entries.push({
         path: fullPath,
-        label: routeMeta.title ?? String(route.name ?? fullPath),
-        icon: routeMeta.icon,
+        label: routeMeta?.title ?? String(route.name ?? fullPath),
+        icon: routeMeta?.icon,
         section: section?.trim() || undefined,
       })
     }

@@ -12,9 +12,9 @@
 - Contribution guides: `django/CONTRIBUTE.md` & `vue/CONTRIBUTE.md` define environment setup, quality gates, and release discipline.
 
 ## Instruction Routing
-- For work inside `vue/`, apply `vue/AGENTS.md` as the frontend source of truth.
+- For frontend work inside `vue/` (components, containers, stories/docs, translations, tests), use the `$wefa-vue-frontend` skill defined at `skills/wefa-vue-frontend/SKILL.md`.
 - For work inside `django/`, use the backend guidance in this file until a dedicated `django/AGENTS.md` is introduced.
-- For cross-cutting work (API + UI), follow this file for shared expectations and `vue/AGENTS.md` for frontend implementation details.
+- For cross-cutting work (API + UI), follow this file for shared expectations and apply the `wefa-vue-frontend` skill for the frontend part.
 
 ## Core Engineering Principles
 - **Convention over configuration**: align with provided settings helpers (`NSIDE_WEFA` for Django and documented Vue defaults) before introducing bespoke wiring.

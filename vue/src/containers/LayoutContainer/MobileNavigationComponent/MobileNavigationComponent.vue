@@ -22,7 +22,11 @@
     class="w-72 max-w-[85vw]"
   >
     <nav class="flex h-full min-h-0 flex-col">
-      <TopComponent :project-title="projectTitle" />
+      <TopComponent
+        :project-title="projectTitle"
+        :project-logo="projectLogo"
+        :project-logo-alt="projectLogoAlt"
+      />
       <MainComponent @navigation-item-click="closeDrawer" />
     </nav>
   </Drawer>
@@ -32,15 +36,21 @@
 import Button from 'primevue/button'
 import Drawer from 'primevue/drawer'
 import { ref } from 'vue'
-import MainComponent from '@/components/LayoutComponent/SideNavigationComponent/MainComponent/MainComponent.vue'
-import TopComponent from '@/components/LayoutComponent/SideNavigationComponent/TopComponent/TopComponent.vue'
+import MainComponent from '@/containers/LayoutContainer/SideNavigationComponent/MainComponent/MainComponent.vue'
+import TopComponent from '@/containers/LayoutContainer/SideNavigationComponent/TopComponent/TopComponent.vue'
 import { useI18nLib } from '@/locales'
 
 export interface MobileNavigationComponentProps {
   projectTitle: string
+  projectLogo?: string
+  projectLogoAlt?: string
 }
 
-const { projectTitle } = defineProps<MobileNavigationComponentProps>()
+const {
+  projectTitle,
+  projectLogo = undefined,
+  projectLogoAlt = undefined,
+} = defineProps<MobileNavigationComponentProps>()
 const { t } = useI18nLib()
 const isDrawerVisible = ref(false)
 

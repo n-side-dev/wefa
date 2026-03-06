@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { defineComponent } from 'vue'
-import LayoutComponent from './LayoutComponent.vue'
+import LayoutContainer from './LayoutContainer.vue'
 
 const SideNavigationStub = defineComponent({
   name: 'SideNavigationComponent',
@@ -10,8 +10,12 @@ const SideNavigationStub = defineComponent({
       type: String,
       required: true,
     },
+    projectLogo: {
+      type: String,
+      default: undefined,
+    },
   },
-  template: '<div data-test="side-navigation">{{ projectTitle }}</div>',
+  template: '<div data-test="side-navigation">{{ projectTitle }}|{{ projectLogo }}</div>',
 })
 
 const MobileNavigationStub = defineComponent({
@@ -21,8 +25,12 @@ const MobileNavigationStub = defineComponent({
       type: String,
       required: true,
     },
+    projectLogo: {
+      type: String,
+      default: undefined,
+    },
   },
-  template: '<div data-test="mobile-navigation">{{ projectTitle }}</div>',
+  template: '<div data-test="mobile-navigation">{{ projectTitle }}|{{ projectLogo }}</div>',
 })
 
 const BreadcrumbStub = defineComponent({
@@ -51,9 +59,9 @@ const ConfirmDialogStub = defineComponent({
   template: '<div data-test="confirm-dialog"></div>',
 })
 
-describe('LayoutComponent', () => {
+describe('LayoutContainer', () => {
   it('passes project title to side and mobile navigation components', () => {
-    const wrapper = mount(LayoutComponent, {
+    const wrapper = mount(LayoutContainer, {
       props: {
         projectTitle: 'My Project',
       },
@@ -69,12 +77,12 @@ describe('LayoutComponent', () => {
       },
     })
 
-    expect(wrapper.get('[data-test="side-navigation"]').text()).toBe('My Project')
-    expect(wrapper.get('[data-test="mobile-navigation"]').text()).toBe('My Project')
+    expect(wrapper.get('[data-test="side-navigation"]').text()).toBe('My Project|')
+    expect(wrapper.get('[data-test="mobile-navigation"]').text()).toBe('My Project|')
   })
 
   it('renders breadcrumb with the expected home route', () => {
-    const wrapper = mount(LayoutComponent, {
+    const wrapper = mount(LayoutContainer, {
       props: {
         projectTitle: 'My Project',
       },
@@ -94,7 +102,7 @@ describe('LayoutComponent', () => {
   })
 
   it('renders router outlet and dynamic PrimeVue receptor components', () => {
-    const wrapper = mount(LayoutComponent, {
+    const wrapper = mount(LayoutContainer, {
       props: {
         projectTitle: 'My Project',
       },
@@ -113,5 +121,31 @@ describe('LayoutComponent', () => {
     expect(wrapper.find('[data-test="router-view"]').exists()).toBe(true)
     expect(wrapper.find('[data-test="toast"]').exists()).toBe(true)
     expect(wrapper.find('[data-test="confirm-dialog"]').exists()).toBe(true)
+  })
+
+  it('passes custom logo to side and mobile navigation components', () => {
+    const wrapper = mount(LayoutContainer, {
+      props: {
+        projectTitle: 'My Project',
+        projectLogo: 'https://example.test/logo.svg',
+      },
+      global: {
+        stubs: {
+          SideNavigationComponent: SideNavigationStub,
+          MobileNavigationComponent: MobileNavigationStub,
+          AutoroutedBreadcrumb: BreadcrumbStub,
+          RouterView: RouterViewStub,
+          Toast: ToastStub,
+          ConfirmDialog: ConfirmDialogStub,
+        },
+      },
+    })
+
+    expect(wrapper.get('[data-test="side-navigation"]').text()).toBe(
+      'My Project|https://example.test/logo.svg'
+    )
+    expect(wrapper.get('[data-test="mobile-navigation"]').text()).toBe(
+      'My Project|https://example.test/logo.svg'
+    )
   })
 })

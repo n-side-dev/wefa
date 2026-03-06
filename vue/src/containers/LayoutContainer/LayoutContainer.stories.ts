@@ -1,23 +1,14 @@
 import { type Meta, type StoryObj } from '@storybook/vue3-vite'
 import { expect, within, waitFor } from 'storybook/test'
 import { useRouter, type RouteMeta, type RouteRecordRaw, type Router } from 'vue-router'
-import LayoutComponent from './LayoutComponent.vue'
-
-interface RouteMetaWefaNavigation {
-  showInNavigation?: boolean
-  section?: string
-}
+import type { WeFaRouteMeta } from '@/router'
+import LayoutContainer from './LayoutContainer.vue'
 
 interface StoryRouteMeta extends RouteMeta {
-  showInNavigation?: boolean
-  section?: string
-  wefa?: RouteMetaWefaNavigation
+  wefa?: WeFaRouteMeta
 }
 
-type RouteConfigurationMode = 'legacy' | 'wefa'
-
 interface RouteNavigationConfiguration {
-  mode: RouteConfigurationMode
   showInNavigation: boolean
   section?: string
 }
@@ -86,28 +77,17 @@ function applyNavigationConfiguration(
 
     const routeMeta = cloneRouteMeta(route.meta)
 
-    if (routeConfiguration.mode === 'legacy') {
-      routeMeta.showInNavigation = routeConfiguration.showInNavigation
-      if (routeConfiguration.section) {
-        routeMeta.section = routeConfiguration.section
-      } else {
-        delete routeMeta.section
-      }
-      delete routeMeta.wefa
+    routeMeta.wefa = {
+      ...(routeMeta.wefa ?? {
+        title: String(route.name),
+      }),
+      showInNavigation: routeConfiguration.showInNavigation,
+    }
+
+    if (routeConfiguration.section) {
+      routeMeta.wefa.section = routeConfiguration.section
     } else {
-      routeMeta.wefa = {
-        ...routeMeta.wefa,
-        showInNavigation: routeConfiguration.showInNavigation,
-      }
-
-      if (routeConfiguration.section) {
-        routeMeta.wefa.section = routeConfiguration.section
-      } else {
-        delete routeMeta.wefa.section
-      }
-
-      delete routeMeta.showInNavigation
-      delete routeMeta.section
+      delete routeMeta.wefa.section
     }
 
     route.meta = routeMeta
@@ -136,38 +116,51 @@ function findRouteMeta(routeName: string): StoryRouteMeta {
   return foundMeta
 }
 
-const legacyNavigationConfiguration = {
-  home: { mode: 'legacy', showInNavigation: true },
-  products: { mode: 'legacy', showInNavigation: true },
-  users: { mode: 'legacy', showInNavigation: true },
+const navigationConfiguration = {
+  home: { showInNavigation: true },
+  products: { showInNavigation: true },
+  users: { showInNavigation: true },
 } satisfies RouterNavigationConfiguration
 
 const wefaSectionedConfiguration = {
-  home: { mode: 'wefa', showInNavigation: true },
-  Dashboard: { mode: 'wefa', showInNavigation: true, section: 'Insights' },
-  Analytics: { mode: 'wefa', showInNavigation: true, section: 'Insights' },
-  users: { mode: 'wefa', showInNavigation: true, section: 'Administration' },
+  home: { showInNavigation: true },
+  Dashboard: { showInNavigation: true, section: 'Insights' },
+  Analytics: { showInNavigation: true, section: 'Insights' },
+  users: { showInNavigation: true, section: 'Administration' },
 } satisfies RouterNavigationConfiguration
 
 const mixedNestedConfiguration = {
-  home: { mode: 'legacy', showInNavigation: true },
-  products: { mode: 'wefa', showInNavigation: true, section: 'Catalog' },
-  users: { mode: 'legacy', showInNavigation: true, section: 'Accounts' },
+  home: { showInNavigation: true },
+  products: { showInNavigation: true, section: 'Catalog' },
+  users: { showInNavigation: true, section: 'Accounts' },
 } satisfies RouterNavigationConfiguration
 
+const customLogoDataUri =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 40'%3E%3Crect width='180' height='40' rx='6' fill='%230b1220'/%3E%3Ctext x='90' y='26' text-anchor='middle' fill='%23ffffff' font-family='Arial,sans-serif' font-size='16'%3EWeFa%3C/text%3E%3C/svg%3E"
+
 const meta = {
-  title: 'Components/LayoutComponent',
-  component: LayoutComponent,
+  title: 'Router containers/LayoutContainer',
+  component: LayoutContainer,
   parameters: {
     layout: 'fullscreen',
   },
   args: {
     projectTitle: 'WeFa Storybook',
+    projectLogo: undefined,
+    projectLogoAlt: undefined,
   },
   argTypes: {
     projectTitle: {
       control: 'text',
       description: 'Label shown in desktop and mobile navigation headers.',
+    },
+    projectLogo: {
+      control: 'text',
+      description: 'Optional logo URL rendered in the top navigation area.',
+    },
+    projectLogoAlt: {
+      control: 'text',
+      description: 'Optional alt text used for the custom logo.',
     },
   },
   decorators: [
@@ -194,23 +187,23 @@ const meta = {
       },
     }),
   ],
-} satisfies Meta<typeof LayoutComponent>
+} satisfies Meta<typeof LayoutContainer>
 
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const LegacyMetaFields: Story = {
+export const WefaNavigationMeta: Story = {
   parameters: {
     initialPath: '/products',
-    routerNavigationConfiguration: legacyNavigationConfiguration,
+    routerNavigationConfiguration: navigationConfiguration,
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
 
     await waitFor(() => {
-      expect(findRouteMeta('home').showInNavigation).toBe(true)
-      expect(findRouteMeta('products').showInNavigation).toBe(true)
-      expect(findRouteMeta('users').showInNavigation).toBe(true)
+      expect(findRouteMeta('home').wefa?.showInNavigation).toBe(true)
+      expect(findRouteMeta('products').wefa?.showInNavigation).toBe(true)
+      expect(findRouteMeta('users').wefa?.showInNavigation).toBe(true)
     })
 
     await waitFor(() => {
@@ -249,14 +242,51 @@ export const MixedNestedRoutes: Story = {
     const canvas = within(canvasElement)
 
     await waitFor(() => {
-      expect(findRouteMeta('home').showInNavigation).toBe(true)
+      expect(findRouteMeta('home').wefa?.showInNavigation).toBe(true)
       expect(findRouteMeta('products').wefa?.section).toBe('Catalog')
-      expect(findRouteMeta('users').section).toBe('Accounts')
+      expect(findRouteMeta('users').wefa?.section).toBe('Accounts')
     })
 
     await waitFor(() => {
       expect(canvas.getByText('Category')).toBeInTheDocument()
       expect(canvas.getByText('Product Item')).toBeInTheDocument()
+    })
+  },
+}
+
+export const CustomLogo: Story = {
+  args: {
+    projectTitle: 'WeFa Storybook',
+    projectLogo: customLogoDataUri,
+    projectLogoAlt: 'WeFa logo',
+  },
+  parameters: {
+    initialPath: '/home',
+    routerNavigationConfiguration: navigationConfiguration,
+  },
+  play: async ({ canvasElement }) => {
+    await waitFor(() => {
+      const logos = canvasElement.querySelectorAll('[data-test="project-logo"]')
+      expect(logos.length).toBeGreaterThan(0)
+    })
+  },
+}
+
+export const NameOnlyFallback: Story = {
+  args: {
+    projectTitle: 'North Side',
+    projectLogo: undefined,
+    projectLogoAlt: undefined,
+  },
+  parameters: {
+    initialPath: '/home',
+    routerNavigationConfiguration: navigationConfiguration,
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await waitFor(() => {
+      expect(canvas.getByText('NS')).toBeInTheDocument()
     })
   },
 }
