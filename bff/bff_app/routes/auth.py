@@ -182,10 +182,29 @@ def logout():
     current_app.logger.debug("Handling /proxy/api/auth/logout")
     settings = get_settings()
 
-    requests.post(
-        settings.oauth_endpoint_logout,
-        {"id_token_hint": session["token"]["id_token"]},
-    )
+    token = session.get("token")
+    id_token = token.get("id_token") if isinstance(token, dict) else None
+
+    if id_token:
+        try:
+            response = requests.post(
+                settings.oauth_endpoint_logout,
+                {"id_token_hint": id_token},
+                timeout=(
+                    settings.backend_connect_timeout_seconds,
+                    settings.backend_read_timeout_seconds,
+                ),
+            )
+            if response.status_code >= 400:
+                current_app.logger.warning(
+                    "Logout endpoint returned status %s",
+                    response.status_code,
+                )
+        except requests.exceptions.RequestException as exc:
+            current_app.logger.warning("Logout request failed: %s", exc)
+    else:
+        current_app.logger.debug("No id_token in session; skipping upstream logout call")
+
     session.clear()
     return jsonify({"message": "logout successful"})
 
