@@ -22,13 +22,30 @@ def test_proxy_request_forwards_to_backend(client, monkeypatch):
     with client.session_transaction() as sess:
         sess["token"] = {"access_token": "access-token"}
 
-    res = client.post("/proxy/api/request/widgets?limit=5", data=b'{"x":1}')
+    res = client.post(
+        "/proxy/api/request/widgets?limit=5",
+        data=b'{"x":1}',
+        headers={
+            "Cookie": "session=browser-cookie",
+            "Connection": "keep-alive, x-remove-me",
+            "X-Remove-Me": "secret",
+            "X-Keep": "ok",
+        },
+    )
 
     assert res.status_code == 200
     assert res.data == b'{"ok":true}'
     # Ensure the upstream call targeted the configured backend base URL.
     assert mock_request.call_args.kwargs["url"] == "http://backend.test/api/widgets"
     assert dict(mock_request.call_args.kwargs["params"]) == {"limit": "5"}
+    forwarded_headers = {
+        key.lower(): value for key, value in mock_request.call_args.kwargs["headers"].items()
+    }
+    assert forwarded_headers["x-keep"] == "ok"
+    assert "cookie" not in forwarded_headers
+    assert "connection" not in forwarded_headers
+    assert "keep-alive" not in forwarded_headers
+    assert "x-remove-me" not in forwarded_headers
     # Flask should drop hop-by-hop headers from the upstream response.
     assert "transfer-encoding" not in res.headers
     # CORS header should be set by flask_cors, not forwarded from upstream.

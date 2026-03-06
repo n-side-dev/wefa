@@ -14,6 +14,42 @@ proxy_bp = Blueprint(
     description="Backend passthrough proxy endpoints.",
 )
 
+HOP_BY_HOP_REQUEST_HEADERS = {
+    "connection",
+    "keep-alive",
+    "proxy-connection",
+    "proxy-authenticate",
+    "proxy-authorization",
+    "te",
+    "trailer",
+    "transfer-encoding",
+    "upgrade",
+}
+SENSITIVE_REQUEST_HEADERS = {
+    "cookie",
+}
+
+
+def _build_upstream_headers() -> dict[str, str]:
+    """Filter incoming request headers before forwarding upstream."""
+    connection_header = request.headers.get("Connection", "")
+    connection_scoped_headers = {
+        header_name.strip().lower()
+        for header_name in connection_header.split(",")
+        if header_name.strip()
+    }
+    excluded_headers = (
+        HOP_BY_HOP_REQUEST_HEADERS
+        | SENSITIVE_REQUEST_HEADERS
+        | {"host"}
+        | connection_scoped_headers
+    )
+    return {
+        key: value
+        for key, value in request.headers
+        if key.lower() not in excluded_headers
+    }
+
 
 @proxy_bp.route(
     "/proxy/api/request/<path:rest_of_url>",
@@ -59,6 +95,7 @@ def proxy_request(rest_of_url: str):
 
     Behavior:
         - Handles CORS preflight by returning ``204`` on ``OPTIONS``.
+        - Removes sensitive/hop-by-hop request headers before forwarding upstream.
         - Injects bearer access token from session when available.
         - Retries once after token refresh when upstream returns
           ``401`` with ``invalid_token``.
@@ -67,7 +104,7 @@ def proxy_request(rest_of_url: str):
     print("-> /proxy/api/request/" + rest_of_url)
     settings = get_settings()
 
-    headers = {k: v for k, v in request.headers if k.lower() != "host"}
+    headers = _build_upstream_headers()
     payload = request.get_data()
 
     if "token" in session and "access_token" in session["token"]:
