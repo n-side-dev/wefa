@@ -97,46 +97,57 @@ def login_cb():
     :returns:
         Redirect response to the configured frontend URL.
     :rtype: flask.Response
-    :raises ValueError:
-        If required callback state information is missing.
     """
     print("-> /proxy/api/auth/callback")
     settings = get_settings()
 
+    request_state = request.args.get("state")
+    session_state = session.get("state")
+    authorization_code = request.args.get("code")
+    code_verifier = session.get("cv")
+
+    if not session_state or not request_state:
+        print("Missing OAuth state during callback")
+        session.clear()
+        return redirect(settings.frontend_redirect, code=302)
+    if request_state != session_state:
+        print("State mismatch")
+        session.clear()
+        return redirect(settings.frontend_redirect, code=302)
+    if not authorization_code or not code_verifier:
+        print("Missing authorization code or PKCE verifier during callback")
+        session.clear()
+        return redirect(settings.frontend_redirect, code=302)
+
+    print("State match !")
+    print("Performing Code Exchange")
+
+    client = OAuth2Session(
+        settings.oauth_client_id,
+        settings.oauth_client_secret,
+        scope=settings.oauth_oidc_scope,
+        code_challenge_method="S256",
+        redirect_uri=settings.oauth_login_redirect_uri,
+    )
+
+    authorization_response = request.url
+    print("Authorization Code : ", authorization_response)
+
     try:
-        if "state" not in session:
-            raise ValueError("State not found in cookie, cookie might be missing")
-        if "state" not in request.args:
-            raise ValueError("State not found in request arguments, incorrect request")
-        if request.args["state"] != session["state"]:
-            print("State mismatch")
-            return redirect(settings.frontend_redirect, code=302)
-
-        print("State match !")
-        print("Performing Code Exchange")
-
-        client = OAuth2Session(
-            settings.oauth_client_id,
-            settings.oauth_client_secret,
-            scope=settings.oauth_oidc_scope,
-            code_challenge_method="S256",
-            redirect_uri=settings.oauth_login_redirect_uri,
-        )
-
-        authorization_response = request.url
-        print("Authorization Code : ", authorization_response)
-
         token = client.fetch_token(
             settings.oauth_endpoint_token,
             authorization_response=authorization_response,
-            code_verifier=session["cv"],
+            code_verifier=code_verifier,
         )
-        session["token"] = token
-
-        return redirect(settings.frontend_redirect, code=302)
     except Exception as exc:
-        print(exc)
-        raise exc
+        print(f"Token exchange failed: {exc}")
+        session.clear()
+        return redirect(settings.frontend_redirect, code=302)
+
+    session["token"] = token
+    session.pop("cv", None)
+    session.pop("state", None)
+    return redirect(settings.frontend_redirect, code=302)
 
 
 @auth_bp.route("/logout", methods=["GET"])
