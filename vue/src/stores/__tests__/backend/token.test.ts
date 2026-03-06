@@ -42,19 +42,19 @@ describe('Token Backend Store', () => {
         {
           path: '/',
           name: 'home',
-          meta: { requiresAuth: false },
+          meta: { wefa: { title: 'Home', requiresAuth: false } },
           component: markRaw({ template: '<p>Component 1</p>' }),
         },
         {
           path: '/protected',
           name: 'protected',
-          meta: { requiresAuth: true },
+          meta: { wefa: { title: 'Protected', requiresAuth: true } },
           component: markRaw({ template: '<p>Component 1</p>' }),
         },
         {
           path: '/login',
           name: 'login',
-          meta: { requiresAuth: false },
+          meta: { wefa: { title: 'Login', requiresAuth: false } },
           component: markRaw({ template: '<p>Component 1</p>' }),
         },
       ],
@@ -66,7 +66,7 @@ describe('Token Backend Store', () => {
         _from: RouteLocationNormalized,
         next: NavigationGuardNext
       ) => {
-        const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
+        const requiresAuth = to.matched.some((record) => record.meta.wefa?.requiresAuth)
         const guestOnly = to.matched.some((record) => record.meta.guestOnly)
         // For routes that require authentication
         if (requiresAuth) {

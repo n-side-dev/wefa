@@ -10,7 +10,9 @@ import type { WeFaRouteRecordRaw } from './types'
 const login: WeFaRouteRecordRaw = {
   path: '/auth/login',
   name: 'authLogin',
-  meta: { title: 'Login', icon: 'pi pi-sign-in' },
+  meta: {
+    wefa: { title: 'Login', icon: 'pi pi-sign-in' },
+  },
   component: () => import('@/views/LoginView.vue'),
   props: { gdpr: true },
 }
@@ -18,7 +20,9 @@ const login: WeFaRouteRecordRaw = {
 const logout: WeFaRouteRecordRaw = {
   path: '/auth/logout',
   name: 'authLogout',
-  meta: { title: 'Logout', icon: 'pi pi-sign-out' },
+  meta: {
+    wefa: { title: 'Logout', icon: 'pi pi-sign-out' },
+  },
   component: () => import('@/views/LogoutView.vue'),
 }
 

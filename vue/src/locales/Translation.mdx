@@ -88,7 +88,7 @@ Use the `$t` function directly in `<template>` to access translations by key.
 <template>
   <nav>
     <a v-for="route in routes" :key="route.name" :href="route.path">
-      {{ $t(route.meta.title) }}
+      {{ $t(route.meta.wefa?.title) }}
     </a>
   </nav>
 </template>
@@ -102,7 +102,7 @@ const routes = route.matched
 
 - **Key**: Use `<category>.<key>` (e.g., `breadcrumb.home`).
 - **Example Output**: For `en`, `$t('breadcrumb.home')` renders `"Home"`; for `fr`, it renders `"Accueil"`.
-- **Note**: Ensure `route.meta.title` contains valid keys (e.g., `breadcrumb.home`) from your translation files.
+- **Note**: Ensure `route.meta.wefa.title` contains valid keys (e.g., `breadcrumb.home`) from your translation files.
 
 ### Using `t()` with `useI18nLib` in Script Setup
 
