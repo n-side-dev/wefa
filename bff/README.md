@@ -37,6 +37,9 @@ For more information on the BFF architecture, see:
 - `SESSION_COOKIE_HTTPONLY`
 - `SESSION_COOKIE_SECURE`
 - `SESSION_COOKIE_SAMESITE`
+- Optional values:
+- `BACKEND_CONNECT_TIMEOUT_SECONDS` (default: `3`)
+- `BACKEND_READ_TIMEOUT_SECONDS` (default: `30`)
 
 **Run Locally (Flask / PyCharm)**
 1. Ensure `.env` exists in the repo root.

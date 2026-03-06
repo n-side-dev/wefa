@@ -121,6 +121,10 @@ def proxy_request(rest_of_url: str):
             headers=headers,
             params=request.args,
             data=payload,
+            timeout=(
+                settings.backend_connect_timeout_seconds,
+                settings.backend_read_timeout_seconds,
+            ),
             allow_redirects=False,
         )
 

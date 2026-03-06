@@ -38,6 +38,7 @@ def test_proxy_request_forwards_to_backend(client, monkeypatch):
     # Ensure the upstream call targeted the configured backend base URL.
     assert mock_request.call_args.kwargs["url"] == "http://backend.test/api/widgets"
     assert dict(mock_request.call_args.kwargs["params"]) == {"limit": "5"}
+    assert mock_request.call_args.kwargs["timeout"] == (3.0, 30.0)
     forwarded_headers = {
         key.lower(): value for key, value in mock_request.call_args.kwargs["headers"].items()
     }
@@ -94,3 +95,7 @@ def test_proxy_request_retries_on_invalid_token(client, monkeypatch):
     assert res.status_code == 200
     assert res.data == b'{"ok":true}'
     assert mock_request.call_count == 2
+    first_call_timeout = mock_request.call_args_list[0].kwargs["timeout"]
+    second_call_timeout = mock_request.call_args_list[1].kwargs["timeout"]
+    assert first_call_timeout == (3.0, 30.0)
+    assert second_call_timeout == (3.0, 30.0)

@@ -68,3 +68,31 @@ def test_load_settings_from_env_returns_validated_settings(
     assert settings.oauth_endpoint_logout == "http://auth.test/logout"
     assert settings.oauth_login_redirect_uri == "http://app.test/proxy/api/auth/callback"
     assert settings.frontend_redirect == "http://frontend.test"
+    assert settings.backend_connect_timeout_seconds == 3.0
+    assert settings.backend_read_timeout_seconds == 30.0
+
+
+def test_load_settings_from_env_accepts_custom_backend_timeouts(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    _set_required_env(monkeypatch)
+    monkeypatch.setenv("BACKEND_CONNECT_TIMEOUT_SECONDS", "1.5")
+    monkeypatch.setenv("BACKEND_READ_TIMEOUT_SECONDS", "12")
+
+    settings = load_settings_from_env()
+
+    assert settings.backend_connect_timeout_seconds == 1.5
+    assert settings.backend_read_timeout_seconds == 12.0
+
+
+def test_load_settings_from_env_rejects_invalid_backend_timeouts(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    _set_required_env(monkeypatch)
+    monkeypatch.setenv("BACKEND_CONNECT_TIMEOUT_SECONDS", "0")
+
+    with pytest.raises(
+        SettingsValidationError,
+        match="BACKEND_CONNECT_TIMEOUT_SECONDS must be greater than 0",
+    ):
+        load_settings_from_env()

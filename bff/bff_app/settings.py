@@ -25,6 +25,34 @@ def _env_bool(name: str, default: bool) -> bool:
     return value.strip().lower() in {"1", "true", "yes", "on"}
 
 
+def _env_positive_float(name: str, default: float) -> float:
+    """Parse a positive float environment variable.
+
+    :param name: Environment variable name.
+    :param default: Value returned when the environment variable is absent.
+    :returns: Parsed positive float.
+    :rtype: float
+    :raises SettingsValidationError:
+        If the variable is present but not a strictly positive number.
+    """
+    value = os.getenv(name)
+    if value is None:
+        return default
+
+    try:
+        parsed = float(value)
+    except ValueError as exc:
+        raise SettingsValidationError(
+            f"{name} must be a positive number. Received: {value!r}"
+        ) from exc
+
+    if parsed <= 0:
+        raise SettingsValidationError(
+            f"{name} must be greater than 0. Received: {value!r}"
+        )
+    return parsed
+
+
 @dataclass(frozen=True)
 class BffSettings:
     """Immutable runtime settings used by endpoint handlers.
@@ -46,6 +74,10 @@ class BffSettings:
     :ivar oauth_endpoint_logout: OAuth logout endpoint URL.
     :ivar oauth_login_redirect_uri: Redirect URI handled by the BFF callback.
     :ivar frontend_redirect: Frontend URL used after login callback.
+    :ivar backend_connect_timeout_seconds:
+        Connect timeout in seconds for backend proxy requests.
+    :ivar backend_read_timeout_seconds:
+        Read timeout in seconds for backend proxy requests.
     """
     flask_secret_key: str
     session_cookie_name: str
@@ -64,6 +96,8 @@ class BffSettings:
     oauth_endpoint_logout: str
     oauth_login_redirect_uri: str
     frontend_redirect: str
+    backend_connect_timeout_seconds: float = 3.0
+    backend_read_timeout_seconds: float = 30.0
 
 
 REQUIRED_ENV_VARS: tuple[str, ...] = (
@@ -135,4 +169,12 @@ def load_settings_from_env() -> BffSettings:
         oauth_endpoint_logout=raw_env["OAUTH_ENDPOINT_LOGOUT"],
         oauth_login_redirect_uri=raw_env["OAUTH_LOGIN_REDIRECT_URI"],
         frontend_redirect=raw_env["FRONTEND_REDIRECT"],
+        backend_connect_timeout_seconds=_env_positive_float(
+            "BACKEND_CONNECT_TIMEOUT_SECONDS",
+            3.0,
+        ),
+        backend_read_timeout_seconds=_env_positive_float(
+            "BACKEND_READ_TIMEOUT_SECONDS",
+            30.0,
+        ),
     )
