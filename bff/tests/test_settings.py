@@ -10,10 +10,6 @@ def _set_required_env(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("SESSION_COOKIE_HTTPONLY", "True")
     monkeypatch.setenv("SESSION_COOKIE_SECURE", "False")
     monkeypatch.setenv("SESSION_COOKIE_SAMESITE", "Lax")
-    monkeypatch.setenv(
-        "SESSION_TOKEN_ENCRYPTION_KEY",
-        "J5a6gijR8f2m6fRgvM_6DULYveoxW48UUfGzSy0RKZg=",
-    )
     monkeypatch.setenv("CORS_ALLOWED_ORIGIN", "http://frontend.test")
     monkeypatch.setenv("BACKEND_ENDPOINT", "http://backend.test/api")
     monkeypatch.setenv("OAUTH_CLIENT_ID", "client-id")
@@ -61,7 +57,6 @@ def test_load_settings_from_env_returns_validated_settings(
     assert settings.session_cookie_httponly is True
     assert settings.session_cookie_secure is False
     assert settings.session_cookie_samesite == "Lax"
-    assert settings.session_token_encryption_key == "J5a6gijR8f2m6fRgvM_6DULYveoxW48UUfGzSy0RKZg="
     assert settings.cors_allowed_origin == "http://frontend.test"
     assert settings.backend_endpoint == "http://backend.test/api"
     assert settings.oauth_client_id == "client-id"
@@ -99,18 +94,5 @@ def test_load_settings_from_env_rejects_invalid_backend_timeouts(
     with pytest.raises(
         SettingsValidationError,
         match="BACKEND_CONNECT_TIMEOUT_SECONDS must be greater than 0",
-    ):
-        load_settings_from_env()
-
-
-def test_load_settings_from_env_rejects_invalid_encryption_key(
-    monkeypatch: pytest.MonkeyPatch,
-):
-    _set_required_env(monkeypatch)
-    monkeypatch.setenv("SESSION_TOKEN_ENCRYPTION_KEY", "not-a-fernet-key")
-
-    with pytest.raises(
-        SettingsValidationError,
-        match="SESSION_TOKEN_ENCRYPTION_KEY must be a valid Fernet key",
     ):
         load_settings_from_env()

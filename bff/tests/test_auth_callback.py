@@ -1,7 +1,6 @@
 from unittest.mock import MagicMock
 
 from bff_app.routes import auth as auth_routes
-from bff_app.services import auth as auth_service
 
 
 def _fake_oauth_session(state="state-123", token=None):
@@ -32,8 +31,7 @@ def test_login_callback_exchanges_code_and_redirects(client, monkeypatch):
 
     # Token should be saved to the session after the code exchange.
     with client.session_transaction() as sess:
-        assert sess["token"]["access_token"] != "tok"
-        assert sess["token"]["access_token"].startswith(auth_service.ENCRYPTED_TOKEN_PREFIX)
+        assert sess["token"]["access_token"] == "tok"
         assert "state" not in sess
         assert "cv" not in sess
 

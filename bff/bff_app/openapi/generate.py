@@ -31,7 +31,6 @@ def _spec_settings() -> BffSettings:
         oauth_endpoint_logout="http://auth.example/logout",
         oauth_login_redirect_uri="http://localhost:5022/proxy/api/auth/callback",
         frontend_redirect="http://localhost:5178",
-        session_token_encryption_key="J5a6gijR8f2m6fRgvM_6DULYveoxW48UUfGzSy0RKZg=",
     )
 
 

@@ -21,10 +21,6 @@ def app(monkeypatch):
     monkeypatch.setenv("SESSION_COOKIE_HTTPONLY", "True")
     monkeypatch.setenv("SESSION_COOKIE_SECURE", "False")
     monkeypatch.setenv("SESSION_COOKIE_SAMESITE", "Lax")
-    monkeypatch.setenv(
-        "SESSION_TOKEN_ENCRYPTION_KEY",
-        "J5a6gijR8f2m6fRgvM_6DULYveoxW48UUfGzSy0RKZg=",
-    )
     monkeypatch.setenv("CORS_ALLOWED_ORIGIN", "http://example.test")
 
     # Backend proxy configuration

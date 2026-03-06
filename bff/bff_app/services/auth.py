@@ -5,13 +5,9 @@ from __future__ import annotations
 from typing import Any, Mapping
 
 import requests
-from cryptography.fernet import Fernet, InvalidToken
 from flask import current_app, session
 
 from bff_app.settings import BffSettings
-
-ENCRYPTED_TOKEN_PREFIX = "enc::"
-SENSITIVE_TOKEN_FIELDS = frozenset({"access_token", "refresh_token"})
 
 
 def get_settings() -> BffSettings:
@@ -23,57 +19,24 @@ def get_settings() -> BffSettings:
     return current_app.extensions["bff_settings"]
 
 
-def _get_token_cipher() -> Fernet:
-    """Build Fernet cipher from configured token encryption key."""
-    settings = get_settings()
-    return Fernet(settings.session_token_encryption_key.encode("utf-8"))
-
-
 def store_session_token(token: Mapping[str, Any]) -> None:
-    """Store OAuth token payload in session with encrypted sensitive fields."""
-    cipher = _get_token_cipher()
-    encrypted_token = dict(token)
-    for field in SENSITIVE_TOKEN_FIELDS:
-        value = encrypted_token.get(field)
-        if isinstance(value, str):
-            encrypted = cipher.encrypt(value.encode("utf-8")).decode("utf-8")
-            encrypted_token[field] = f"{ENCRYPTED_TOKEN_PREFIX}{encrypted}"
-    session["token"] = encrypted_token
+    """Store OAuth token payload in the signed Flask session cookie."""
+    session["token"] = dict(token)
 
 
 def get_session_token() -> dict[str, Any] | None:
-    """Return OAuth token payload from session with sensitive fields decrypted."""
+    """Return OAuth token payload from the signed Flask session cookie."""
     raw_token = session.get("token")
-    if not isinstance(raw_token, Mapping):
-        return None
+    if isinstance(raw_token, Mapping):
+        return dict(raw_token)
 
-    token = dict(raw_token)
-    cipher = _get_token_cipher()
-    for field in SENSITIVE_TOKEN_FIELDS:
-        value = token.get(field)
-        if value is None:
-            continue
-        if not isinstance(value, str):
-            current_app.logger.warning(
-                "Session token field %s has unexpected type %s",
-                field,
-                type(value).__name__,
-            )
-            session.clear()
-            return None
-        if not value.startswith(ENCRYPTED_TOKEN_PREFIX):
-            # Backward compatibility for pre-encryption sessions.
-            continue
-
-        encrypted_value = value.removeprefix(ENCRYPTED_TOKEN_PREFIX)
-        try:
-            token[field] = cipher.decrypt(encrypted_value.encode("utf-8")).decode("utf-8")
-        except InvalidToken:
-            current_app.logger.warning("Failed to decrypt session token field %s", field)
-            session.clear()
-            return None
-
-    return token
+    if raw_token is not None:
+        current_app.logger.warning(
+            "Session token payload has unexpected type %s",
+            type(raw_token).__name__,
+        )
+        session.pop("token", None)
+    return None
 
 
 def refresh_access_token() -> bool:

@@ -37,7 +37,6 @@ For more information on the BFF architecture, see:
 - `SESSION_COOKIE_HTTPONLY`
 - `SESSION_COOKIE_SECURE`
 - `SESSION_COOKIE_SAMESITE`
-- `SESSION_TOKEN_ENCRYPTION_KEY` (Fernet key used to encrypt access/refresh tokens in the session cookie)
 - Optional values:
 - `BACKEND_CONNECT_TIMEOUT_SECONDS` (default: `3`)
 - `BACKEND_READ_TIMEOUT_SECONDS` (default: `30`)
@@ -76,6 +75,7 @@ docker-compose up --build
 
 **Security Notes**
 - Tokens, PKCE verifier, and OAuth state are stored in Flask's signed session cookie.
+- Flask signs the cookie to prevent tampering, but cookie contents are not encrypted by default.
 - This service does not currently configure Flask-Session/Redis-backed server-side session storage.
 - Keep `SESSION_COOKIE_SECURE=True` and `SESSION_COOKIE_SAMESITE=Strict` in production.
 
