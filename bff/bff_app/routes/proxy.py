@@ -6,7 +6,15 @@ import requests
 from flask import Response, current_app, request
 from flask_smorest import Blueprint
 
-from bff_app.services.auth import get_session_token, get_settings, refresh_access_token
+from bff_app.services.auth import (
+    clear_session_token,
+    get_session_token,
+    get_settings,
+    has_session_token_cookie,
+    refresh_access_token,
+    store_session_token,
+)
+from bff_app.services.token_cookies import TokenCookieTooLargeError
 
 proxy_bp = Blueprint(
     "proxy",
@@ -96,7 +104,7 @@ def proxy_request(rest_of_url: str):
     Behavior:
         - Handles CORS preflight by returning ``204`` on ``OPTIONS``.
         - Removes sensitive/hop-by-hop request headers before forwarding upstream.
-        - Injects bearer access token from session when available.
+        - Injects bearer access token from encrypted auth cookies when available.
         - Retries once after token refresh when upstream returns
           ``401`` with ``invalid_token``.
         - Drops hop-by-hop and duplicate CORS headers from upstream response.
@@ -107,12 +115,18 @@ def proxy_request(rest_of_url: str):
     headers = _build_upstream_headers()
     payload = request.get_data()
 
+    has_token_cookie = has_session_token_cookie()
+    should_clear_token_cookies = False
+    refreshed_token: dict[str, object] | None = None
+
     session_token = get_session_token()
     if session_token and "access_token" in session_token:
         headers["Authorization"] = f"Bearer {session_token['access_token']}"
     else:
+        if has_token_cookie:
+            should_clear_token_cookies = True
         current_app.logger.warning(
-            "Access token missing in session for proxied request: %s",
+            "Access token missing in auth cookies for proxied request: %s",
             rest_of_url,
         )
 
@@ -136,14 +150,15 @@ def proxy_request(rest_of_url: str):
         response = forward_request()
     except requests.exceptions.RequestException as exc:
         current_app.logger.warning("REST proxy error for %s: %s", rest_of_url, exc)
-        return Response("Upstream connection error", status=502)
+        failed_response = Response("Upstream connection error", status=502)
+        if should_clear_token_cookies:
+            clear_session_token(failed_response)
+        return failed_response
 
     www_authenticate = response.headers.get("www-authenticate", "")
     if response.status_code == 401 and "invalid_token" in www_authenticate:
-        if refresh_access_token():
-            refreshed_token = get_session_token()
-            if not refreshed_token or "access_token" not in refreshed_token:
-                return Response("Upstream connection error", status=502)
+        refreshed_token = refresh_access_token()
+        if refreshed_token and "access_token" in refreshed_token:
             headers["Authorization"] = f"Bearer {refreshed_token['access_token']}"
             try:
                 response = forward_request()
@@ -153,7 +168,11 @@ def proxy_request(rest_of_url: str):
                     rest_of_url,
                     exc,
                 )
-                return Response("Upstream connection error", status=502)
+                failed_response = Response("Upstream connection error", status=502)
+                clear_session_token(failed_response)
+                return failed_response
+        else:
+            should_clear_token_cookies = has_token_cookie
 
     excluded_headers = [
         "transfer-encoding",
@@ -165,4 +184,22 @@ def proxy_request(rest_of_url: str):
         if k.lower() not in excluded_headers
     ]
 
-    return Response(response.content, response.status_code, filtered_headers)
+    proxied_response = Response(response.content, response.status_code, filtered_headers)
+
+    if refreshed_token:
+        try:
+            store_session_token(proxied_response, refreshed_token)
+        except TokenCookieTooLargeError as exc:
+            current_app.logger.warning(
+                "Refreshed token cookie %s exceeds browser size budget (%s bytes)",
+                exc.cookie_name,
+                exc.cookie_size_bytes,
+            )
+            unauthorized_response = Response("Unauthorized", status=401)
+            clear_session_token(unauthorized_response)
+            return unauthorized_response
+
+    if should_clear_token_cookies:
+        clear_session_token(proxied_response)
+
+    return proxied_response

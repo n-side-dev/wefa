@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import base64
+import binascii
 import os
 from dataclasses import dataclass
 from typing import Mapping
@@ -53,11 +55,36 @@ def _env_positive_float(name: str, default: float) -> float:
     return parsed
 
 
+def _env_base64url_32_bytes(name: str) -> bytes:
+    """Parse a URL-safe base64 encoded 32-byte key from env."""
+    value = os.getenv(name)
+    if value is None or not value.strip():
+        raise SettingsValidationError(f"{name} must be set to a base64url-encoded key")
+
+    normalized = value.strip()
+    padding = "=" * (-len(normalized) % 4)
+    try:
+        decoded = base64.urlsafe_b64decode(normalized + padding)
+    except (binascii.Error, ValueError) as exc:
+        raise SettingsValidationError(
+            f"{name} must be a valid base64url-encoded value"
+        ) from exc
+
+    if len(decoded) != 32:
+        raise SettingsValidationError(
+            f"{name} must decode to exactly 32 bytes; got {len(decoded)} bytes"
+        )
+
+    return decoded
+
+
 @dataclass(frozen=True)
 class BffSettings:
     """Immutable runtime settings used by endpoint handlers.
 
     :ivar flask_secret_key: Secret key used to sign the Flask session cookie.
+    :ivar token_cookie_encryption_key:
+        Base64url-decoded 32-byte key used to encrypt token cookies.
     :ivar session_cookie_name: Name of the session cookie.
     :ivar session_cookie_path: Path scope of the session cookie.
     :ivar session_cookie_httponly: Whether JavaScript access to the cookie is disabled.
@@ -80,6 +107,7 @@ class BffSettings:
         Read timeout in seconds for backend proxy requests.
     """
     flask_secret_key: str
+    token_cookie_encryption_key: bytes
     session_cookie_name: str
     session_cookie_path: str
     session_cookie_httponly: bool
@@ -102,6 +130,7 @@ class BffSettings:
 
 REQUIRED_ENV_VARS: tuple[str, ...] = (
     "FLASK_SECRET_KEY",
+    "TOKEN_COOKIE_ENCRYPTION_KEY",
     "SESSION_COOKIE_NAME",
     "SESSION_COOKIE_PATH",
     "SESSION_COOKIE_HTTPONLY",
@@ -153,6 +182,9 @@ def load_settings_from_env() -> BffSettings:
 
     return BffSettings(
         flask_secret_key=raw_env["FLASK_SECRET_KEY"],
+        token_cookie_encryption_key=_env_base64url_32_bytes(
+            "TOKEN_COOKIE_ENCRYPTION_KEY"
+        ),
         session_cookie_name=raw_env["SESSION_COOKIE_NAME"],
         session_cookie_path=os.getenv("SESSION_COOKIE_PATH", "/"),
         session_cookie_httponly=_env_bool("SESSION_COOKIE_HTTPONLY", True),

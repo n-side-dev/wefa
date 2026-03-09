@@ -28,8 +28,8 @@ paths:
         '302':
           description: Redirects to frontend after successful or failed state check.
       summary: OAuth callback
-      description: Exchanges the authorization code for tokens and stores them in
-        the session.
+      description: Exchanges the authorization code for tokens and stores encrypted
+        token cookies.
       tags:
       - auth
   /proxy/api/auth/logout:
@@ -341,8 +341,8 @@ components:
     sessionCookie:
       type: apiKey
       in: cookie
-      name: SESSION_COOKIE_NAME
-      description: Signed session cookie name is configured at runtime via SESSION_COOKIE_NAME
-        in the app environment.
+      name: SESSION_COOKIE_NAME_at
+      description: Authentication uses encrypted token cookies with suffixes (_at,
+        _rt, _it, _meta) derived from SESSION_COOKIE_NAME.
 servers:
 - url: /

@@ -6,13 +6,17 @@ import requests
 from bff_app.routes import auth as auth_routes
 
 
-def test_logout_revokes_tokens_and_clears_session(client, monkeypatch):
+def test_logout_revokes_tokens_and_clears_session(
+    client,
+    monkeypatch,
+    set_auth_cookies,
+    build_token_payload,
+):
     # Mock the auth server logout call.
     mock_post = MagicMock(return_value=SimpleNamespace(status_code=200))
     monkeypatch.setattr(auth_routes.requests, "post", mock_post)
 
-    with client.session_transaction() as sess:
-        sess["token"] = {"id_token": "id-token"}
+    set_auth_cookies(client, build_token_payload(id_token="id-token"))
 
     res = client.get("/proxy/api/auth/logout")
 
@@ -44,12 +48,16 @@ def test_logout_without_token_still_clears_session(client, monkeypatch):
         assert len(sess.keys()) == 0
 
 
-def test_logout_handles_upstream_timeout_and_still_clears_session(client, monkeypatch):
+def test_logout_handles_upstream_timeout_and_still_clears_session(
+    client,
+    monkeypatch,
+    set_auth_cookies,
+    build_token_payload,
+):
     mock_post = MagicMock(side_effect=requests.exceptions.Timeout("timeout"))
     monkeypatch.setattr(auth_routes.requests, "post", mock_post)
 
-    with client.session_transaction() as sess:
-        sess["token"] = {"id_token": "id-token"}
+    set_auth_cookies(client, build_token_payload(id_token="id-token"))
 
     res = client.get("/proxy/api/auth/logout")
 

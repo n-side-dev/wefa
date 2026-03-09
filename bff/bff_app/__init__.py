@@ -46,10 +46,10 @@ def create_app(settings: BffSettings) -> Flask:
         {
             "type": "apiKey",
             "in": "cookie",
-            "name": "SESSION_COOKIE_NAME",
+            "name": f"{settings.session_cookie_name}_at",
             "description": (
-                "Signed session cookie name is configured at runtime via "
-                "SESSION_COOKIE_NAME in the app environment."
+                "Authentication uses encrypted token cookies with suffixes "
+                "(_at, _rt, _it, _meta) derived from SESSION_COOKIE_NAME."
             ),
         },
     )

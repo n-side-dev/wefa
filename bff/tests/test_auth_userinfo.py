@@ -6,7 +6,12 @@ import requests
 from bff_app.routes import auth as auth_routes
 
 
-def test_userinfo_proxies_to_auth_server(client, monkeypatch):
+def test_userinfo_proxies_to_auth_server(
+    client,
+    monkeypatch,
+    set_auth_cookies,
+    build_token_payload,
+):
     # Mock userinfo response from auth server.
     mock_get = MagicMock(
         return_value=SimpleNamespace(
@@ -16,8 +21,7 @@ def test_userinfo_proxies_to_auth_server(client, monkeypatch):
     )
     monkeypatch.setattr(auth_routes.requests, "get", mock_get)
 
-    with client.session_transaction() as sess:
-        sess["token"] = {"access_token": "access-token"}
+    set_auth_cookies(client, build_token_payload())
 
     res = client.get("/proxy/api/auth/userinfo")
 
@@ -38,12 +42,16 @@ def test_userinfo_missing_session_token_returns_401(client, monkeypatch):
     mock_get.assert_not_called()
 
 
-def test_userinfo_handles_upstream_request_errors(client, monkeypatch):
+def test_userinfo_handles_upstream_request_errors(
+    client,
+    monkeypatch,
+    set_auth_cookies,
+    build_token_payload,
+):
     mock_get = MagicMock(side_effect=requests.exceptions.Timeout("timeout"))
     monkeypatch.setattr(auth_routes.requests, "get", mock_get)
 
-    with client.session_transaction() as sess:
-        sess["token"] = {"access_token": "access-token"}
+    set_auth_cookies(client, build_token_payload())
 
     res = client.get("/proxy/api/auth/userinfo")
 
@@ -51,7 +59,12 @@ def test_userinfo_handles_upstream_request_errors(client, monkeypatch):
     assert res.get_json() == {"message": "Upstream connection error"}
 
 
-def test_userinfo_clears_session_on_upstream_401(client, monkeypatch):
+def test_userinfo_clears_session_on_upstream_401(
+    client,
+    monkeypatch,
+    set_auth_cookies,
+    build_token_payload,
+):
     mock_get = MagicMock(
         return_value=SimpleNamespace(
             status_code=401,
@@ -60,12 +73,14 @@ def test_userinfo_clears_session_on_upstream_401(client, monkeypatch):
     )
     monkeypatch.setattr(auth_routes.requests, "get", mock_get)
 
-    with client.session_transaction() as sess:
-        sess["token"] = {"access_token": "access-token"}
+    set_auth_cookies(client, build_token_payload())
 
     res = client.get("/proxy/api/auth/userinfo")
 
     assert res.status_code == 401
     assert res.get_json() == {"message": "Unauthorized"}
-    with client.session_transaction() as sess:
-        assert "token" not in sess
+    set_cookie_headers = res.headers.getlist("Set-Cookie")
+    assert any(header.startswith("test-session_at=;") for header in set_cookie_headers)
+    assert any(header.startswith("test-session_rt=;") for header in set_cookie_headers)
+    assert any(header.startswith("test-session_it=;") for header in set_cookie_headers)
+    assert any(header.startswith("test-session_meta=;") for header in set_cookie_headers)

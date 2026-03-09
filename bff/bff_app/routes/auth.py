@@ -2,18 +2,23 @@
 
 from __future__ import annotations
 
-import requests
 import secrets
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
+
+import requests
 from authlib.integrations.requests_client import OAuth2Session
 from flask import current_app, jsonify, redirect, request, session
 from flask_smorest import Blueprint
 
 from bff_app.services.auth import (
+    clear_session_token,
     get_session_token,
     get_settings,
+    has_session_token_cookie,
     refresh_access_token,
     store_session_token,
 )
+from bff_app.services.token_cookies import TokenCookieTooLargeError
 
 auth_bp = Blueprint(
     "auth",
@@ -21,6 +26,33 @@ auth_bp = Blueprint(
     description="Authentication endpoints for login, callback, logout and session checks.",
     url_prefix="/proxy/api/auth",
 )
+
+
+def _build_redirect_with_error(frontend_redirect: str, error_code: str) -> str:
+    """Append deterministic error query parameter to the frontend redirect URL."""
+    parsed = urlsplit(frontend_redirect)
+    query_items = [
+        (key, value)
+        for key, value in parse_qsl(parsed.query, keep_blank_values=True)
+        if key != "error"
+    ]
+    query_items.append(("error", error_code))
+
+    return urlunsplit(
+        (
+            parsed.scheme,
+            parsed.netloc,
+            parsed.path,
+            urlencode(query_items),
+            parsed.fragment,
+        )
+    )
+
+
+def _clear_auth_state(response: object) -> None:
+    """Clear both Flask session state and encrypted auth token cookies."""
+    session.clear()
+    clear_session_token(response)
 
 
 @auth_bp.route("/login", methods=["GET"])
@@ -82,7 +114,7 @@ def login():
 @auth_bp.route("/callback", methods=["GET"])
 @auth_bp.doc(
     summary="OAuth callback",
-    description="Exchanges the authorization code for tokens and stores them in the session.",
+    description="Exchanges the authorization code for tokens and stores encrypted token cookies.",
     responses={
         "302": {
             "description": "Redirects to frontend after successful or failed state check."
@@ -96,8 +128,8 @@ def login_cb():
         ``state`` and ``code`` as returned by the OAuth provider.
 
     Side effects:
-        Validates CSRF ``state`` and writes token payload to
-        ``session["token"]`` on success.
+        Validates CSRF ``state`` and writes token payload to encrypted
+        HttpOnly cookies on success.
 
     :returns:
         Redirect response to the configured frontend URL.
@@ -113,18 +145,21 @@ def login_cb():
 
     if not session_state or not request_state:
         current_app.logger.warning("Missing OAuth state during callback")
-        session.clear()
-        return redirect(settings.frontend_redirect, code=302)
+        response = redirect(settings.frontend_redirect, code=302)
+        _clear_auth_state(response)
+        return response
     if request_state != session_state:
         current_app.logger.warning("OAuth callback state mismatch")
-        session.clear()
-        return redirect(settings.frontend_redirect, code=302)
+        response = redirect(settings.frontend_redirect, code=302)
+        _clear_auth_state(response)
+        return response
     if not authorization_code or not code_verifier:
         current_app.logger.warning(
             "Missing authorization code or PKCE verifier during callback"
         )
-        session.clear()
-        return redirect(settings.frontend_redirect, code=302)
+        response = redirect(settings.frontend_redirect, code=302)
+        _clear_auth_state(response)
+        return response
 
     current_app.logger.debug("OAuth callback state validated")
     current_app.logger.debug("Performing OAuth code exchange")
@@ -148,13 +183,34 @@ def login_cb():
         )
     except Exception as exc:
         current_app.logger.warning("OAuth token exchange failed: %s", exc)
-        session.clear()
-        return redirect(settings.frontend_redirect, code=302)
+        response = redirect(settings.frontend_redirect, code=302)
+        _clear_auth_state(response)
+        return response
 
-    store_session_token(token)
+    response = redirect(settings.frontend_redirect, code=302)
+    try:
+        store_session_token(response, token)
+    except TokenCookieTooLargeError as exc:
+        current_app.logger.warning(
+            "OAuth callback token cookie %s exceeds browser size budget (%s bytes)",
+            exc.cookie_name,
+            exc.cookie_size_bytes,
+        )
+        error_redirect = _build_redirect_with_error(
+            settings.frontend_redirect,
+            "auth_cookie_too_large",
+        )
+        response = redirect(error_redirect, code=302)
+        _clear_auth_state(response)
+        return response
+    except ValueError as exc:
+        current_app.logger.warning("OAuth token payload is invalid: %s", exc)
+        _clear_auth_state(response)
+        return response
+
     session.pop("cv", None)
     session.pop("state", None)
-    return redirect(settings.frontend_redirect, code=302)
+    return response
 
 
 @auth_bp.route("/logout", methods=["GET"])
@@ -208,10 +264,13 @@ def logout():
         except requests.exceptions.RequestException as exc:
             current_app.logger.warning("Logout request failed: %s", exc)
     else:
-        current_app.logger.debug("No id_token in session; skipping upstream logout call")
+        current_app.logger.debug(
+            "No id_token in token cookies; skipping upstream logout call"
+        )
 
-    session.clear()
-    return jsonify({"message": "logout successful"})
+    response = jsonify({"message": "logout successful"})
+    _clear_auth_state(response)
+    return response
 
 
 @auth_bp.route("/userinfo", methods=["GET"])
@@ -267,20 +326,26 @@ def auth_userinfo():
     """Proxy the OAuth userinfo endpoint for the authenticated session.
 
     Requires:
-        ``session["token"]["access_token"]`` to be present.
+        ``access_token`` to be present in encrypted auth cookies.
 
     :returns:
         JSON object returned by the upstream userinfo endpoint.
-    :rtype: dict
+    :rtype: flask.Response
     """
     current_app.logger.debug("Handling /proxy/api/auth/userinfo")
     settings = get_settings()
 
     token = get_session_token()
+    has_token_cookie = has_session_token_cookie()
+
     access_token = token.get("access_token") if isinstance(token, dict) else None
     if not access_token:
+        response = jsonify({"message": "Unauthorized"})
+        response.status_code = 401
         session.clear()
-        return jsonify({"message": "Unauthorized"}), 401
+        if has_token_cookie:
+            clear_session_token(response)
+        return response
 
     try:
         userinfo = requests.get(
@@ -296,8 +361,10 @@ def auth_userinfo():
         return jsonify({"message": "Upstream connection error"}), 502
 
     if userinfo.status_code in {401, 403}:
-        session.clear()
-        return jsonify({"message": "Unauthorized"}), userinfo.status_code
+        response = jsonify({"message": "Unauthorized"})
+        response.status_code = userinfo.status_code
+        _clear_auth_state(response)
+        return response
 
     if userinfo.status_code != 200:
         current_app.logger.warning(
@@ -340,7 +407,7 @@ def check_session():
         1. Call the userinfo endpoint with the stored access token.
         2. If token is invalid, attempt refresh via refresh token.
         3. Re-check userinfo after successful refresh.
-        4. Clear session when no valid auth state remains.
+        4. Clear auth state when no valid auth state remains.
 
     :returns:
         JSON object containing ``{"session": <bool>}``.
@@ -349,7 +416,9 @@ def check_session():
     current_app.logger.debug("Handling /proxy/api/auth/session")
     settings = get_settings()
 
+    has_token_cookie = has_session_token_cookie()
     is_valid_session = False
+    refreshed_token: dict[str, object] | None = None
 
     token = get_session_token()
     if token and "access_token" in token:
@@ -362,22 +431,39 @@ def check_session():
             ),
         )
         is_valid_session = userinfo.status_code == 200
-        if not is_valid_session and refresh_access_token():
-            refreshed_token = get_session_token()
-            if not refreshed_token or "access_token" not in refreshed_token:
-                session.clear()
-                return jsonify({"session": False})
-            userinfo = requests.get(
-                settings.oauth_endpoint_userinfo,
-                headers={"Authorization": f"Bearer {refreshed_token['access_token']}"},
-                timeout=(
-                    settings.backend_connect_timeout_seconds,
-                    settings.backend_read_timeout_seconds,
-                ),
+        if not is_valid_session:
+            refreshed_token = refresh_access_token()
+            if refreshed_token and "access_token" in refreshed_token:
+                userinfo = requests.get(
+                    settings.oauth_endpoint_userinfo,
+                    headers={
+                        "Authorization": f"Bearer {refreshed_token['access_token']}"
+                    },
+                    timeout=(
+                        settings.backend_connect_timeout_seconds,
+                        settings.backend_read_timeout_seconds,
+                    ),
+                )
+                is_valid_session = userinfo.status_code == 200
+
+    response = jsonify({"session": is_valid_session})
+
+    if is_valid_session and refreshed_token:
+        try:
+            store_session_token(response, refreshed_token)
+        except TokenCookieTooLargeError as exc:
+            current_app.logger.warning(
+                "Refreshed token cookie %s exceeds browser size budget (%s bytes)",
+                exc.cookie_name,
+                exc.cookie_size_bytes,
             )
-            is_valid_session = userinfo.status_code == 200
+            response = jsonify({"session": False})
+            _clear_auth_state(response)
+            return response
 
     if not is_valid_session:
         session.clear()
+        if has_token_cookie:
+            clear_session_token(response)
 
-    return jsonify({"session": is_valid_session})
+    return response

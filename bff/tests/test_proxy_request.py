@@ -5,7 +5,12 @@ from bff_app.routes import proxy as proxy_routes
 from bff_app.services import auth as auth_service
 
 
-def test_proxy_request_forwards_to_backend(client, monkeypatch):
+def test_proxy_request_forwards_to_backend(
+    client,
+    monkeypatch,
+    set_auth_cookies,
+    build_token_payload,
+):
     # Mock backend response so we avoid a real HTTP call.
     backend_response = SimpleNamespace(
         content=b'{"ok":true}',
@@ -19,8 +24,7 @@ def test_proxy_request_forwards_to_backend(client, monkeypatch):
     mock_request = MagicMock(return_value=backend_response)
     monkeypatch.setattr(proxy_routes.requests, "request", mock_request)
 
-    with client.session_transaction() as sess:
-        sess["token"] = {"access_token": "access-token"}
+    set_auth_cookies(client, build_token_payload())
 
     res = client.post(
         "/proxy/api/request/widgets?limit=5",
@@ -59,7 +63,12 @@ def test_proxy_request_options_short_circuits(client):
     assert res.status_code == 204
 
 
-def test_proxy_request_retries_on_invalid_token(client, monkeypatch):
+def test_proxy_request_retries_on_invalid_token(
+    client,
+    monkeypatch,
+    set_auth_cookies,
+    build_token_payload,
+):
     backend_response = SimpleNamespace(
         content=b'{"ok":true}',
         status_code=200,
@@ -84,11 +93,13 @@ def test_proxy_request_retries_on_invalid_token(client, monkeypatch):
     ))
     monkeypatch.setattr(auth_service.requests, "post", mock_post)
 
-    with client.session_transaction() as sess:
-        sess["token"] = {
-            "access_token": "access-token",
-            "refresh_token": "refresh-token",
-        }
+    set_auth_cookies(
+        client,
+        build_token_payload(
+            access_token="access-token",
+            refresh_token="refresh-token",
+        ),
+    )
 
     res = client.get("/proxy/api/request/widgets")
 

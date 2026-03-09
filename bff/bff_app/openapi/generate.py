@@ -15,6 +15,7 @@ def _spec_settings() -> BffSettings:
     """Build deterministic settings for spec export."""
     return BffSettings(
         flask_secret_key="openapi-generator",
+        token_cookie_encryption_key=b"0123456789abcdef0123456789abcdef",
         session_cookie_name="SESSION_COOKIE_NAME",
         session_cookie_path="/",
         session_cookie_httponly=True,
