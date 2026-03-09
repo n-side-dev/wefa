@@ -14,7 +14,7 @@
       </Transition>
       <div
         :class="[isExactActive ? 'bg-zinc-500/5' : '']"
-        class="flex w-full items-center rounded-lg cursor-pointer text-base px-2 py-2 5 gap-3 hover:bg-zinc-950/5"
+        class="flex w-full items-center rounded-lg cursor-pointer text-base px-2 py-2 gap-3 hover:bg-zinc-950/5"
         @click="emitNavigationClick"
       >
         <i v-if="icon" class="pi" :class="icon" style="font-size: 1.5rem"></i>
