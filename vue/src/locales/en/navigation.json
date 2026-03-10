@@ -5,5 +5,7 @@
   "signout": "Sign Out",
   "account": "Account",
   "profile": "Profile",
-  "settings": "Settings"
+  "settings": "Settings",
+  "open_navigation_menu": "Open navigation menu",
+  "open_user_menu_for": "Open user menu for {username}"
 }

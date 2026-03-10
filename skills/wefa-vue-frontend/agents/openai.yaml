@@ -1,0 +1,4 @@
+interface:
+  display_name: "Wefa Vue Frontend"
+  short_description: "Apply WeFa Vue frontend implementation and quality rules"
+  default_prompt: "Use this skill to implement or review changes in the vue workspace following WeFa frontend standards."
