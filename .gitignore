@@ -5,3 +5,4 @@
 *.iml
 django/docs/source/api/*
 django/docs/output/**/*
+.env

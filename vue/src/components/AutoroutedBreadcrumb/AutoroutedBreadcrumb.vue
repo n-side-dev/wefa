@@ -6,7 +6,7 @@
           :href="href"
           v-bind="props.action"
           role="link"
-          class="flex flex-row gap-1"
+          class="flex flex-row gap-1 items-center"
           @click="navigate"
         >
           <span v-if="item.icon" :class="[item.icon, 'text-color']" />
@@ -65,31 +65,41 @@ const matchedRoutes: ComputedRef<RouteLocationMatched[]> = computed(() => {
  */
 const items: ComputedRef<AutoroutedBreadcrumbItem[]> = computed(() => {
   // matchedRoutes are already ordered from parent to child
-  return matchedRoutes.value.map((route) => {
-    const meta = route.meta || {}
+  const dedupedRoutes = matchedRoutes.value.reduce<RouteLocationMatched[]>((acc, route) => {
+    const lastRoute = acc[acc.length - 1]
+    if (lastRoute && lastRoute.path === route.path) {
+      acc[acc.length - 1] = route
+      return acc
+    }
+    acc.push(route)
+    return acc
+  }, [])
+
+  return dedupedRoutes.map((route) => {
+    const wefaMeta = route.meta?.wefa
 
     // Filter out id and paramId from params
     const filteredParams = { ...currentRoute.params }
     delete filteredParams.id
     delete filteredParams.itemId
 
-    // Create route object
-    const routeObj: RouteLocationRaw = {
-      name: route.name,
-      query: currentRoute.query,
-      hash: currentRoute.hash,
-    }
+    // Create route object. Fall back to path-based routing for unnamed records.
+    const routeObj: RouteLocationRaw = route.name
+      ? {
+          name: route.name,
+          query: currentRoute.query,
+          hash: currentRoute.hash,
+          ...(route.path !== '/' ? { params: filteredParams } : {}),
+        }
+      : {
+          path: route.path,
+          query: currentRoute.query,
+          hash: currentRoute.hash,
+        }
 
-    // Only include params if path is not root
-    if (route.path !== '/') {
-      routeObj.params = filteredParams
-    }
-
-    // Instead of using route.path, use the current route's resolved path
-    // This preserves the parameters in the path
     return {
-      label: (meta.title as string) || route.name?.toString() || '',
-      icon: meta.icon as string | undefined,
+      label: wefaMeta?.title || route.name?.toString() || '',
+      icon: wefaMeta?.icon,
       route: routeObj,
     }
   })

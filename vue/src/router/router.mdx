@@ -12,7 +12,7 @@ The Router dictates what route (as visible in the browser URL) should display wh
 
 On top of that, it is possible to add custom metadata to your routes to control the flow of the application.
 
-To make all that easier to use, the WeFa provides you with some helpers.
+To make all that easier to use, WeFa provides helpers and shared route metadata typing.
 
 ## External documentation
 
@@ -20,93 +20,125 @@ Vue Router : https://router.vuejs.org/guide/
 
 ## Router setup
 
-In your application, you should setup your router as below, importing and using helpers from WeFa.
+In your application, setup your router as below, importing and using helpers from WeFa.
 If you're using the PBT to create your project, this is already done for you.
 
 ```ts
 // src/router/index.ts
-import { createRouter, createWebHistory, type NavigationGuardNext, type RouteLocationNormalized, type RouteLocationNormalizedLoaded } from 'vue-router'
-import { libRouteRecords, type WeFaRouteRecordRaw, defaultRouteGuards } from '@nside/wefa/router'
+import {
+  createRouter,
+  createWebHistory,
+  type NavigationGuardNext,
+  type RouteLocationNormalized,
+  type RouteLocationNormalizedLoaded,
+  type RouteRecordRaw,
+} from 'vue-router'
+import {
+  libRouteRecords,
+  type WefaRouteRecordRaw,
+  type WefaRouteMeta,
+  defaultRouteGuards,
+} from '@nside/wefa/router'
 
-//Define routes
-const routes: WeFaRouteRecordRaw[] = [
+const appRoutes: RouteRecordRaw[] = [
+  {
+    path: '/',
+    name: 'home',
+    meta: {
+      wefa: {
+        title: 'Home',
+        icon: 'pi pi-home',
+        showInNavigation: true,
+      } satisfies WefaRouteMeta,
+    },
+    component: () => import('@/views/MyHomeView.vue'),
+    children: [
+      // ...
+    ],
+  },
+]
 
+const routes: RouteRecordRaw[] = [
   // Load common routes from WeFa
   ...Object.values(libRouteRecords),
 
   // Override WeFa routes with your own config
   {
-    ...libRouteRecords.login,
-    props: { gdpr: false } // e.g disable GDPR prop on lib-provided default Login component
-  } as WeFaRouteRecordRaw,
+    ...(libRouteRecords.login as WefaRouteRecordRaw),
+    props: { gdpr: false }, // e.g. disable GDPR on lib-provided Login view
+  },
 
-  // Add your project-specific routes
-  {
-    path: '/',
-    name: 'home',
-    meta: { title: 'Home', icon: 'pi pi-home' },
-    component: () => import('@/views/MyHomeView.vue'),
-    children: [
-      ...
-    ]
-  }
+  ...appRoutes,
 ]
 
-// Instantiate router
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: routes
+  routes,
 })
 
-// Setup route guards
-router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormalizedLoaded, next: NavigationGuardNext) => {
+router.beforeEach(
+  async (
+    to: RouteLocationNormalized,
+    from: RouteLocationNormalizedLoaded,
+    next: NavigationGuardNext
+  ) => {
+    // Run the default route guards provided by the library
+    defaultRouteGuards(to, from, next)
 
-  // Run the default route guards provided by the library
-  defaultRouteGuards(to, from, next)
+    // On top, implement your own route guards
+    // ...
 
-  // On top, implement your own route guards
-  ...
-
-  // If all guards passed, proceed
-  next()
-});
+    // If all guards passed, proceed
+    next()
+  }
+)
 
 export default router
 ```
 
 ## Adding routes to register your own views
 
-Once you've created a Vue Single File Component (SFC) you need to add it to your router to make it visible on your application.
-
-In your project routes, add your `MyNiceComponent.vue` like this :
+Once you've created a Vue Single File Component (SFC), add it to your router to make it visible in your application.
 
 ```ts
-// Add your project-specific routes
-  {
-    path: '/',
-    name: 'home',
-    meta: { title: 'Home', icon: 'pi pi-home', requiresAuth: true, requiresUnauth: false, showInNavigation: true },
-    component: () => import('@/views/MyHomeView.vue'),
-    children: [
-      {
-        path: 'my-nice-component',
-        name: 'myNiceComponent',
-        meta: { title: 'My Nice Component', icon: 'pi pi-home' },
-        component: () => import('@/views/MyNiceComponent.vue')
-      }
-    ]
-  }
+{
+  path: '/',
+  name: 'home',
+  meta: {
+    wefa: {
+      title: 'Home',
+      icon: 'pi pi-home',
+      requiresAuth: true,
+      requiresUnauth: false,
+      showInNavigation: true,
+    },
+  },
+  component: () => import('@/views/MyHomeView.vue'),
+  children: [
+    {
+      path: 'my-nice-component',
+      name: 'myNiceComponent',
+      meta: {
+        wefa: {
+          title: 'My Nice Component',
+          icon: 'pi pi-home',
+        },
+      },
+      component: () => import('@/views/MyNiceComponent.vue'),
+    },
+  ],
+}
 ```
 
-Your component can now be accessed by visiting the URL `/my-nice-component` (e.g `http://localhost:5173/my-nice-component`)
+Your component can now be accessed at `/my-nice-component` (e.g `http://localhost:5173/my-nice-component`).
 
 ## Route Metadata
 
-Arbitrary metadata can be attached to routes using the `meta` field.
+WeFa route metadata is stored under `route.meta.wefa` and typed as `WefaRouteMeta`.
 
-Children routes automatically inherit the metadata of their parents, and can override them.
+Children routes automatically inherit metadata from their parents and can override fields.
 
-The following fields are used by WeFa :
+The following `WefaRouteMeta` fields are used by WeFa:
 
 <table>
   <thead>
@@ -118,39 +150,48 @@ The following fields are used by WeFa :
   </thead>
   <tbody>
     <tr>
-      <td class='font-mono'>title</td>
+      <td class='font-mono'>wefa.title</td>
       <td>Yes</td>
       <td>
-        Title used to display your route in some UI components, such as the AutoroutedBreadcrumb
+        Title used to display your route in UI components such as AutoroutedBreadcrumb and router
+        containers.
       </td>
     </tr>
     <tr>
-      <td class='font-mono'>icon</td>
+      <td class='font-mono'>wefa.icon</td>
       <td>Optional</td>
       <td>
-        Icon used to display your route in some UI components, such as the AutoroutedBreadcrumb
+        Icon used to display your route in UI components such as AutoroutedBreadcrumb and router
+        containers.
       </td>
     </tr>
     <tr>
-      <td class='font-mono'>requiresAuth</td>
+      <td class='font-mono'>wefa.requiresAuth</td>
       <td>Optional</td>
       <td>
-        Indicates that the user should be **authenticated** to access this route. This is enforced
-        by the default WeFa route guards.
+        Indicates that the user should be authenticated to access this route. Enforced by default
+        WeFa route guards.
       </td>
     </tr>
     <tr>
-      <td class='font-mono'>requiresUnauth</td>
+      <td class='font-mono'>wefa.requiresUnauth</td>
       <td>Optional</td>
       <td>
-        Indicates that the user should be **unauthenticated** to access this route. This is enforced
-        by the default WeFa route guards.
+        Indicates that the user should be unauthenticated to access this route. Enforced by default
+        WeFa route guards.
       </td>
     </tr>
     <tr>
-      <td class='font-mono'>showInNavigation</td>
+      <td class='font-mono'>wefa.showInNavigation</td>
       <td>Optional</td>
-      <td>Indicates if the route should be hidden in Navigation components (NavBar, SideMenu)</td>
+      <td>Indicates whether the route should be shown in navigation containers.</td>
+    </tr>
+    <tr>
+      <td class='font-mono'>wefa.section</td>
+      <td>Optional</td>
+      <td>
+        Groups routes under a section label in navigation UIs that support sectioned rendering.
+      </td>
     </tr>
   </tbody>
 </table>

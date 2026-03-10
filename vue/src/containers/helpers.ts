@@ -6,6 +6,7 @@ import {
   type RouteLocationAsRelativeGeneric,
   type RouteLocationAsPathGeneric,
 } from 'vue-router'
+import type { WeFaRouteMeta } from '@/router'
 import { useI18nLib } from '@/locales'
 
 export interface GenericContainerProps {
@@ -35,7 +36,8 @@ export function menuItemsFromRoute(
 ): MenuItem[] {
   return routeLocationMatched.value.children
     ?.filter((child: RouteRecordRaw) => {
-      return child.meta?.showInNavigation === undefined || child.meta?.showInNavigation
+      const routeMeta = child.meta?.wefa as WeFaRouteMeta | undefined
+      return routeMeta?.showInNavigation === undefined || routeMeta.showInNavigation
     })
     .map((child: RouteRecordRaw) => {
       return itemizeRouteRecordRaw(child, routeLocationMatched.value.path, depth, 1)
@@ -57,10 +59,11 @@ export function itemizeRouteRecordRaw(
   currentDepth: number
 ): MenuItem {
   const currentPath = `${parentPath}/${routeRecordRaw.path}`
+  const routeMeta = routeRecordRaw.meta?.wefa as WeFaRouteMeta | undefined
 
   const menuItem: MenuItem = {
-    label: (routeRecordRaw.meta?.title as string) ?? routeRecordRaw.name ?? routeRecordRaw.path,
-    icon: routeRecordRaw.meta?.icon as string,
+    label: routeMeta?.title ?? String(routeRecordRaw.name ?? routeRecordRaw.path),
+    icon: routeMeta?.icon,
     to: { path: currentPath },
     depth: currentDepth,
     items:
