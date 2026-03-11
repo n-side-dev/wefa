@@ -60,7 +60,7 @@ def read_package_lock_version(path: Path) -> str:
         raise ValueError('missing packages[""].version')
     if root_version != package_version:
         raise ValueError(
-            f"inconsistent package-lock versions: root={root_version}, packages[\"\"]={package_version}"
+            f'inconsistent package-lock versions: root={root_version}, packages[""]={package_version}'
         )
     return root_version
 
@@ -89,7 +89,9 @@ def read_uv_lock_package_version(path: Path, package_name: str) -> str:
     ]
     matched_versions = [value for value in matched_versions if isinstance(value, str)]
     if len(matched_versions) != 1:
-        raise ValueError(f"expected exactly one package named {package_name!r}, found {len(matched_versions)}")
+        raise ValueError(
+            f"expected exactly one package named {package_name!r}, found {len(matched_versions)}"
+        )
     return matched_versions[0]
 
 
@@ -124,7 +126,9 @@ def collect_versions() -> dict[str, str]:
         try:
             version = source.reader(source.path)
         except Exception as exc:  # pragma: no cover - defensive branch
-            raise RuntimeError(f"failed to read version from {relpath(source.path)}: {exc}") from exc
+            raise RuntimeError(
+                f"failed to read version from {relpath(source.path)}: {exc}"
+            ) from exc
         versions[relpath(source.path)] = version
     return versions
 
@@ -206,6 +210,49 @@ def run_command(command: list[str]) -> None:
     subprocess.run(command, cwd=ROOT, check=True)
 
 
+def update_pyproject_version(path: Path, target_version: str) -> None:
+    text = path.read_text(encoding="utf-8")
+    # Anchor to the [project] section; (?:(?!\n\[).)*? stops before the next section header.
+    pattern = re.compile(r'(?ms)(\[project\](?:(?!\n\[).)*?\n)(version = ")([^"]+)(")')
+    match = pattern.search(text)
+    if not match:
+        raise RuntimeError(
+            f"unable to locate version under [project] in {relpath(path)}"
+        )
+    if match.group(3) == target_version:
+        return
+    updated, replacements = pattern.subn(
+        rf"\g<1>\g<2>{target_version}\g<4>", text, count=1
+    )
+    if replacements != 1:
+        raise RuntimeError(
+            f"unable to update version under [project] in {relpath(path)}"
+        )
+    path.write_text(updated, encoding="utf-8")
+
+
+def update_uv_lock_version(path: Path, package_name: str, target_version: str) -> None:
+    text = path.read_text(encoding="utf-8")
+    pattern = re.compile(
+        r'(?m)(^\[\[package\]\]\nname = "'
+        + re.escape(package_name)
+        + r'"\nversion = )"([^"]+)"',
+    )
+    match = pattern.search(text)
+    if not match:
+        raise RuntimeError(
+            f"unable to locate package {package_name!r} in {relpath(path)}"
+        )
+    if match.group(2) == target_version:
+        return
+    updated, replacements = pattern.subn(rf'\g<1>"{target_version}"', text, count=1)
+    if replacements != 1:
+        raise RuntimeError(
+            f"unable to update version for {package_name!r} in {relpath(path)}"
+        )
+    path.write_text(updated, encoding="utf-8")
+
+
 def update_django_init_version(target_version: str) -> None:
     path = ROOT / "django/nside_wefa/__init__.py"
     text = path.read_text(encoding="utf-8")
@@ -215,7 +262,9 @@ def update_django_init_version(target_version: str) -> None:
         raise RuntimeError(f"unable to locate __version__ in {relpath(path)}")
     if match.group(1) == target_version:
         return
-    updated, replacements = pattern.subn(f'__version__ = "{target_version}"', text, count=1)
+    updated, replacements = pattern.subn(
+        f'__version__ = "{target_version}"', text, count=1
+    )
     if replacements != 1:
         raise RuntimeError(f"unable to update __version__ in {relpath(path)}")
     path.write_text(updated, encoding="utf-8")
@@ -302,8 +351,10 @@ def cmd_set(args: argparse.Namespace) -> int:
             print(f"- {path}")
         return 0
 
-    run_command(["uv", "version", "--project", "django", target, "--no-sync"])
-    run_command(["uv", "version", "--project", "bff", target, "--no-sync"])
+    update_pyproject_version(ROOT / "django/pyproject.toml", target)
+    update_uv_lock_version(ROOT / "django/uv.lock", DJANGO_PACKAGE_NAME, target)
+    update_pyproject_version(ROOT / "bff/pyproject.toml", target)
+    update_uv_lock_version(ROOT / "bff/uv.lock", BFF_PACKAGE_NAME, target)
     run_command(
         [
             "npm",
@@ -335,8 +386,10 @@ def cmd_bump(args: argparse.Namespace) -> int:
             print(f"- {path}")
         return 0
 
-    run_command(["uv", "version", "--project", "django", target, "--no-sync"])
-    run_command(["uv", "version", "--project", "bff", target, "--no-sync"])
+    update_pyproject_version(ROOT / "django/pyproject.toml", target)
+    update_uv_lock_version(ROOT / "django/uv.lock", DJANGO_PACKAGE_NAME, target)
+    update_pyproject_version(ROOT / "bff/pyproject.toml", target)
+    update_uv_lock_version(ROOT / "bff/uv.lock", BFF_PACKAGE_NAME, target)
     run_command(
         [
             "npm",
@@ -361,10 +414,14 @@ def build_parser() -> argparse.ArgumentParser:
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    parser_show = subparsers.add_parser("show", help="Show the unified monorepo version.")
+    parser_show = subparsers.add_parser(
+        "show", help="Show the unified monorepo version."
+    )
     parser_show.set_defaults(func=cmd_show)
 
-    parser_check = subparsers.add_parser("check", help="Check that all project versions are aligned.")
+    parser_check = subparsers.add_parser(
+        "check", help="Check that all project versions are aligned."
+    )
     parser_check.add_argument(
         "--expect",
         help="Assert the unified version matches this SemVer value.",
@@ -373,7 +430,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     parser_set = subparsers.add_parser("set", help="Set the unified monorepo version.")
     parser_set.add_argument("version", help="Target version in strict SemVer format.")
-    parser_set.add_argument("--dry-run", action="store_true", help="Preview changes without writing files.")
+    parser_set.add_argument(
+        "--dry-run", action="store_true", help="Preview changes without writing files."
+    )
     parser_set.add_argument(
         "--allow-dirty-version-files",
         action="store_true",
@@ -381,9 +440,15 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser_set.set_defaults(func=cmd_set)
 
-    parser_bump = subparsers.add_parser("bump", help="Bump the unified monorepo version.")
-    parser_bump.add_argument("part", choices=["major", "minor", "patch"], help="Version segment to bump.")
-    parser_bump.add_argument("--dry-run", action="store_true", help="Preview changes without writing files.")
+    parser_bump = subparsers.add_parser(
+        "bump", help="Bump the unified monorepo version."
+    )
+    parser_bump.add_argument(
+        "part", choices=["major", "minor", "patch"], help="Version segment to bump."
+    )
+    parser_bump.add_argument(
+        "--dry-run", action="store_true", help="Preview changes without writing files."
+    )
     parser_bump.add_argument(
         "--allow-dirty-version-files",
         action="store_true",
