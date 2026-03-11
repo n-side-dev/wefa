@@ -1,0 +1,39 @@
+name: BFF CI
+
+on:
+  pull_request:
+    paths:
+      - 'bff/**'
+  push:
+    branches:
+      - main
+    paths:
+      - 'bff/**'
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: bff
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Python and install deps
+        uses: ./.github/actions/setup-python
+        with:
+          python-version: '3.12'
+          project-dir: 'bff'
+          cache-dependency-path: |
+            bff/pyproject.toml
+            bff/uv.lock
+          install-dev: 'true'
+
+      - name: Run tests
+        run: uv run pytest -q
+
+      - name: Check OpenAPI spec drift
+        run: uv run python -m bff_app.openapi.generate --check --output bff_app/openapi/openapi.yaml

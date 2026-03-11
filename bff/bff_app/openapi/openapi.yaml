@@ -1,0 +1,348 @@
+paths:
+  /proxy/api/auth/login:
+    get:
+      responses:
+        default:
+          $ref: '#/components/responses/DEFAULT_ERROR'
+        '200':
+          description: Auth server redirect URL.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  redirect:
+                    type: string
+                required:
+                - redirect
+      summary: Start login flow
+      description: Creates a PKCE authorization URL and stores verifier/state in the
+        session cookie.
+      tags:
+      - auth
+  /proxy/api/auth/callback:
+    get:
+      responses:
+        default:
+          $ref: '#/components/responses/DEFAULT_ERROR'
+        '302':
+          description: Redirects to frontend after successful or failed state check.
+      summary: OAuth callback
+      description: Exchanges the authorization code for tokens and stores encrypted
+        token cookies.
+      tags:
+      - auth
+  /proxy/api/auth/logout:
+    get:
+      responses:
+        default:
+          $ref: '#/components/responses/DEFAULT_ERROR'
+        '200':
+          description: Logout successful.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                required:
+                - message
+      summary: Logout and revoke tokens
+      description: Log out from auth server and clear local session data.
+      tags:
+      - auth
+      security:
+      - sessionCookie: []
+  /proxy/api/auth/userinfo:
+    get:
+      responses:
+        default:
+          $ref: '#/components/responses/DEFAULT_ERROR'
+        '200':
+          description: User info from the auth server.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    type: string
+                  email_verified:
+                    type: boolean
+                  family_name:
+                    type: string
+                  given_name:
+                    type: string
+                  name:
+                    type: string
+                  preferred_username:
+                    type: string
+                  sub:
+                    type: string
+                required:
+                - email
+                - email_verified
+                - family_name
+                - given_name
+                - name
+                - preferred_username
+                - sub
+              examples:
+                default:
+                  value:
+                    email: olivia.diaz@embergenpower.demo
+                    email_verified: true
+                    family_name: Diaz
+                    given_name: Olivia
+                    name: Olivia Diaz
+                    preferred_username: olivia.diaz@embergenpower.demo
+                    sub: 8b8135af-4555-455c-bf84-567f99ff9e96
+      summary: Fetch user info
+      description: Proxy userinfo endpoint for the authenticated session.
+      tags:
+      - auth
+      security:
+      - sessionCookie: []
+  /proxy/api/auth/session:
+    get:
+      responses:
+        default:
+          $ref: '#/components/responses/DEFAULT_ERROR'
+        '200':
+          description: Session state.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session:
+                    type: boolean
+                required:
+                - session
+      summary: Check session validity
+      description: Validate whether the current browser session is still authenticated.
+      tags:
+      - auth
+      security:
+      - sessionCookie: []
+  /proxy/api/request/{rest_of_url}:
+    options:
+      responses:
+        default:
+          $ref: '#/components/responses/DEFAULT_ERROR'
+        '204':
+          description: Preflight response.
+      summary: REST preflight
+      tags:
+      - proxy
+    parameters:
+    - in: path
+      name: rest_of_url
+      required: true
+      schema:
+        type: string
+    head:
+      responses:
+        default:
+          $ref: '#/components/responses/DEFAULT_ERROR'
+        '200':
+          description: Proxied response from REST backend.
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+        '502':
+          description: Upstream connection error.
+      summary: Proxy REST request
+      description: Forward the incoming request to BACKEND_ENDPOINT with auth token
+        passthrough.
+      tags:
+      - proxy
+      security:
+      - sessionCookie: []
+    get:
+      responses:
+        default:
+          $ref: '#/components/responses/DEFAULT_ERROR'
+        '200':
+          description: Proxied response from REST backend.
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+        '502':
+          description: Upstream connection error.
+      summary: Proxy REST request
+      description: Forward the incoming request to BACKEND_ENDPOINT with auth token
+        passthrough.
+      tags:
+      - proxy
+      security:
+      - sessionCookie: []
+    post:
+      responses:
+        default:
+          $ref: '#/components/responses/DEFAULT_ERROR'
+        '200':
+          description: Proxied response from REST backend.
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+        '502':
+          description: Upstream connection error.
+      summary: Proxy REST request
+      description: Forward the incoming request to BACKEND_ENDPOINT with auth token
+        passthrough.
+      tags:
+      - proxy
+      security:
+      - sessionCookie: []
+    put:
+      responses:
+        default:
+          $ref: '#/components/responses/DEFAULT_ERROR'
+        '200':
+          description: Proxied response from REST backend.
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+        '502':
+          description: Upstream connection error.
+      summary: Proxy REST request
+      description: Forward the incoming request to BACKEND_ENDPOINT with auth token
+        passthrough.
+      tags:
+      - proxy
+      security:
+      - sessionCookie: []
+    patch:
+      responses:
+        default:
+          $ref: '#/components/responses/DEFAULT_ERROR'
+        '200':
+          description: Proxied response from REST backend.
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+        '502':
+          description: Upstream connection error.
+      summary: Proxy REST request
+      description: Forward the incoming request to BACKEND_ENDPOINT with auth token
+        passthrough.
+      tags:
+      - proxy
+      security:
+      - sessionCookie: []
+    delete:
+      responses:
+        default:
+          $ref: '#/components/responses/DEFAULT_ERROR'
+        '200':
+          description: Proxied response from REST backend.
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+        '502':
+          description: Upstream connection error.
+      summary: Proxy REST request
+      description: Forward the incoming request to BACKEND_ENDPOINT with auth token
+        passthrough.
+      tags:
+      - proxy
+      security:
+      - sessionCookie: []
+  /ping:
+    get:
+      responses:
+        default:
+          $ref: '#/components/responses/DEFAULT_ERROR'
+        '200':
+          description: Pong response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                required:
+                - message
+      summary: Health check
+      description: Return a basic healthcheck response.
+      tags:
+      - health
+info:
+  title: BFF Flask API
+  version: 1.0.0
+tags:
+- name: auth
+  description: Authentication endpoints for login, callback, logout and session checks.
+- name: proxy
+  description: Backend passthrough proxy endpoints.
+- name: health
+  description: Healthcheck endpoints.
+openapi: 3.0.3
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: Error code
+        status:
+          type: string
+          description: Error name
+        message:
+          type: string
+          description: Error message
+        errors:
+          type: object
+          description: Errors
+          additionalProperties: {}
+      additionalProperties: false
+    PaginationMetadata:
+      type: object
+      properties:
+        total:
+          type: integer
+        total_pages:
+          type: integer
+        first_page:
+          type: integer
+        last_page:
+          type: integer
+        page:
+          type: integer
+        previous_page:
+          type: integer
+        next_page:
+          type: integer
+      additionalProperties: false
+  responses:
+    DEFAULT_ERROR:
+      description: Default error response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: SESSION_COOKIE_NAME_at
+      description: Authentication uses encrypted token cookies with suffixes (_at,
+        _rt, _it, _meta) derived from SESSION_COOKIE_NAME.
+servers:
+- url: /

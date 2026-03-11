@@ -16,6 +16,14 @@ updates:
       patch:
         update-types:
           - "patch"
+  - package-ecosystem: "uv"
+    directory: "/bff"
+    schedule:
+      interval: "daily"
+    groups:
+      patch:
+        update-types:
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
