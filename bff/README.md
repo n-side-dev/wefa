@@ -20,6 +20,7 @@ For more information on the BFF architecture, see:
 - Template: `.env.example`
 - Required values (validated at startup):
 - `FLASK_SECRET_KEY`
+- `TOKEN_COOKIE_ENCRYPTION_KEY` (base64url key that decodes to 32 bytes)
 - `BACKEND_ENDPOINT`
 - `CORS_ALLOWED_ORIGIN`
 - `OAUTH_CLIENT_ID`
@@ -37,6 +38,17 @@ For more information on the BFF architecture, see:
 - `SESSION_COOKIE_HTTPONLY`
 - `SESSION_COOKIE_SECURE`
 - `SESSION_COOKIE_SAMESITE`
+- Optional values:
+- `BACKEND_CONNECT_TIMEOUT_SECONDS` (default: `3`)
+- `BACKEND_READ_TIMEOUT_SECONDS` (default: `30`)
+
+Generate a random `TOKEN_COOKIE_ENCRYPTION_KEY`:
+```bash
+python - <<'PY'
+import base64, secrets
+print(base64.urlsafe_b64encode(secrets.token_bytes(32)).rstrip(b'=').decode())
+PY
+```
 
 **Run Locally (Flask / PyCharm)**
 1. Ensure `.env` exists in the repo root.
@@ -55,11 +67,11 @@ FLASK_RUN_PORT=5022 uv run flask --app bff.py run
 **Generate OpenAPI Spec**
 1. Generate or refresh the spec file.
 ```bash
-uv run python -m bff_app.openapi.generate --output openapi.yaml
+uv run python -m bff_app.openapi.generate --output bff_app/openapi/openapi.yaml
 ```
 2. Validate that the committed spec is up to date.
 ```bash
-uv run python -m bff_app.openapi.generate --check --output openapi.yaml
+uv run python -m bff_app.openapi.generate --check --output bff_app/openapi/openapi.yaml
 ```
 
 **Run with Docker**
@@ -71,8 +83,15 @@ docker-compose up --build
 - Docker uses `PORT` from `.env` for the exposed port.
 
 **Security Notes**
-- Tokens, PKCE verifier, and OAuth state are stored in Flask's signed session cookie.
-- This service does not currently configure Flask-Session/Redis-backed server-side session storage.
+- OAuth tokens are stored in encrypted HttpOnly cookies derived from `SESSION_COOKIE_NAME`:
+  - `<SESSION_COOKIE_NAME>_at` (access token)
+  - `<SESSION_COOKIE_NAME>_rt` (refresh token)
+  - `<SESSION_COOKIE_NAME>_it` (id token)
+  - `<SESSION_COOKIE_NAME>_meta` (remaining token payload)
+- PKCE verifier and OAuth state remain in Flask's signed session cookie.
+- If any encrypted token cookie would exceed the 4 KB browser cookie limit, callback login fails and redirects with `?error=auth_cookie_too_large`.
+- Existing signed-session token payloads are not migrated. Users with pre-change sessions must log in again after rollout.
+- This service does not configure server-side session storage.
 - Keep `SESSION_COOKIE_SECURE=True` and `SESSION_COOKIE_SAMESITE=Strict` in production.
 
 **Notes / Common Pitfalls**

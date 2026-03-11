@@ -21,9 +21,9 @@ RUN uv sync --frozen --no-dev --no-install-project
 # Do this after installing the dependencies to avoid breaking Docker cache
 COPY . /app
 
-# Make port 5000 available to the world outside this container
-ARG PORT
-EXPOSE $PORT
+# Make the exposed container port explicit; runtime mapping can still override host port
+ARG PORT=5000
+EXPOSE ${PORT}
 
 # Run app.py when the container launches
 CMD ["sh", "-c", "uv run flask --app bff.py run --host 0.0.0.0 --port ${PORT:-5000}"]

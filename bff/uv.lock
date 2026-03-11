@@ -37,6 +37,7 @@ version = "0.3.0"
 source = { virtual = "." }
 dependencies = [
     { name = "authlib" },
+    { name = "cryptography" },
     { name = "flask" },
     { name = "flask-cors" },
     { name = "flask-session" },
@@ -54,6 +55,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "authlib" },
+    { name = "cryptography" },
     { name = "flask", specifier = "~=3.1.2" },
     { name = "flask-cors" },
     { name = "flask-session" },

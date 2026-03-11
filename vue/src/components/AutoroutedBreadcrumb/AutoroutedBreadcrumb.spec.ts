@@ -37,13 +37,13 @@ const mockRouter = createRouter({
           path: 'level1',
           name: 'level1',
           component: { template: '<div>Level 1</div>' },
-          meta: { title: 'Level 1', icon: 'pi pi-folder' },
+          meta: { wefa: { title: 'Level 1', icon: 'pi pi-folder' } },
           children: [
             {
               path: 'level2',
               name: 'level2',
               component: { template: '<div>Level 2</div>' },
-              meta: { title: 'Level 2', icon: 'pi pi-file' },
+              meta: { wefa: { title: 'Level 2', icon: 'pi pi-file' } },
             },
           ],
         },
@@ -87,7 +87,6 @@ function createMockRoute(
 }
 
 describe('AutoroutedBreadcrumb', () => {
-  // Setup and teardown
   beforeEach(() => {
     vi.clearAllMocks()
   })
@@ -95,9 +94,8 @@ describe('AutoroutedBreadcrumb', () => {
   afterEach(() => {
     vi.resetAllMocks()
   })
-  // Basic test - renders with default props
+
   it('renders properly with no matched routes', async () => {
-    // Mock route with no matched routes
     const mockRoute = createMockRoute([], '/')
 
     vi.mocked(useRoute).mockReturnValue(mockRoute)
@@ -109,25 +107,22 @@ describe('AutoroutedBreadcrumb', () => {
     })
     await flushPromises()
 
-    // Should render the Breadcrumb component but with no items
     expect(wrapper.findComponent({ name: 'Breadcrumb' }).exists()).toBe(true)
     expect(wrapper.findAll('a').length).toBe(0)
   })
 
-  // Test with matched routes
   it('renders breadcrumb items based on matched routes', async () => {
-    // Mock route with matched routes
     const mockRoute = createMockRoute(
       [
         {
           path: '/',
           name: 'home',
-          meta: { title: 'Home', icon: 'pi pi-home' },
+          meta: { wefa: { title: 'Home', icon: 'pi pi-home' } },
         },
         {
           path: '/products',
           name: 'products',
-          meta: { title: 'Products', icon: 'pi pi-box' },
+          meta: { wefa: { title: 'Products', icon: 'pi pi-box' } },
         },
       ],
       '/products'
@@ -142,22 +137,19 @@ describe('AutoroutedBreadcrumb', () => {
     })
     await flushPromises()
 
-    // Should render breadcrumb items for each matched route
     const items = wrapper.findAll('a')
     expect(items.length).toBe(2)
     expect(items[0]?.text()).toContain('Home')
     expect(items[1]?.text()).toContain('Products')
   })
 
-  // Test with homeRoute prop
   it('renders home icon when homeRoute prop is provided', async () => {
-    // Mock route that is not the home route
     const mockRoute = createMockRoute(
       [
         {
           path: '/products',
           name: 'products',
-          meta: { title: 'Products', icon: 'pi pi-box' },
+          meta: { wefa: { title: 'Products', icon: 'pi pi-box' } },
         },
       ],
       '/products'
@@ -175,22 +167,19 @@ describe('AutoroutedBreadcrumb', () => {
     })
     await flushPromises()
 
-    // Should render home icon plus the matched route
     const items = wrapper.findAll('a')
     expect(items.length).toBe(2)
     expect(items[0]?.find('.pi-home').exists()).toBe(true)
     expect(items[1]?.text()).toContain('Products')
   })
 
-  // Test when current route is home route
   it('does not render home icon when current route is home route', async () => {
-    // Mock route that is the home route
     const mockRoute = createMockRoute(
       [
         {
           path: '/',
           name: 'home',
-          meta: { title: 'Home', icon: 'pi pi-home' },
+          meta: { wefa: { title: 'Home', icon: 'pi pi-home' } },
         },
       ],
       '/'
@@ -208,21 +197,18 @@ describe('AutoroutedBreadcrumb', () => {
     })
     await flushPromises()
 
-    // Should only render the matched route, not the home icon
     const items = wrapper.findAll('a')
     expect(items.length).toBe(1)
     expect(items[0]?.text()).toContain('Home')
   })
 
-  // Test with missing meta information
-  it('uses route name as fallback when meta.title is missing', async () => {
-    // Mock route with no meta.title
+  it('uses route name as fallback when meta.wefa.title is missing', async () => {
     const mockRoute = createMockRoute(
       [
         {
           path: '/no-meta',
           name: 'no-meta-route',
-          meta: { icon: 'pi pi-info' },
+          meta: { wefa: { icon: 'pi pi-info' } },
         },
       ],
       '/no-meta'
@@ -237,21 +223,18 @@ describe('AutoroutedBreadcrumb', () => {
     })
     await flushPromises()
 
-    // Should use route name as label
     const items = wrapper.findAll('a')
     expect(items.length).toBe(1)
     expect(items[0]?.text()).toContain('no-meta-route')
   })
 
-  // Test with undefined route name
   it('handles undefined route name gracefully', async () => {
-    // Mock route with undefined name
     const mockRoute = createMockRoute(
       [
         {
           path: '/unnamed',
           name: undefined,
-          meta: { title: 'Unnamed Route' },
+          meta: { wefa: { title: 'Unnamed Route' } },
         },
       ],
       '/unnamed'
@@ -266,31 +249,28 @@ describe('AutoroutedBreadcrumb', () => {
     })
     await flushPromises()
 
-    // Should use meta.title as label
     const items = wrapper.findAll('a')
     expect(items.length).toBe(1)
     expect(items[0]?.text()).toContain('Unnamed Route')
   })
 
-  // Test with multiple levels of nested routes
   it('renders correctly with multiple levels of nested routes', async () => {
-    // Mock route with nested routes
     const mockRoute = createMockRoute(
       [
         {
           path: '/nested',
           name: 'nested',
-          meta: { title: 'Nested', icon: 'pi pi-home' },
+          meta: { wefa: { title: 'Nested', icon: 'pi pi-home' } },
         },
         {
           path: '/nested/level1',
           name: 'level1',
-          meta: { title: 'Level 1', icon: 'pi pi-folder' },
+          meta: { wefa: { title: 'Level 1', icon: 'pi pi-folder' } },
         },
         {
           path: '/nested/level1/level2',
           name: 'level2',
-          meta: { title: 'Level 2', icon: 'pi pi-file' },
+          meta: { wefa: { title: 'Level 2', icon: 'pi pi-file' } },
         },
       ],
       '/nested/level1/level2'
@@ -305,7 +285,6 @@ describe('AutoroutedBreadcrumb', () => {
     })
     await flushPromises()
 
-    // Should render all three levels
     const items = wrapper.findAll('a')
     expect(items.length).toBe(3)
     expect(items[0]?.text()).toContain('Nested')
@@ -313,20 +292,18 @@ describe('AutoroutedBreadcrumb', () => {
     expect(items[2]?.text()).toContain('Level 2')
   })
 
-  // Test icon rendering
   it('renders icons correctly for routes with icons', async () => {
-    // Mock route with icons
     const mockRoute = createMockRoute(
       [
         {
           path: '/nested',
           name: 'nested',
-          meta: { title: 'Nested', icon: 'pi pi-home' },
+          meta: { wefa: { title: 'Nested', icon: 'pi pi-home' } },
         },
         {
           path: '/nested/level1',
           name: 'level1',
-          meta: { title: 'Level 1', icon: 'pi pi-folder' },
+          meta: { wefa: { title: 'Level 1', icon: 'pi pi-folder' } },
         },
       ],
       '/nested/level1'
@@ -341,20 +318,22 @@ describe('AutoroutedBreadcrumb', () => {
     })
     await flushPromises()
 
-    // Should render icons
     expect(wrapper.find('.pi-home').exists()).toBe(true)
     expect(wrapper.find('.pi-folder').exists()).toBe(true)
   })
 
-  // Test click navigation
-  it('navigates correctly when breadcrumb items are clicked', async () => {
-    // Mock route
+  it('uses path-based routing when a matched route has no name', async () => {
     const mockRoute = createMockRoute(
       [
         {
+          path: '/',
+          name: undefined,
+          meta: { wefa: { icon: 'pi pi-home' } },
+        },
+        {
           path: '/products',
           name: 'products',
-          meta: { title: 'Products' },
+          meta: { wefa: { title: 'Products' } },
         },
       ],
       '/products'
@@ -362,7 +341,71 @@ describe('AutoroutedBreadcrumb', () => {
 
     vi.mocked(useRoute).mockReturnValue(mockRoute)
 
-    // Spy on router push method
+    const wrapper = mount(AutoroutedBreadcrumb, {
+      global: {
+        plugins: [mockRouter],
+      },
+    })
+    await flushPromises()
+
+    const items = wrapper.findAll('a')
+    expect(items.length).toBe(2)
+    expect(items[0]?.attributes('href')).toBe('/')
+  })
+
+  it('dedupes breadcrumb items when parent and child share the same path', async () => {
+    if (!mockRouter.hasRoute('duplicate-child')) {
+      mockRouter.addRoute({
+        path: '/duplicate',
+        name: 'duplicate-child',
+        component: { template: '<div>Duplicate</div>' },
+      })
+    }
+
+    const mockRoute = createMockRoute(
+      [
+        {
+          path: '/duplicate',
+          name: 'duplicate-parent',
+          meta: { wefa: { title: 'Parent' } },
+        },
+        {
+          path: '/duplicate',
+          name: 'duplicate-child',
+          meta: { wefa: { title: 'Child' } },
+        },
+      ],
+      '/duplicate'
+    )
+
+    vi.mocked(useRoute).mockReturnValue(mockRoute)
+
+    const wrapper = mount(AutoroutedBreadcrumb, {
+      global: {
+        plugins: [mockRouter],
+      },
+    })
+    await flushPromises()
+
+    const items = wrapper.findAll('a')
+    expect(items.length).toBe(1)
+    expect(items[0]?.text()).toContain('Child')
+  })
+
+  it('navigates correctly when breadcrumb items are clicked', async () => {
+    const mockRoute = createMockRoute(
+      [
+        {
+          path: '/products',
+          name: 'products',
+          meta: { wefa: { title: 'Products' } },
+        },
+      ],
+      '/products'
+    )
+
+    vi.mocked(useRoute).mockReturnValue(mockRoute)
+
     const routerPushSpy = vi.spyOn(mockRouter, 'push')
 
     const wrapper = mount(AutoroutedBreadcrumb, {
@@ -372,10 +415,8 @@ describe('AutoroutedBreadcrumb', () => {
     })
     await flushPromises()
 
-    // Click the breadcrumb item
     await wrapper.find('a').trigger('click')
 
-    // Verify router.push was called with correct route
     expect(routerPushSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         name: 'products',

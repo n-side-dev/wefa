@@ -194,3 +194,23 @@ python3 scripts/wefa_version.py set <x.y.z[-prerelease]>
 cd vue
 npm publish --access public
 ```
+
+## Testing the library locally
+
+If you want to test the library locally on a project using WeFa, you can do it with the following steps:
+
+### In the WeFa Folder
+
+```bash
+# Build the project
+npm run build
+# Generate a pack (this will output a .tgz file)
+npm pack
+```
+
+### In the project folder that uses WeFa
+
+```bash
+# Install the packed dependency
+npm i /ABSOLUTE_PATH_TO_THE_PACK/nside-wefa-0.3.0.tgz
+```

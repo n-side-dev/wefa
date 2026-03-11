@@ -5,6 +5,7 @@ description = "Flask backend-for-frontend"
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "authlib",
+    "cryptography",
     "flask~=3.1.2",
     "flask-cors",
     "flask-session",

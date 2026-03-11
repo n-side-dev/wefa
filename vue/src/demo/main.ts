@@ -1,10 +1,9 @@
 // CSS
-import './assets/main.css'
-import './demo/demo.css'
+import '../assets/main.css'
 
 // APP
 import { createApp } from 'vue'
-import App from './demo/DemoApp.vue'
+import App from './App.vue'
 const app = createApp(App)
 
 import { type CookieConfiguration, cookiesPlugin } from '@/plugins/cookies'
@@ -28,12 +27,12 @@ axiosInstance.defaults.baseURL = 'http://localhost:8000'
 
 // Setup typed api client, from OpenAPI schema
 // If not done, first generate code with npm run openapi-codegen
-import { client } from '@/demo/openapi/client.gen'
+import { client } from '@/demo/openapi/client.gen.ts'
 import { typedApiClient } from '@/network'
 typedApiClient.setupOpenApiClient(client)
 
 // Pinia for stores
-import pinia from './demo/pinia'
+import pinia from './pinia.ts'
 app.use(pinia)
 
 // PrimeToasts
@@ -43,13 +42,13 @@ app.use(ToastService)
 app.use(ConfirmationService)
 
 // i18n
-import { createLibI18n } from './locales'
+import { createLibI18n } from '@/locales'
 const i18n = createLibI18n({})
 app.use(i18n)
 
 // Router
 import { backendStore } from '@/demo/backendStore.ts'
-import router from './demo/router'
+import router from './router.ts'
 
 import { legalConsentPlugin } from '@/plugins'
 app.use(router)

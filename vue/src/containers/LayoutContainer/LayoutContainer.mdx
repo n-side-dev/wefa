@@ -1,0 +1,128 @@
+import { Meta, Canvas, ArgTypes } from '@storybook/addon-docs/blocks'
+import * as LayoutContainerStories from './LayoutContainer.stories'
+
+<Meta of={LayoutContainerStories} />
+
+# LayoutContainer
+
+## Overview
+
+`LayoutContainer` is the shell used to render:
+
+- desktop side navigation
+- mobile drawer navigation
+- route-aware breadcrumb
+- child route content through `<router-view />`
+
+The stories below focus on router metadata setup, because navigation links are generated directly from the router tree.
+
+## Router Configurations
+
+### Wefa Route Metadata
+
+Uses `meta.wefa.showInNavigation` and `meta.wefa.section`.
+
+<Canvas of={LayoutContainerStories.WefaNavigationMeta} />
+<Canvas of={LayoutContainerStories.WefaSectionedMeta} />
+
+```ts
+{
+  path: '/dashboard',
+  name: 'Dashboard',
+  meta: {
+    wefa: {
+      title: 'Dashboard',
+      icon: 'pi pi-chart-line',
+      showInNavigation: true,
+      section: 'Insights',
+    },
+  },
+}
+```
+
+### Nested Routes
+
+<Canvas of={LayoutContainerStories.MixedNestedRoutes} />
+
+```ts
+{
+  path: '/products',
+  name: 'products',
+  children: [
+    {
+      path: 'category/:id',
+      name: 'category',
+      children: [
+        {
+          path: 'item/:itemId',
+          name: 'item',
+        },
+      ],
+    },
+  ],
+  meta: {
+    wefa: { title: 'Products', showInNavigation: true, section: 'Catalog' },
+  },
+}
+```
+
+## Header Branding
+
+Use `projectLogo` to render a custom logo in the top navigation area.
+
+<Canvas of={LayoutContainerStories.CustomLogo} />
+
+When only `projectTitle` is provided, the top area falls back to the avatar + app name.
+
+<Canvas of={LayoutContainerStories.NameOnlyFallback} />
+
+## Props
+
+<ArgTypes of={LayoutContainerStories} />
+
+## Usage
+
+Mount `LayoutContainer` once in your root app shell (`App.vue`), like the demo:
+
+```vue
+<template>
+  <LayoutContainer project-title="My Project" />
+</template>
+
+<script setup lang="ts">
+import { LayoutContainer, setupDepthTracker } from '@nside/wefa/containers'
+
+const routerViewDepth = setupDepthTracker()
+</script>
+```
+
+Then keep your application routes as regular page routes (do not use `LayoutContainer` as a route component):
+
+```ts
+const routes = [
+  {
+    path: '/home',
+    name: 'home',
+    component: HomeView,
+    meta: {
+      wefa: {
+        title: 'Home',
+        icon: 'pi pi-home',
+        showInNavigation: true,
+      },
+    },
+  },
+  {
+    path: '/showcase',
+    name: 'showcase',
+    component: ShowcaseView,
+    meta: {
+      wefa: {
+        title: 'Showcase',
+        icon: 'pi pi-bars',
+        showInNavigation: true,
+      },
+    },
+  },
+]
+```
