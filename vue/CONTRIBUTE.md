@@ -114,9 +114,16 @@ Document deviations from these gates in the pull request summary and explain the
 Our first public release will be automated through GitHub Actions. For now follow the manual flow when testing locally:
 
 ```bash
-npm version <major|minor|patch>
+cd ..
+python3 scripts/wefa_version.py bump <major|minor|patch>
+# or:
+python3 scripts/wefa_version.py set <x.y.z[-prerelease]>
+cd vue
 npm publish --access public
 ```
+
+Use SemVer when calling the script. Prerelease identifiers are limited to `alpha.<N>`, `beta.<N>`,
+or `rc.<N>`. Python package files are written with the equivalent PEP 440 prerelease notation.
 
 Do not publish from feature branches. Coordinate releases through a dedicated pull request, obtain approvals, update the changelog, and tag the release. Once CI is in place the workflow will be updated here.
 
