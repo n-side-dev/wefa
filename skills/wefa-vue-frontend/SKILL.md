@@ -36,7 +36,7 @@ Apply the WeFa Vue frontend standards with predictable implementation and valida
 - `npm run type-check`
 - `npm run format-check`
 - `npm run test:unit -- --reporter=dot --silent`
-- `npm run test:e2e -- --reporter=dot --quiet` when routing/flows changed
+- `npm run test:e2e -- --reporter=dot` when routing/flows changed
 
 ## Test Output Discipline
 1. Always run tests with low-verbosity flags to limit terminal noise and token usage.
