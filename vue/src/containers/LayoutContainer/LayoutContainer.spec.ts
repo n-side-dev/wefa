@@ -59,6 +59,11 @@ const ConfirmDialogStub = defineComponent({
   template: '<div data-test="confirm-dialog"></div>',
 })
 
+const CommandPaletteStub = defineComponent({
+  name: 'CommandPaletteComponent',
+  template: '<div data-test="command-palette"></div>',
+})
+
 describe('LayoutContainer', () => {
   it('passes project title to side and mobile navigation components', () => {
     const wrapper = mount(LayoutContainer, {
@@ -73,6 +78,7 @@ describe('LayoutContainer', () => {
           RouterView: RouterViewStub,
           Toast: ToastStub,
           ConfirmDialog: ConfirmDialogStub,
+          CommandPaletteComponent: CommandPaletteStub,
         },
       },
     })
@@ -94,6 +100,7 @@ describe('LayoutContainer', () => {
           RouterView: RouterViewStub,
           Toast: ToastStub,
           ConfirmDialog: ConfirmDialogStub,
+          CommandPaletteComponent: CommandPaletteStub,
         },
       },
     })
@@ -114,11 +121,13 @@ describe('LayoutContainer', () => {
           RouterView: RouterViewStub,
           Toast: ToastStub,
           ConfirmDialog: ConfirmDialogStub,
+          CommandPaletteComponent: CommandPaletteStub,
         },
       },
     })
 
     expect(wrapper.find('[data-test="router-view"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="command-palette"]').exists()).toBe(true)
     expect(wrapper.find('[data-test="toast"]').exists()).toBe(true)
     expect(wrapper.find('[data-test="confirm-dialog"]').exists()).toBe(true)
   })
@@ -137,6 +146,7 @@ describe('LayoutContainer', () => {
           RouterView: RouterViewStub,
           Toast: ToastStub,
           ConfirmDialog: ConfirmDialogStub,
+          CommandPaletteComponent: CommandPaletteStub,
         },
       },
     })

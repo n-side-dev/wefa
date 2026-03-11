@@ -7,5 +7,11 @@
   "profile": "Profile",
   "settings": "Settings",
   "open_navigation_menu": "Open navigation menu",
-  "open_user_menu_for": "Open user menu for {username}"
+  "open_user_menu_for": "Open user menu for {username}",
+  "command_palette_title": "Command Palette",
+  "command_palette_shortcut": "Cmd/Ctrl + K",
+  "command_palette_search_placeholder": "Search for a route or action",
+  "command_palette_search_aria_label": "Search command palette actions",
+  "command_palette_results_aria_label": "Command palette results",
+  "command_palette_no_results": "No matching actions"
 }

@@ -12,6 +12,7 @@ import * as LayoutContainerStories from './LayoutContainer.stories'
 - desktop side navigation
 - mobile drawer navigation
 - route-aware breadcrumb
+- global command palette (`Cmd/Ctrl + K`)
 - child route content through `<router-view />`
 
 The stories below focus on router metadata setup, because navigation links are generated directly from the router tree.
@@ -20,7 +21,7 @@ The stories below focus on router metadata setup, because navigation links are g
 
 ### Wefa Route Metadata
 
-Uses `meta.wefa.showInNavigation` and `meta.wefa.section`.
+Uses `meta.wefa.showInNavigation`, `meta.wefa.section`, and `meta.wefa.showInCommandPalette`.
 
 <Canvas of={LayoutContainerStories.WefaNavigationMeta} />
 <Canvas of={LayoutContainerStories.WefaSectionedMeta} />
@@ -34,6 +35,7 @@ Uses `meta.wefa.showInNavigation` and `meta.wefa.section`.
       title: 'Dashboard',
       icon: 'pi pi-chart-line',
       showInNavigation: true,
+      showInCommandPalette: true,
       section: 'Insights',
     },
   },
@@ -109,6 +111,7 @@ const routes = [
         title: 'Home',
         icon: 'pi pi-home',
         showInNavigation: true,
+        showInCommandPalette: true,
       },
     },
   },
@@ -121,6 +124,7 @@ const routes = [
         title: 'Showcase',
         icon: 'pi pi-bars',
         showInNavigation: true,
+        showInCommandPalette: true,
       },
     },
   },
