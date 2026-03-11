@@ -175,6 +175,11 @@ def canonicalize_semver(value: str, *, flag_name: str) -> str:
     prerelease = match.group("prerelease")
     if prerelease is None:
         return base
+    parts = prerelease.split(".")
+    if len(parts) == 2 and parts[1].isdigit():
+        normalized_label = parts[0].lower()
+        if normalized_label in PRERELEASE_LABEL_TO_PEP440:
+            return f"{base}-{normalized_label}.{parts[1]}"
     return f"{base}-{prerelease}"
 
 

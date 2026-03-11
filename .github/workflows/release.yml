@@ -19,8 +19,19 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Normalize release tag for SemVer validation
+        id: normalize-tag
+        run: |
+          raw_tag="${{ github.event.release.tag_name }}"
+          if [[ "$raw_tag" =~ ^[vV](.+)$ ]]; then
+            semver_tag="${BASH_REMATCH[1]}"
+          else
+            semver_tag="$raw_tag"
+          fi
+          echo "semver_tag=$semver_tag" >> "$GITHUB_OUTPUT"
+
       - name: Validate shared version against release tag
-        run: python3 scripts/wefa_version.py check --expect "${{ github.event.release.tag_name }}"
+        run: python3 scripts/wefa_version.py check --expect "${{ steps.normalize-tag.outputs.semver_tag }}"
 
   publish-bff-image:
     name: Build, tag and publish BFF image

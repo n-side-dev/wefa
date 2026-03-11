@@ -58,6 +58,11 @@ class WefaVersionTests(TestCase):
         with self.assertRaisesRegex(ValueError, "prerelease label must be one of"):
             wefa_version.build_version_targets("1.2.3-preview.1", flag_name="version")
 
+    def test_supported_prerelease_label_is_canonicalized_to_lowercase(self) -> None:
+        targets = wefa_version.build_version_targets("1.2.3-RC.1", flag_name="version")
+        self.assertEqual(targets.semver, "1.2.3-rc.1")
+        self.assertEqual(targets.python, "1.2.3rc1")
+
     def test_unified_version_accepts_mixed_semver_and_pep440(self) -> None:
         self.assertEqual(wefa_version.unified_version(MIXED_RC_VERSIONS), "1.0.0-rc.1")
 
