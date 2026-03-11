@@ -16,25 +16,25 @@ const dummyRoutes = [
   {
     path: '/',
     name: 'home',
-    meta: { title: 'Home', icon: 'pi pi-home' },
+    meta: { wefa: { title: 'Home', icon: 'pi pi-home' } },
     component: { template: '<div>Home</div>' }
   },
   {
     path: '/products',
     name: 'products',
-    meta: { title: 'Products', icon: 'pi pi-box' },
+    meta: { wefa: { title: 'Products', icon: 'pi pi-box' } },
     component: { template: '<div>Products</div>' },
     children: [
       {
         path: 'category/:id',
         name: 'category',
-        meta: { title: 'Category', icon: 'pi pi-tag' },
+        meta: { wefa: { title: 'Category', icon: 'pi pi-tag' } },
         component: { template: '<div>Category</div>' },
         children: [
           {
             path: 'item/:itemId',
             name: 'item',
-            meta: { title: 'Product Item', icon: 'pi pi-shopping-cart' },
+            meta: { wefa: { title: 'Product Item', icon: 'pi pi-shopping-cart' } },
             component: { template: '<div>Item</div>' }
           }
         ]
@@ -44,13 +44,13 @@ const dummyRoutes = [
   {
     path: '/users',
     name: 'users',
-    meta: { title: 'Users', icon: 'pi pi-users' },
+    meta: { wefa: { title: 'Users', icon: 'pi pi-users' } },
     component: { template: '<div>Users</div>' },
     children: [
       {
         path: 'profile/:id',
         name: 'profile',
-        meta: { title: 'User Profile', icon: 'pi pi-user' },
+        meta: { wefa: { title: 'User Profile', icon: 'pi pi-user' } },
         component: { template: '<div>Profile</div>' }
       }
     ]
@@ -59,37 +59,37 @@ const dummyRoutes = [
   {
     path: '/dashboard',
     name: 'Dashboard',
-    meta: { title: 'Dashboard', icon: 'pi pi-chart-line' },
+    meta: { wefa: { title: 'Dashboard', icon: 'pi pi-chart-line' } },
     component: { template: '<div><h2>Tab 1 Content</h2><p>This is the content for the first tab.</p></div>' }
   },
   {
     path: '/analytics',
     name: 'Analytics',
-    meta: { title: 'Analytics', icon: 'pi pi-chart-bar' },
+    meta: { wefa: { title: 'Analytics', icon: 'pi pi-chart-bar' } },
     component: { template: '<div><h2>Tab 2 Content</h2><p>This is the content for the second tab.</p></div>' }
   },
   {
     path: '/containers',
     name: 'Container Demo',
-    meta: { title: 'Container Demo' },
+    meta: { wefa: { title: 'Container Demo' } },
     component: BareContainer,
     children: [
       {
         path: 'settings',
         name: 'settings',
-        meta: { title: 'Settings' },
+        meta: { wefa: { title: 'Settings' } },
         component: SideMenuContainer,
         children: [
-          { path: 'passwordreset', name: 'passwordreset', meta: { title: 'Password', icon: 'pi pi-asterisk' }, component: PlaceholderView },
-          { path: 'apitoken', name: 'apitoken', meta: { title: 'API Token', icon: 'pi pi-key' }, redirect: {name: 'apitoken-readonly'}, component: NavbarContainer, children: [
-            { path: 'readonly', name: 'apitoken-readonly', meta: { title: 'Read-Only' }, component: PlaceholderView },
-            { path: 'readwrite', name: 'apitoken-readwrite', meta: { title: 'Read + Write' }, component: PlaceholderView },
-            { path: 'admin', name: 'apitoken-admin', meta: { title: 'Admin' }, component: NavbarContainer, children: [
-              { path: 'audit', name: 'apitoken-admin-audit', meta: { title: 'Audit' }, component: PlaceholderView },
-              { path: 'logs', name: 'apitoken-admin-logs', meta: { title: 'Logs' }, component: PlaceholderView }
+          { path: 'passwordreset', name: 'passwordreset', meta: { wefa: { title: 'Password', icon: 'pi pi-asterisk' } }, component: PlaceholderView },
+          { path: 'apitoken', name: 'apitoken', meta: { wefa: { title: 'API Token', icon: 'pi pi-key' } }, redirect: {name: 'apitoken-readonly'}, component: NavbarContainer, children: [
+            { path: 'readonly', name: 'apitoken-readonly', meta: { wefa: { title: 'Read-Only' } }, component: PlaceholderView },
+            { path: 'readwrite', name: 'apitoken-readwrite', meta: { wefa: { title: 'Read + Write' } }, component: PlaceholderView },
+            { path: 'admin', name: 'apitoken-admin', meta: { wefa: { title: 'Admin' } }, component: NavbarContainer, children: [
+              { path: 'audit', name: 'apitoken-admin-audit', meta: { wefa: { title: 'Audit' } }, component: PlaceholderView },
+              { path: 'logs', name: 'apitoken-admin-logs', meta: { wefa: { title: 'Logs' } }, component: PlaceholderView }
             ]}
           ]},
-          { path: 'preferences', name: 'preferences', meta: { title: 'Preferences', icon: 'pi pi-user-edit' }, component: PlaceholderView },
+          { path: 'preferences', name: 'preferences', meta: { wefa: { title: 'Preferences', icon: 'pi pi-user-edit' } }, component: PlaceholderView },
         ],
       },
     ]

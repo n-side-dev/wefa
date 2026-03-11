@@ -24,32 +24,32 @@ Let's take the example of a settings panel which contains multiples views for pa
 /** router.ts*/
 
 routes: [
-    {
-      path: '/settings',
-      name: 'settings',
-      meta: { title: 'Settings'}
-      children: [
-        {
-          path: 'passwordreset',
-          name: 'passwordreset',
-          meta: { title: 'Password reset'},
-          component: PasswordResetView
-        },
-        {
-          path: 'apitoken',
-          name: 'apitoken',
-          meta: { title: 'API Token'},
-          component: ApiTokenView
-        },
-        {
-          path: 'preferences',
-          name: 'preferences',
-          meta: { title: 'Preferences'},
-          component: UserPreferencesView
-        }
-      ]
-    }
-  ]
+  {
+    path: '/settings',
+    name: 'settings',
+    meta: { wefa: { title: 'Settings' } },
+    children: [
+      {
+        path: 'passwordreset',
+        name: 'passwordreset',
+        meta: { wefa: { title: 'Password reset' } },
+        component: PasswordResetView,
+      },
+      {
+        path: 'apitoken',
+        name: 'apitoken',
+        meta: { wefa: { title: 'API Token' } },
+        component: ApiTokenView,
+      },
+      {
+        path: 'preferences',
+        name: 'preferences',
+        meta: { wefa: { title: 'Preferences' } },
+        component: UserPreferencesView,
+      },
+    ],
+  },
+]
 ```
 
 In such a setup, you may need to have a navigation element allowing you to see and navigate between these three children routes.
@@ -64,8 +64,8 @@ routes: [
     {
       path: '/settings',
       name: 'settings',
-      meta: { title: 'Settings'}
-      component: SideMenuContainer
+      meta: { wefa: { title: 'Settings' } },
+      component: SideMenuContainer,
       children: [
         ...
       ]
@@ -88,19 +88,19 @@ routes: [
     {
       path: '/settings',
       name: 'settings',
-      meta: { title: 'Settings'},
-      component: SideMenuContainer
+      meta: { wefa: { title: 'Settings' } },
+      component: SideMenuContainer,
       children: [
         ...
         {
           path: 'apitoken',
           name: 'apitoken',
-          meta: { title: 'API Token'},
+          meta: { wefa: { title: 'API Token' } },
           component: NavBarContainer,
           children: [
-            { path: 'readonly', meta: { title: 'Read-Only'}, ...},
-            { path: 'readwrite', meta: { title: 'Read + Write'}, ...},
-            { path: 'admin', meta: { title: 'Admin'}, ...}
+            { path: 'readonly', meta: { wefa: { title: 'Read-Only' }}, ...},
+            { path: 'readwrite', meta: { wefa: { title: 'Read + Write' }}, ...},
+            { path: 'admin', meta: { wefa: { title: 'Admin' }}, ...}
           ]
         },
         ...
@@ -109,9 +109,9 @@ routes: [
   ]
 ```
 
-## Customizing appearance with route.meta
+## Customizing appearance with route.meta.wefa
 
-Navigation elements (e.g in the NavbarContainer or SideMenuContainer) will rely on metadata specified on your route.meta, such as
+Navigation elements (e.g in the NavbarContainer or SideMenuContainer) rely on metadata specified on `route.meta.wefa`, such as:
 
 - title
 - icon
