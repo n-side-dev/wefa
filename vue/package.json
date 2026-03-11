@@ -116,7 +116,7 @@
     "eslint-plugin-jsdoc": "^62.7.1",
     "eslint-plugin-playwright": "^2.9.0",
     "eslint-plugin-security": "^4.0.0",
-    "eslint-plugin-sonarjs": "^4.0.1",
+    "eslint-plugin-sonarjs": "^4.0.2",
     "eslint-plugin-storybook": "^10.2.17",
     "eslint-plugin-vue": "~10.8.0",
     "jiti": "^2.6.1",
