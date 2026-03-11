@@ -27,7 +27,7 @@ jobs:
 
       - name: Compute image metadata
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ${{ secrets.OCI_REGISTRY_HOST }}/${{ secrets.OCI_BFF_IMAGE_REPOSITORY }}
           tags: |
