@@ -78,6 +78,13 @@ python3 scripts/wefa_version.py set 1.0.0-rc.1
 
 Use `--dry-run` to preview changes and `--allow-dirty-version-files` only when you intentionally need to override preflight checks.
 
+### BFF Container Image
+
+When a GitHub release is published, CI builds and pushes the BFF Docker image to GitHub Container Registry (GHCR):
+
+- `ghcr.io/n-side-dev/wefa/bff:<release-tag>`
+- `ghcr.io/n-side-dev/wefa/bff:latest` for non-prerelease tags only
+
 ## Contributing
 
 Contributions are welcome! Start with open issues or propose new ideas through GitHub discussions. Please read [Django CONTRIBUTE](django/CONTRIBUTE.md) and/or [Vue CONTRIBUTE](vue/CONTRIBUTE.md) for the current contribution workflow.

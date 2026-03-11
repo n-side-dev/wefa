@@ -27,6 +27,9 @@ jobs:
     if: ${{ !github.event.release.draft }}
     runs-on: ubuntu-latest
     needs: validate-version
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -37,15 +40,15 @@ jobs:
       - name: Login to registry
         uses: docker/login-action@v3
         with:
-          registry: ${{ secrets.OCI_REGISTRY_HOST }}
-          username: ${{ secrets.OCI_REGISTRY_USERNAME }}
-          password: ${{ secrets.OCI_REGISTRY_PASSWORD }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Compute image metadata
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ secrets.OCI_REGISTRY_HOST }}/${{ secrets.OCI_BFF_IMAGE_REPOSITORY }}
+          images: ghcr.io/${{ github.repository }}/bff
           tags: |
             type=raw,value=${{ github.event.release.tag_name }}
             type=raw,value=latest,enable=${{ !github.event.release.prerelease }}
