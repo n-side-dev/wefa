@@ -78,6 +78,10 @@ python3 scripts/wefa_version.py set 1.0.0-rc.1
 
 Use `--dry-run` to preview changes and `--allow-dirty-version-files` only when you intentionally need to override preflight checks.
 
+Use SemVer for CLI inputs and release tags (for example `1.2.3-rc.1`). For prereleases, only
+`alpha.<N>`, `beta.<N>`, and `rc.<N>` are supported. Python project files are written in PEP 440
+equivalent form (`1.2.3a1`, `1.2.3b1`, `1.2.3rc1`) by the orchestrator.
+
 ### BFF Container Image
 
 When a GitHub release is published, CI builds and pushes the BFF Docker image to GitHub Container Registry (GHCR):

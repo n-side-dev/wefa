@@ -195,6 +195,10 @@ cd vue
 npm publish --access public
 ```
 
+The version script expects SemVer for user input and tags. For prereleases, use
+`alpha.<N>`, `beta.<N>`, or `rc.<N>`; Python package files are automatically normalized to PEP 440
+(`a`, `b`, `rc`) during updates.
+
 ## Testing the library locally
 
 If you want to test the library locally on a project using WeFa, you can do it with the following steps:

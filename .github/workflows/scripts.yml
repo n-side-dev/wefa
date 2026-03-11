@@ -1,0 +1,29 @@
+name: Scripts CI
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/**'
+      - '.github/workflows/scripts.yml'
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'scripts/**'
+      - '.github/workflows/scripts.yml'
+  workflow_dispatch:
+
+jobs:
+  tests:
+    name: Scripts Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run scripts unit tests
+        run: python3 -m unittest discover -s scripts -p 'test_*.py'
