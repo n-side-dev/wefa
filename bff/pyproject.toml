@@ -1,0 +1,21 @@
+[project]
+name = "backend-for-frontend"
+version = "0.3.0"
+description = "Flask backend-for-frontend"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "authlib",
+    "cryptography",
+    "flask~=3.1.2",
+    "flask-cors",
+    "flask-session",
+    "flask-smorest>=0.46.2",
+    "pyyaml~=6.0",
+    "python-dotenv~=1.2.1",
+    "requests",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+]

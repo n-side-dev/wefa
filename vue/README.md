@@ -184,12 +184,20 @@ We welcome pull requests! Start with [`CONTRIBUTE`](CONTRIBUTE.md) for the full 
 
 ## Release process
 
-Versioning currently follows SemVer. To test a release locally:
+Versioning for this repository is managed from the monorepo root so `vue`, `django`, and `bff` stay aligned:
 
 ```bash
-npm version <major|minor|patch>
+cd ..
+python3 scripts/wefa_version.py bump <major|minor|patch>
+# or:
+python3 scripts/wefa_version.py set <x.y.z[-prerelease]>
+cd vue
 npm publish --access public
 ```
+
+The version script expects SemVer for user input and tags. For prereleases, use
+`alpha.<N>`, `beta.<N>`, or `rc.<N>`; Python package files are automatically normalized to PEP 440
+(`a`, `b`, `rc`) during updates.
 
 ## Testing the library locally
 
