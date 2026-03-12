@@ -35,8 +35,13 @@ Apply the WeFa Vue frontend standards with predictable implementation and valida
 - `npm run lint-check`
 - `npm run type-check`
 - `npm run format-check`
-- `npm run test:unit`
-- `npm run test:e2e` when routing/flows changed
+- `npm run test:unit -- --reporter=dot --silent`
+- `npm run test:e2e -- --reporter=dot` when routing/flows changed
+
+## Test Output Discipline
+1. Always run tests with low-verbosity flags to limit terminal noise and token usage.
+2. Keep the minimal reporters above unless debugging failures requires temporary extra detail.
+3. If extra verbosity is needed for debugging, rerun only the failing test scope with detailed output.
 
 ## References
 - Read `vue/README.md` and `vue/CONTRIBUTE.md` for project workflows.
