@@ -49,6 +49,7 @@ const appRoutes: RouteRecordRaw[] = [
         title: 'Home',
         icon: 'pi pi-home',
         showInNavigation: true,
+        showInCommandPalette: true,
       } satisfies WefaRouteMeta,
     },
     component: () => import('@/views/MyHomeView.vue'),
@@ -105,13 +106,14 @@ Once you've created a Vue Single File Component (SFC), add it to your router to 
   path: '/',
   name: 'home',
   meta: {
-    wefa: {
-      title: 'Home',
-      icon: 'pi pi-home',
-      requiresAuth: true,
-      requiresUnauth: false,
-      showInNavigation: true,
-    },
+      wefa: {
+        title: 'Home',
+        icon: 'pi pi-home',
+        requiresAuth: true,
+        requiresUnauth: false,
+        showInNavigation: true,
+        showInCommandPalette: true,
+      },
   },
   component: () => import('@/views/MyHomeView.vue'),
   children: [
@@ -185,6 +187,13 @@ The following `WefaRouteMeta` fields are used by WeFa:
       <td class='font-mono'>wefa.showInNavigation</td>
       <td>Optional</td>
       <td>Indicates whether the route should be shown in navigation containers.</td>
+    </tr>
+    <tr>
+      <td class='font-mono'>wefa.showInCommandPalette</td>
+      <td>Optional</td>
+      <td>
+        Indicates whether the route should be shown as an actionable entry in the Command Palette.
+      </td>
     </tr>
     <tr>
       <td class='font-mono'>wefa.section</td>

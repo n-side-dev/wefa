@@ -7,6 +7,7 @@ export interface WeFaRouteMeta {
   requiresAuth?: boolean
   requiresUnauth?: boolean
   showInNavigation?: boolean
+  showInCommandPalette?: boolean
   section?: string
 }
 
