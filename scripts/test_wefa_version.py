@@ -102,3 +102,15 @@ class WefaVersionTests(TestCase):
                     wefa_version.run_transactional_version_update(mutate)
 
             self.assertEqual(path.read_text(encoding="utf-8"), "before\n")
+
+    def test_update_django_init_version_appends_trailing_newline(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            path = root / "django/nside_wefa/__init__.py"
+            path.parent.mkdir(parents=True)
+            path.write_text('__version__ = "1.0.0rc1"', encoding="utf-8")
+
+            with mock.patch.object(wefa_version, "ROOT", root):
+                wefa_version.update_django_init_version("1.0.1")
+
+            self.assertEqual(path.read_text(encoding="utf-8"), '__version__ = "1.0.1"\n')

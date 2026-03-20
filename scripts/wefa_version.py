@@ -361,6 +361,8 @@ def update_django_init_version(target_version: str) -> None:
     updated, replacements = pattern.subn(f'__version__ = "{target_version}"', text, count=1)
     if replacements != 1:
         raise RuntimeError(f"unable to update __version__ in {relpath(path)}")
+    if not updated.endswith("\n"):
+        updated = f"{updated}\n"
     path.write_text(updated, encoding="utf-8")
 
 
