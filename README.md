@@ -88,6 +88,7 @@ When a GitHub release is published, CI builds and pushes the BFF Docker image to
 
 - `ghcr.io/n-side-dev/wefa/bff:<release-tag>`
 - `ghcr.io/n-side-dev/wefa/bff:latest` for non-prerelease tags only
+- Multi-arch manifest for `linux/amd64` and `linux/arm64`
 
 ## Contributing
 
