@@ -1,4 +1,5 @@
 import { fileURLToPath, URL } from 'node:url'
+import { copyFileSync, existsSync, mkdirSync } from 'node:fs'
 import { defineConfig } from 'vite'
 import { resolve } from "path"
 import vue from '@vitejs/plugin-vue'
@@ -6,9 +7,24 @@ import tailwindcss from '@tailwindcss/vite'
 import dts from 'vite-plugin-dts'
 import tidewave from 'tidewave/vite-plugin'
 
+const bffOpenApiSource = resolve(__dirname, '../bff/bff_app/openapi/openapi.yaml')
+const bffOpenApiDistDir = resolve(__dirname, 'dist/bff')
+const bffOpenApiDistFile = resolve(bffOpenApiDistDir, 'openapi.yaml')
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
+    {
+      name: 'copy-bff-openapi',
+      writeBundle() {
+        if (!existsSync(bffOpenApiSource)) {
+          throw new Error(`Missing BFF OpenAPI file at ${bffOpenApiSource}`)
+        }
+
+        mkdirSync(bffOpenApiDistDir, { recursive: true })
+        copyFileSync(bffOpenApiSource, bffOpenApiDistFile)
+      },
+    },
     tidewave(),
     vue({script: {defineModel: true}}),
     // vueDevTools(),
