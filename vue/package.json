@@ -42,6 +42,7 @@
       "import": "./dist/network.js",
       "require": "./dist/network.cjs"
     },
+    "./bff-openapi": "./dist/bff/openapi.yaml",
     "./types": "./dist/lib.d.ts",
     "./style": "./src/assets/main.css"
   },
@@ -70,7 +71,7 @@
     "@primevue/forms": "^4.5.4",
     "@tailwindcss/cli": "^4.2.2",
     "@tailwindcss/vite": "^4.2.2",
-    "@tanstack/vue-query": "^5.92.10",
+    "@tanstack/vue-query": "^5.95.2",
     "@vee-validate/zod": "^4.15.1",
     "@vueuse/core": "^14.2.1",
     "axios": "^1.13.6",
