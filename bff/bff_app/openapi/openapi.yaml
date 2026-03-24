@@ -26,7 +26,8 @@ paths:
         default:
           $ref: '#/components/responses/DEFAULT_ERROR'
         '302':
-          description: Redirects to frontend after successful or failed state check.
+          description: Redirects to the frontend. Failed callbacks append an error
+            query parameter.
       summary: OAuth callback
       description: Exchanges the authorization code for tokens and stores encrypted
         token cookies.

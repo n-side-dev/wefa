@@ -49,6 +49,14 @@ def _build_redirect_with_error(frontend_redirect: str, error_code: str) -> str:
     )
 
 
+def _redirect_to_frontend(frontend_redirect: str, error_code: str | None = None) -> object:
+    """Build a frontend redirect response with an optional error code."""
+    redirect_target = frontend_redirect
+    if error_code is not None:
+        redirect_target = _build_redirect_with_error(frontend_redirect, error_code)
+    return redirect(redirect_target, code=302)
+
+
 def _clear_auth_state(response: object) -> None:
     """Clear both Flask session state and encrypted auth token cookies."""
     session.clear()
@@ -117,7 +125,10 @@ def login():
     description="Exchanges the authorization code for tokens and stores encrypted token cookies.",
     responses={
         "302": {
-            "description": "Redirects to frontend after successful or failed state check."
+            "description": (
+                "Redirects to the frontend. Failed callbacks append an error query "
+                "parameter."
+            )
         }
     },
 )
@@ -125,14 +136,16 @@ def login_cb():
     """Handle OAuth callback and exchange authorization code for tokens.
 
     Request query parameters:
-        ``state`` and ``code`` as returned by the OAuth provider.
+        ``state``, ``code`` and optional ``error`` as returned by the OAuth provider.
 
     Side effects:
         Validates CSRF ``state`` and writes token payload to encrypted
-        HttpOnly cookies on success.
+        HttpOnly cookies on success. Clears the Flask session and auth cookies on
+        failure.
 
     :returns:
-        Redirect response to the configured frontend URL.
+        Redirect response to the configured frontend URL. Failed callbacks append a
+        deterministic ``error`` query parameter.
     :rtype: flask.Response
     """
     current_app.logger.debug("Handling /proxy/api/auth/callback")
@@ -140,24 +153,45 @@ def login_cb():
 
     request_state = request.args.get("state")
     session_state = session.get("state")
+    authorization_error = request.args.get("error")
     authorization_code = request.args.get("code")
     code_verifier = session.get("cv")
 
     if not session_state or not request_state:
         current_app.logger.warning("Missing OAuth state during callback")
-        response = redirect(settings.frontend_redirect, code=302)
+        response = _redirect_to_frontend(
+            settings.frontend_redirect,
+            error_code="auth_state_missing",
+        )
         _clear_auth_state(response)
         return response
     if request_state != session_state:
         current_app.logger.warning("OAuth callback state mismatch")
-        response = redirect(settings.frontend_redirect, code=302)
+        response = _redirect_to_frontend(
+            settings.frontend_redirect,
+            error_code="auth_state_mismatch",
+        )
+        _clear_auth_state(response)
+        return response
+    if authorization_error:
+        current_app.logger.warning(
+            "OAuth provider returned callback error: %s",
+            authorization_error,
+        )
+        response = _redirect_to_frontend(
+            settings.frontend_redirect,
+            error_code="auth_provider_error",
+        )
         _clear_auth_state(response)
         return response
     if not authorization_code or not code_verifier:
         current_app.logger.warning(
             "Missing authorization code or PKCE verifier during callback"
         )
-        response = redirect(settings.frontend_redirect, code=302)
+        response = _redirect_to_frontend(
+            settings.frontend_redirect,
+            error_code="auth_callback_incomplete",
+        )
         _clear_auth_state(response)
         return response
 
@@ -183,11 +217,14 @@ def login_cb():
         )
     except Exception as exc:
         current_app.logger.warning("OAuth token exchange failed: %s", exc)
-        response = redirect(settings.frontend_redirect, code=302)
+        response = _redirect_to_frontend(
+            settings.frontend_redirect,
+            error_code="auth_token_exchange_failed",
+        )
         _clear_auth_state(response)
         return response
 
-    response = redirect(settings.frontend_redirect, code=302)
+    response = _redirect_to_frontend(settings.frontend_redirect)
     try:
         store_session_token(response, token)
     except TokenCookieTooLargeError as exc:
@@ -196,15 +233,18 @@ def login_cb():
             exc.cookie_name,
             exc.cookie_size_bytes,
         )
-        error_redirect = _build_redirect_with_error(
+        response = _redirect_to_frontend(
             settings.frontend_redirect,
-            "auth_cookie_too_large",
+            error_code="auth_cookie_too_large",
         )
-        response = redirect(error_redirect, code=302)
         _clear_auth_state(response)
         return response
     except ValueError as exc:
         current_app.logger.warning("OAuth token payload is invalid: %s", exc)
+        response = _redirect_to_frontend(
+            settings.frontend_redirect,
+            error_code="auth_invalid_token",
+        )
         _clear_auth_state(response)
         return response
 
