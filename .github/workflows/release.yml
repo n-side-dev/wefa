@@ -135,7 +135,7 @@ jobs:
         run: uv pip install --python "$VIRTUAL_ENV" build
 
       - name: Build distributions
-        run: uv run python -m build
+        run: uv run python -m build --installer uv
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
