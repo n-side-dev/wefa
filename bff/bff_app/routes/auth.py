@@ -250,6 +250,11 @@ def login_cb():
 
     session.pop("cv", None)
     session.pop("state", None)
+    current_app.logger.info(
+        "OAuth callback succeeded; returning response with status=%s location=%s",
+        response.status_code,
+        response.headers.get("Location"),
+    )
     return response
 
 

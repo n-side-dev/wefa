@@ -1,3 +1,4 @@
+import logging
 from unittest.mock import MagicMock
 
 from bff_app.routes import auth as auth_routes
@@ -18,7 +19,7 @@ def _fake_oauth_session(state="state-123", token=None):
     return fake
 
 
-def test_login_callback_exchanges_code_and_redirects(client, monkeypatch):
+def test_login_callback_exchanges_code_and_redirects(client, monkeypatch, app, caplog):
     # Mock the token exchange so we don't call the real auth server.
     fake_oauth = _fake_oauth_session(
         token={
@@ -35,10 +36,15 @@ def test_login_callback_exchanges_code_and_redirects(client, monkeypatch):
         sess["state"] = "state-123"
         sess["cv"] = "cv-hex"
 
-    res = client.get("/proxy/api/auth/callback?state=state-123&code=abc")
+    with caplog.at_level(logging.INFO, logger=app.logger.name):
+        res = client.get("/proxy/api/auth/callback?state=state-123&code=abc")
 
     assert res.status_code == 302
     assert res.headers["Location"] == "http://frontend.test"
+    assert (
+        "OAuth callback succeeded; returning response with status=302 "
+        "location=http://frontend.test"
+    ) in caplog.text
     set_cookie_headers = res.headers.getlist("Set-Cookie")
     assert any(header.startswith("test-session_at=") for header in set_cookie_headers)
     assert any(header.startswith("test-session_rt=") for header in set_cookie_headers)
