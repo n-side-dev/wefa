@@ -1,3 +1,4 @@
+import logging
 from unittest.mock import MagicMock
 
 from bff_app.routes import auth as auth_routes
@@ -18,7 +19,7 @@ def _fake_oauth_session(state="state-123", token=None):
     return fake
 
 
-def test_login_callback_exchanges_code_and_redirects(client, monkeypatch):
+def test_login_callback_exchanges_code_and_redirects(client, monkeypatch, app, caplog):
     # Mock the token exchange so we don't call the real auth server.
     fake_oauth = _fake_oauth_session(
         token={
@@ -35,10 +36,15 @@ def test_login_callback_exchanges_code_and_redirects(client, monkeypatch):
         sess["state"] = "state-123"
         sess["cv"] = "cv-hex"
 
-    res = client.get("/proxy/api/auth/callback?state=state-123&code=abc")
+    with caplog.at_level(logging.INFO, logger=app.logger.name):
+        res = client.get("/proxy/api/auth/callback?state=state-123&code=abc")
 
     assert res.status_code == 302
     assert res.headers["Location"] == "http://frontend.test"
+    assert (
+        "OAuth callback succeeded; returning response with status=302 "
+        "location=http://frontend.test"
+    ) in caplog.text
     set_cookie_headers = res.headers.getlist("Set-Cookie")
     assert any(header.startswith("test-session_at=") for header in set_cookie_headers)
     assert any(header.startswith("test-session_rt=") for header in set_cookie_headers)
@@ -65,7 +71,7 @@ def test_login_callback_state_mismatch_redirects(
     res = client.get("/proxy/api/auth/callback?state=wrong&code=abc")
 
     assert res.status_code == 302
-    assert res.headers["Location"] == "http://frontend.test"
+    assert res.headers["Location"] == "http://frontend.test?error=auth_state_mismatch"
     set_cookie_headers = res.headers.getlist("Set-Cookie")
     assert any(header.startswith("test-session_at=;") for header in set_cookie_headers)
     with client.session_transaction() as sess:
@@ -84,7 +90,7 @@ def test_login_callback_missing_state_redirects_and_clears_session(
     res = client.get("/proxy/api/auth/callback?code=abc")
 
     assert res.status_code == 302
-    assert res.headers["Location"] == "http://frontend.test"
+    assert res.headers["Location"] == "http://frontend.test?error=auth_state_missing"
     set_cookie_headers = res.headers.getlist("Set-Cookie")
     assert any(header.startswith("test-session_at=;") for header in set_cookie_headers)
     with client.session_transaction() as sess:
@@ -104,7 +110,27 @@ def test_login_callback_missing_code_redirects_and_clears_session(
     res = client.get("/proxy/api/auth/callback?state=state-123")
 
     assert res.status_code == 302
-    assert res.headers["Location"] == "http://frontend.test"
+    assert res.headers["Location"] == "http://frontend.test?error=auth_callback_incomplete"
+    set_cookie_headers = res.headers.getlist("Set-Cookie")
+    assert any(header.startswith("test-session_at=;") for header in set_cookie_headers)
+    with client.session_transaction() as sess:
+        assert len(sess.keys()) == 0
+
+
+def test_login_callback_provider_error_redirects_with_error(
+    client,
+    set_auth_cookies,
+    build_token_payload,
+):
+    set_auth_cookies(client, build_token_payload())
+    with client.session_transaction() as sess:
+        sess["state"] = "state-123"
+        sess["cv"] = "cv-hex"
+
+    res = client.get("/proxy/api/auth/callback?state=state-123&error=access_denied")
+
+    assert res.status_code == 302
+    assert res.headers["Location"] == "http://frontend.test?error=auth_provider_error"
     set_cookie_headers = res.headers.getlist("Set-Cookie")
     assert any(header.startswith("test-session_at=;") for header in set_cookie_headers)
     with client.session_transaction() as sess:
@@ -129,7 +155,7 @@ def test_login_callback_token_exchange_error_redirects_without_500(
     res = client.get("/proxy/api/auth/callback?state=state-123&code=abc")
 
     assert res.status_code == 302
-    assert res.headers["Location"] == "http://frontend.test"
+    assert res.headers["Location"] == "http://frontend.test?error=auth_token_exchange_failed"
     set_cookie_headers = res.headers.getlist("Set-Cookie")
     assert any(header.startswith("test-session_at=;") for header in set_cookie_headers)
     with client.session_transaction() as sess:
@@ -157,3 +183,26 @@ def test_login_callback_cookie_too_large_redirects_with_error(client, monkeypatc
     assert res.headers["Location"] == "http://frontend.test?error=auth_cookie_too_large"
     set_cookie_headers = res.headers.getlist("Set-Cookie")
     assert any(header.startswith("test-session_at=;") for header in set_cookie_headers)
+
+
+def test_login_callback_invalid_token_payload_redirects_with_error(client, monkeypatch):
+    fake_oauth = _fake_oauth_session(
+        token={
+            "access_token": "tok",
+            "refresh_token": "rtok",
+        }
+    )
+    monkeypatch.setattr(auth_routes, "OAuth2Session", lambda *args, **kwargs: fake_oauth)
+
+    with client.session_transaction() as sess:
+        sess["state"] = "state-123"
+        sess["cv"] = "cv-hex"
+
+    res = client.get("/proxy/api/auth/callback?state=state-123&code=abc")
+
+    assert res.status_code == 302
+    assert res.headers["Location"] == "http://frontend.test?error=auth_invalid_token"
+    set_cookie_headers = res.headers.getlist("Set-Cookie")
+    assert any(header.startswith("test-session_at=;") for header in set_cookie_headers)
+    with client.session_transaction() as sess:
+        assert len(sess.keys()) == 0

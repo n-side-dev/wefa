@@ -89,7 +89,8 @@ docker-compose up --build
   - `<SESSION_COOKIE_NAME>_it` (id token)
   - `<SESSION_COOKIE_NAME>_meta` (remaining token payload)
 - PKCE verifier and OAuth state remain in Flask's signed session cookie.
-- If any encrypted token cookie would exceed the 4 KB browser cookie limit, callback login fails and redirects with `?error=auth_cookie_too_large`.
+- Callback login failures redirect to `FRONTEND_REDIRECT` with `?error=<code>` and clear local auth state.
+- Current callback error codes are `auth_state_missing`, `auth_state_mismatch`, `auth_provider_error`, `auth_callback_incomplete`, `auth_token_exchange_failed`, `auth_invalid_token`, and `auth_cookie_too_large`.
 - Existing signed-session token payloads are not migrated. Users with pre-change sessions must log in again after rollout.
 - This service does not configure server-side session storage.
 - Keep `SESSION_COOKIE_SECURE=True` and `SESSION_COOKIE_SAMESITE=Strict` in production.

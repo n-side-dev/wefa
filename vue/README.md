@@ -106,6 +106,8 @@ Types live under the `@nside/wefa/types` export:
 import type { WefaButtonProps } from '@nside/wefa/types';
 ```
 
+The published package also includes the Backend-for-Frontend OpenAPI document at `@nside/wefa/bff-openapi`.
+
 ### Theme preset
 
 To apply the NSIDE Prime theme preset in your app:
