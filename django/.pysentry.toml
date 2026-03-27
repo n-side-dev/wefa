@@ -1,0 +1,8 @@
+# PySentry configuration for the Django package.
+version = 1
+
+[defaults]
+fail_on = "medium"
+
+[ignore]
+while_no_fix = ["GHSA-5239-wwwm-4pmq"]

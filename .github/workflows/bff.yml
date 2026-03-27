@@ -16,6 +16,26 @@ defaults:
     working-directory: bff
 
 jobs:
+  security-analysis:
+    name: Security Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Python and install deps
+        uses: ./.github/actions/setup-python
+        with:
+          python-version: '3.12'
+          project-dir: 'bff'
+          cache-dependency-path: |
+            bff/pyproject.toml
+            bff/uv.lock
+          install-dev: 'true'
+
+      - name: Dependency Check
+        run: uvx pysentry-rs --config .pysentry.toml .
+
   verify:
     runs-on: ubuntu-latest
     steps:
