@@ -1,6 +1,6 @@
 [project]
 name = "backend-for-frontend"
-version = "0.4.2"
+version = "0.4.4"
 description = "Flask backend-for-frontend"
 requires-python = ">=3.12,<3.13"
 dependencies = [
@@ -12,7 +12,7 @@ dependencies = [
     "flask-smorest>=0.46.2",
     "pyyaml~=6.0",
     "python-dotenv~=1.2.1",
-    "requests",
+    "requests>=2.33.0",
 ]
 
 [dependency-groups]

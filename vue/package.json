@@ -1,6 +1,6 @@
 {
   "name": "@nside/wefa",
-  "version": "0.4.2",
+  "version": "0.4.4",
   "type": "module",
   "main": "./dist/lib.umd.cjs",
   "module": "./dist/lib.js",
@@ -42,6 +42,7 @@
       "import": "./dist/network.js",
       "require": "./dist/network.cjs"
     },
+    "./bff-openapi": "./dist/bff/openapi.yaml",
     "./types": "./dist/lib.d.ts",
     "./style": "./src/assets/main.css"
   },
