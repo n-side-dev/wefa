@@ -18,6 +18,7 @@ const routes: RouteRecordRaw[] = [
         title: 'Home',
         icon: 'pi pi-home',
         showInNavigation: true,
+        showInCommandPalette: true,
       },
     },
   },
@@ -30,6 +31,7 @@ const routes: RouteRecordRaw[] = [
         title: 'Showcase',
         icon: 'pi pi-bars',
         showInNavigation: true,
+        showInCommandPalette: true,
       },
     },
   },
@@ -41,6 +43,7 @@ const routes: RouteRecordRaw[] = [
       wefa: {
         title: 'Playground',
         showInNavigation: true,
+        showInCommandPalette: true,
         section: 'Others',
       },
     },
@@ -53,6 +56,7 @@ const routes: RouteRecordRaw[] = [
       wefa: {
         title: 'Demo',
         showInNavigation: true,
+        showInCommandPalette: true,
         section: 'Others',
       },
     },
