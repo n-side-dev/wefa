@@ -1,22 +1,36 @@
 <template>
-  <div class="flex flex-col items-center justify-center gap-4 bg-white rounded-3xl p-8 shadow-xl">
-    <h1>Hi ! You've reached the demo view of N-SIDE WeFa</h1>
+  <div
+    class="flex flex-col items-center justify-center gap-6 rounded-3xl bg-white p-8 shadow-xl"
+    data-test="demo-home"
+  >
+    <div class="space-y-3 text-center">
+      <h1 class="text-3xl font-semibold text-zinc-950">{{ t('demo.home_title') }}</h1>
+      <p class="max-w-2xl text-sm text-zinc-600">
+        {{ t('demo.home_subtitle') }}
+      </p>
+    </div>
 
-    <Divider></Divider>
+    <Divider />
 
-    <span>
-      If you're looking for the Storybook documentation, you need to run<span
-        class="font-mono bg-primary-100 px-2"
-        >npm run storybook</span
-      >
-      instead
-    </span>
+    <div class="grid gap-3 text-center text-sm text-zinc-600">
+      <span>{{ t('demo.home_shortcut') }}</span>
+      <span>
+        {{ t('demo.home_storybook_prefix') }}
+        <span class="rounded bg-primary-100 px-2 font-mono">npm run storybook</span>
+        {{ t('demo.home_storybook_suffix') }}
+      </span>
+    </div>
 
-    <Divider></Divider>
+    <Divider />
 
-    <RouterLink :to="{ name: 'showcase' }">
-      <Button label="Access the local Showcase"></Button>
-    </RouterLink>
+    <div class="flex flex-wrap items-center justify-center gap-3">
+      <RouterLink :to="{ name: 'catalogHome' }">
+        <Button :label="t('demo.home_open_catalog')" />
+      </RouterLink>
+      <RouterLink :to="{ name: 'productCreate' }">
+        <Button severity="secondary" :label="t('demo.home_open_product_create')" />
+      </RouterLink>
+    </div>
   </div>
 </template>
 
@@ -25,4 +39,8 @@ import { RouterLink } from 'vue-router'
 
 import Divider from 'primevue/divider'
 import Button from 'primevue/button'
+
+import { useI18nLib } from '@/locales'
+
+const { t } = useI18nLib()
 </script>

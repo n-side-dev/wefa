@@ -50,6 +50,9 @@ const appRoutes: RouteRecordRaw[] = [
         icon: 'pi pi-home',
         showInNavigation: true,
         showInCommandPalette: true,
+        assistant: {
+          docId: 'catalog.home',
+        },
       } satisfies WefaRouteMeta,
     },
     component: () => import('@/views/MyHomeView.vue'),
@@ -113,6 +116,9 @@ Once you've created a Vue Single File Component (SFC), add it to your router to 
         requiresUnauth: false,
         showInNavigation: true,
         showInCommandPalette: true,
+        assistant: {
+          docId: 'catalog.home',
+        },
       },
   },
   component: () => import('@/views/MyHomeView.vue'),
@@ -202,5 +208,40 @@ The following `WefaRouteMeta` fields are used by WeFa:
         Groups routes under a section label in navigation UIs that support sectioned rendering.
       </td>
     </tr>
+    <tr>
+      <td class='font-mono'>wefa.assistant.docId</td>
+      <td>Optional</td>
+      <td>
+        Stable identifier used by the command palette assistant to map frontend routes to richer
+        backend action documentation. When present, the route is included in the assistant route
+        manifest sent to the backend.
+      </td>
+    </tr>
   </tbody>
 </table>
+
+## Assistant Metadata
+
+When you enable the optional `Ask` mode in the command palette, routes should expose a stable
+assistant document identifier under `meta.wefa.assistant.docId`. The frontend sends this compact
+route manifest to the backend, and the backend matches it against richer action docs when
+generating recipes or clarification questions.
+
+```ts
+{
+  path: '/catalog/products/new',
+  name: 'productCreate',
+  meta: {
+    wefa: {
+      title: 'Create Product',
+      icon: 'pi pi-plus-circle',
+      showInNavigation: true,
+      showInCommandPalette: true,
+      section: 'Commerce',
+      assistant: {
+        docId: 'catalog.product.create',
+      },
+    },
+  },
+}
+```

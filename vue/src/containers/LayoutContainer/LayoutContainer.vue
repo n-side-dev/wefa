@@ -23,7 +23,7 @@
     </main>
 
     <!-- PrimeVue Dynamic Components Receptors -->
-    <CommandPaletteComponent />
+    <CommandPaletteComponent :assistant="commandPalette?.assistant" />
     <Toast ref="toast" />
     <ConfirmDialog />
   </section>
@@ -33,15 +33,23 @@
 import SideNavigationComponent from '@/containers/LayoutContainer/SideNavigationComponent/SideNavigationComponent.vue'
 import { AutoroutedBreadcrumb } from '@/components/AutoroutedBreadcrumb'
 import MobileNavigationComponent from '@/containers/LayoutContainer/MobileNavigationComponent/MobileNavigationComponent.vue'
-import { CommandPaletteComponent } from '@/components/CommandPaletteComponent'
+import {
+  CommandPaletteComponent,
+  type CommandPaletteAssistantConfig,
+} from '@/components/CommandPaletteComponent'
 import { setupDepthTracker } from '../helpers'
 import Toast from 'primevue/toast'
 import ConfirmDialog from 'primevue/confirmdialog'
+
+export interface LayoutContainerCommandPaletteConfig {
+  assistant?: CommandPaletteAssistantConfig
+}
 
 export interface LayoutContainerProps {
   projectTitle: string
   projectLogo?: string
   projectLogoAlt?: string
+  commandPalette?: LayoutContainerCommandPaletteConfig
 }
 
 // Calling setupDepthTracker() is mandatory for all components with a <RouterView />
@@ -51,5 +59,6 @@ const {
   projectTitle,
   projectLogo = undefined,
   projectLogoAlt = undefined,
+  commandPalette = undefined,
 } = defineProps<LayoutContainerProps>()
 </script>

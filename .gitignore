@@ -6,3 +6,4 @@
 django/docs/source/api/*
 django/docs/output/**/*
 .env
+django/demo/.env

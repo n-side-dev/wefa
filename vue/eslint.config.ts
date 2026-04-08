@@ -1,5 +1,5 @@
 // For more info, see https://github.com/storybookjs/eslint-plugin-storybook#configuration-flat-config-format
-import storybook from "eslint-plugin-storybook";
+import storybook from 'eslint-plugin-storybook'
 
 import { globalIgnores } from 'eslint/config'
 import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript'
@@ -16,6 +16,10 @@ import skipFormatting from '@vue/eslint-config-prettier/skip-formatting'
 // configureVueProject({ scriptLangs: ['ts', 'tsx'] })
 // More info at https://github.com/vuejs/eslint-config-typescript/#advanced-setup
 
+const sonarjsRecommended = sonarjs.configs?.recommended
+const sonarjsRecommendedConfig = sonarjsRecommended
+  ? [sonarjsRecommended as never]
+  : []
 
 export default defineConfigWithVueTs(
   {
@@ -28,8 +32,7 @@ export default defineConfigWithVueTs(
   pluginVue.configs['flat/recommended'],
   vueTsConfigs.recommended,
   pluginSecurity.configs.recommended,
-  // @ts-expect-error Type mismatch from vendor as of 3.0.6
-  sonarjs.configs.recommended,
+  ...sonarjsRecommendedConfig,
   jsdoc.configs['flat/recommended-typescript'],
   storybook.configs['flat/recommended'],
   {

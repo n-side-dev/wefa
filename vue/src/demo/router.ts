@@ -3,6 +3,10 @@ import DemoView from '@/demo/views/DemoView.vue'
 import ShowcaseView from '@/demo/views/ShowcaseView.vue'
 import PlaygroundView from '@/demo/views/PlaygroundView.vue'
 import DemoContent from '@/demo/views/DemoContent.vue'
+import CatalogView from '@/demo/views/CatalogView.vue'
+import ProductCreateView from '@/demo/views/ProductCreateView.vue'
+import CartView from '@/demo/views/CartView.vue'
+import CheckoutView from '@/demo/views/CheckoutView.vue'
 
 const routes: RouteRecordRaw[] = [
   {
@@ -58,6 +62,74 @@ const routes: RouteRecordRaw[] = [
         showInNavigation: true,
         showInCommandPalette: true,
         section: 'Others',
+      },
+    },
+  },
+  {
+    path: '/catalog',
+    name: 'catalogHome',
+    component: CatalogView,
+    meta: {
+      wefa: {
+        title: 'Catalog',
+        icon: 'pi pi-box',
+        showInNavigation: true,
+        showInCommandPalette: true,
+        section: 'Commerce',
+        assistant: {
+          docId: 'catalog.home',
+        },
+      },
+    },
+  },
+  {
+    path: '/catalog/products/new',
+    name: 'productCreate',
+    component: ProductCreateView,
+    meta: {
+      wefa: {
+        title: 'Create Product',
+        icon: 'pi pi-plus-circle',
+        showInNavigation: true,
+        showInCommandPalette: true,
+        section: 'Commerce',
+        assistant: {
+          docId: 'catalog.product.create',
+        },
+      },
+    },
+  },
+  {
+    path: '/cart',
+    name: 'cart',
+    component: CartView,
+    meta: {
+      wefa: {
+        title: 'Cart',
+        icon: 'pi pi-shopping-cart',
+        showInNavigation: true,
+        showInCommandPalette: true,
+        section: 'Commerce',
+        assistant: {
+          docId: 'cart.view',
+        },
+      },
+    },
+  },
+  {
+    path: '/checkout',
+    name: 'checkout',
+    component: CheckoutView,
+    meta: {
+      wefa: {
+        title: 'Checkout',
+        icon: 'pi pi-credit-card',
+        showInNavigation: true,
+        showInCommandPalette: true,
+        section: 'Commerce',
+        assistant: {
+          docId: 'checkout.view',
+        },
       },
     },
   },

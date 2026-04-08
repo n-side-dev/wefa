@@ -13,5 +13,20 @@
   "command_palette_search_placeholder": "Search for a route or action",
   "command_palette_search_aria_label": "Search command palette actions",
   "command_palette_results_aria_label": "Command palette results",
-  "command_palette_no_results": "No matching actions"
+  "command_palette_no_results": "No matching actions",
+  "command_palette_mode_navigate": "Navigate",
+  "command_palette_mode_ask": "Ask",
+  "command_palette_ask_placeholder": "Describe what you want to do",
+  "command_palette_ask_aria_label": "Ask command palette assistant",
+  "command_palette_ask_help": "Ask for a structured recipe based on available routes and backend docs.",
+  "command_palette_ask_submit": "Generate recipe",
+  "command_palette_ask_loading": "Generating your recipe...",
+  "command_palette_ask_error": "Unable to generate recipe. Please try again.",
+  "command_palette_clarification_title": "More information is required",
+  "command_palette_recipe_title": "Suggested recipe",
+  "command_palette_recipe_open_step": "Open step",
+  "command_palette_recipe_warnings": "Warnings",
+  "command_palette_recipe_empty": "Describe your goal to generate a recipe.",
+  "command_palette_recipe_unsupported": "This request cannot be mapped to a supported workflow.",
+  "command_palette_recipe_clear": "Clear recipe"
 }

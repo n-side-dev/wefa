@@ -61,7 +61,14 @@ const ConfirmDialogStub = defineComponent({
 
 const CommandPaletteStub = defineComponent({
   name: 'CommandPaletteComponent',
-  template: '<div data-test="command-palette"></div>',
+  props: {
+    assistant: {
+      type: Object,
+      default: undefined,
+    },
+  },
+  template:
+    '<div data-test="command-palette">{{ assistant ? JSON.stringify(assistant) : "none" }}</div>',
 })
 
 describe('LayoutContainer', () => {
@@ -127,7 +134,7 @@ describe('LayoutContainer', () => {
     })
 
     expect(wrapper.find('[data-test="router-view"]').exists()).toBe(true)
-    expect(wrapper.find('[data-test="command-palette"]').exists()).toBe(true)
+    expect(wrapper.get('[data-test="command-palette"]').text()).toBe('none')
     expect(wrapper.find('[data-test="toast"]').exists()).toBe(true)
     expect(wrapper.find('[data-test="confirm-dialog"]').exists()).toBe(true)
   })
@@ -157,5 +164,35 @@ describe('LayoutContainer', () => {
     expect(wrapper.get('[data-test="mobile-navigation"]').text()).toBe(
       'My Project|https://example.test/logo.svg'
     )
+  })
+
+  it('forwards command palette assistant configuration when provided', () => {
+    const wrapper = mount(LayoutContainer, {
+      props: {
+        projectTitle: 'My Project',
+        commandPalette: {
+          assistant: {
+            enabled: true,
+            generateRecipe: async () => ({
+              status: 'unsupported',
+              message: 'noop',
+            }),
+          },
+        },
+      },
+      global: {
+        stubs: {
+          SideNavigationComponent: SideNavigationStub,
+          MobileNavigationComponent: MobileNavigationStub,
+          AutoroutedBreadcrumb: BreadcrumbStub,
+          RouterView: RouterViewStub,
+          Toast: ToastStub,
+          ConfirmDialog: ConfirmDialogStub,
+          CommandPaletteComponent: CommandPaletteStub,
+        },
+      },
+    })
+
+    expect(wrapper.get('[data-test="command-palette"]').text()).toContain('"enabled":true')
   })
 })

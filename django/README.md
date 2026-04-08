@@ -19,6 +19,7 @@ WeFa (Web Factory) delivers a set of modular Django apps that cover recurring we
 
 - Shared utilities that power the higher-level apps (`nside_wefa.common`)
 - Plug-and-play Django REST Framework authentication configuration (token and JWT) (`nside_wefa.authentication`)
+- Structured GenAI recipe planning backed by reusable backend action docs (`nside_wefa.ai_assistant`)
 - Legal consent tracking with automatic user onboarding and templated documents (`nside_wefa.legal_consent`)
 - System checks and sensible defaults so configuration mistakes surface early
 
@@ -46,6 +47,10 @@ Foundational helpers shared across the toolkit. You rarely interact with it dire
 
 Automatically wires Django REST Framework authentication classes, URLs, and dependency checks. See `nside_wefa/authentication/README.md` for the full guide.
 
+### AI Assistant
+
+Provides a reusable recipe-planning endpoint that combines frontend route manifests with richer backend action documentation. See `nside_wefa/ai_assistant/README.md` for the full guide.
+
 ### Legal Consent
 
 Tracks acceptance of privacy and terms documents with templating support and REST endpoints. See `nside_wefa/legal_consent/README.md` for details.
@@ -63,6 +68,7 @@ Tracks acceptance of privacy and terms documents with templating support and RES
        "rest_framework_simplejwt",  # For JWT auth
        "nside_wefa.common",
        "nside_wefa.authentication",
+        "nside_wefa.ai_assistant",
        "nside_wefa.legal_consent",
    ]
    ```
@@ -94,7 +100,11 @@ The toolkit reads from a namespaced settings dictionary. Start with the minimal 
 NSIDE_WEFA = {
     "APP_NAME": "My Product",  # Used in legal consent templates
     "AUTHENTICATION": {
-        "TYPES": ["TOKEN", "JWT"],  # Enable the authentication flows you need
+       "TYPES": ["TOKEN", "JWT"],  # Enable the authentication flows you need
+    },
+    "AI_ASSISTANT": {
+        "PROVIDER": "mock",
+        "DOC_MODULES": ["my_project.ai_docs"],
     },
     "LEGAL_CONSENT": {
         "VERSION": 1,
@@ -127,9 +137,12 @@ pip install -e .[dev]
 Run the demo project:
 
 ```bash
+cp demo/.env.example demo/.env
 python manage.py migrate
 python manage.py runserver
 ```
+
+Edit `demo/.env` if you want to switch the AI assistant demo from the default mock provider to OpenAI. If your machine or company proxy uses a custom root certificate, also set `OPENAI_CA_BUNDLE` there.
 
 Execute the test suite and linters:
 

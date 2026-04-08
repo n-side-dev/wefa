@@ -1,5 +1,11 @@
 import type { RouteMeta, RouteRecordRaw } from 'vue-router'
 
+export interface WeFaAssistantRouteMeta {
+  docId: string
+  routeLabelKey?: string
+  routeSummaryKey?: string
+}
+
 // If updated, you need to update the documentation in router.mdx
 export interface WeFaRouteMeta {
   title: string
@@ -9,6 +15,7 @@ export interface WeFaRouteMeta {
   showInNavigation?: boolean
   showInCommandPalette?: boolean
   section?: string
+  assistant?: WeFaAssistantRouteMeta
 }
 
 export type WeFaRouteRecordRaw = RouteRecordRaw & {

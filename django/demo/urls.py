@@ -22,4 +22,5 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("legal-consent/", include("nside_wefa.legal_consent.urls")),
     path("authentication/", include("nside_wefa.authentication.urls")),
+    path("ai-assistant/", include("nside_wefa.ai_assistant.urls")),
 ]

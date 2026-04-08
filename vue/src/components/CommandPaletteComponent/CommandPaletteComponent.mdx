@@ -1,0 +1,65 @@
+import { Meta, Canvas, ArgTypes } from '@storybook/addon-docs/blocks'
+import * as CommandPaletteStories from './CommandPaletteComponent.stories'
+
+<Meta of={CommandPaletteStories} />
+
+# CommandPaletteComponent
+
+## Overview
+
+`CommandPaletteComponent` provides a global `Cmd/Ctrl + K` command palette with two modes:
+
+- `Navigate`: route search using `meta.wefa.showInCommandPalette`
+- `Ask`: optional recipe generation mode backed by your application backend
+
+## Assistant Route Metadata
+
+To make routes available for Ask mode recipe linking, define `meta.wefa.assistant.docId`.
+
+```ts
+{
+  path: '/catalog/:id/edit',
+  name: 'catalogEdit',
+  meta: {
+    wefa: {
+      title: 'Edit Product',
+      assistant: { docId: 'catalog.edit' },
+    },
+  },
+}
+```
+
+`docId` is the stable mapping key used by backend recipe steps.
+
+## Assistant Configuration
+
+Enable Ask mode by passing the `assistant` prop.
+
+```ts
+const assistant = {
+  enabled: true,
+  async generateRecipe(request) {
+    return await fetch('/api/assistant/recipes/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(request),
+    }).then((response) => response.json())
+  },
+}
+```
+
+The component handles:
+
+- clarification loops (`needs_clarification`)
+- recipe rendering (`recipe`)
+- unsupported requests (`unsupported`)
+- recipe recall on reopen via session storage
+
+## Stories
+
+<Canvas of={CommandPaletteStories.NavigateOnly} />
+<Canvas of={CommandPaletteStories.NavigateWithAskMode} />
+
+## Props
+
+<ArgTypes of={CommandPaletteStories} />

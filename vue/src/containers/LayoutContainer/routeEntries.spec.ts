@@ -1,7 +1,11 @@
 import { describe, it, expect } from 'vitest'
 import { defineComponent } from 'vue'
 import type { RouteRecordRaw } from 'vue-router'
-import { routeCommandPaletteEntries, routeNavigationEntries } from '@/router/routeEntries'
+import {
+  routeAssistantManifestEntries,
+  routeCommandPaletteEntries,
+  routeNavigationEntries,
+} from '@/router/routeEntries'
 
 const StubView = defineComponent({
   template: '<div />',
@@ -172,6 +176,89 @@ describe('routeEntries', () => {
         label: 'Overview',
         icon: undefined,
         section: undefined,
+      },
+    ])
+  })
+
+  it('extracts assistant manifest entries from route metadata and keeps parameterized routes', () => {
+    const routes: RouteRecordRaw[] = [
+      {
+        path: '/catalog',
+        name: 'catalog',
+        component: StubView,
+        meta: {
+          wefa: {
+            title: 'Catalog',
+            assistant: {
+              docId: 'catalog.list',
+              routeLabelKey: 'catalog.title',
+            },
+          },
+        },
+        children: [
+          {
+            path: ':productId',
+            name: 'productDetails',
+            component: StubView,
+            meta: {
+              wefa: {
+                title: 'Product Details',
+                assistant: {
+                  docId: 'catalog.product.details',
+                },
+              },
+            },
+          },
+        ],
+      },
+      {
+        path: '/:pathMatch(.*)*',
+        name: 'notFound',
+        component: StubView,
+        meta: {
+          wefa: {
+            title: 'Not Found',
+            assistant: {
+              docId: 'not.found',
+            },
+          },
+        },
+      },
+      {
+        path: '/duplicate',
+        name: 'duplicate',
+        component: StubView,
+        meta: {
+          wefa: {
+            title: 'Duplicate',
+            assistant: {
+              docId: 'catalog.list',
+            },
+          },
+        },
+      },
+    ]
+
+    expect(routeAssistantManifestEntries(routes)).toEqual([
+      {
+        docId: 'catalog.list',
+        pathTemplate: '/catalog',
+        label: 'Catalog',
+        routeName: 'catalog',
+        section: undefined,
+        icon: undefined,
+        routeLabelKey: 'catalog.title',
+        routeSummaryKey: undefined,
+      },
+      {
+        docId: 'catalog.product.details',
+        pathTemplate: '/catalog/:productId',
+        label: 'Product Details',
+        routeName: 'productDetails',
+        section: undefined,
+        icon: undefined,
+        routeLabelKey: undefined,
+        routeSummaryKey: undefined,
       },
     ])
   })

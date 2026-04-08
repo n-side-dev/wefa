@@ -12,9 +12,44 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 from typing import Any
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+DEMO_DIR = Path(__file__).resolve().parent
+
+
+def load_demo_env(env_path: Path) -> None:
+    """Load key/value pairs from the demo-local .env file when present."""
+    if not env_path.exists():
+        return
+
+    for raw_line in env_path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+
+        if line.startswith("export "):
+            line = line.removeprefix("export ").strip()
+
+        key, separator, value = line.partition("=")
+        if not separator:
+            continue
+
+        normalized_key = key.strip()
+        normalized_value = value.strip()
+
+        if (
+            normalized_value.startswith(("'", '"'))
+            and normalized_value.endswith(("'", '"'))
+            and len(normalized_value) >= 2
+        ):
+            normalized_value = normalized_value[1:-1]
+
+        os.environ.setdefault(normalized_key, normalized_value)
+
+
+load_demo_env(DEMO_DIR / ".env")
 
 
 # Quick-start development settings - unsuitable for production
@@ -43,6 +78,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "nside_wefa.common",
     "nside_wefa.authentication",
+    "nside_wefa.ai_assistant",
     "nside_wefa.legal_consent",
     "drf_spectacular",
 ]
@@ -55,6 +91,18 @@ NSIDE_WEFA = {
         # "TEMPLATES": BASE_DIR / "demo" / "templates" / "legal_consent",
     },
     "AUTHENTICATION": {"TYPES": ["TOKEN", "JWT"]},
+    "AI_ASSISTANT": {
+        "PROVIDER": os.environ.get("WEFA_AI_PROVIDER", "mock"),
+        "OPENAI_API_KEY": os.environ.get("OPENAI_API_KEY", ""),
+        "OPENAI_MODEL": os.environ.get("OPENAI_MODEL", "gpt-4.1-mini"),
+        "OPENAI_CA_BUNDLE": os.environ.get("OPENAI_CA_BUNDLE", ""),
+        "DOC_MODULES": ["demo.ai_assistant_docs"],
+        "MAX_CLARIFICATION_TURNS": 3,
+        "MAX_CANDIDATE_DOCS": 8,
+        "PROMPT_MAX_CHARS": 3000,
+        "CONVERSATION_TTL_SECONDS": 1800,
+        "REQUIRE_AUTHENTICATION": False,
+    },
 }
 
 REST_FRAMEWORK = {

@@ -8,6 +8,17 @@ export interface WeFaRouteEntry {
   section?: string
 }
 
+export interface WeFaAssistantManifestEntry {
+  docId: string
+  pathTemplate: string
+  label: string
+  routeName?: string
+  section?: string
+  icon?: string
+  routeLabelKey?: string
+  routeSummaryKey?: string
+}
+
 interface WeFaRouteEntryOptions {
   include: (meta: WeFaRouteMeta | undefined) => boolean
   excludeParameterizedRoutes?: boolean
@@ -101,6 +112,45 @@ function collectRouteEntries(
 }
 
 /**
+ * Recursively traverses route records and collects assistant manifest entries.
+ * Wildcard routes are skipped because they do not represent actionable targets.
+ * @param routes Route list to inspect
+ * @param parentPath Parent route path used to resolve children
+ * @returns Flattened assistant manifest entries in declaration order
+ */
+function collectAssistantManifestEntries(
+  routes: RouteRecordRaw[],
+  parentPath: string = '/'
+): WeFaAssistantManifestEntry[] {
+  const entries: WeFaAssistantManifestEntry[] = []
+
+  for (const route of routes) {
+    const fullPath = resolvePath(parentPath, route.path)
+    const routeMeta = route.meta?.wefa as WeFaRouteMeta | undefined
+    const docId = routeMeta?.assistant?.docId?.trim()
+
+    if (docId && !fullPath.includes('*')) {
+      entries.push({
+        docId,
+        pathTemplate: fullPath,
+        label: routeMeta?.title ?? String(route.name ?? fullPath),
+        routeName: route.name ? String(route.name) : undefined,
+        section: routeMeta?.section?.trim() || undefined,
+        icon: routeMeta?.icon,
+        routeLabelKey: routeMeta?.assistant?.routeLabelKey,
+        routeSummaryKey: routeMeta?.assistant?.routeSummaryKey,
+      })
+    }
+
+    if (route.children?.length) {
+      entries.push(...collectAssistantManifestEntries(route.children, fullPath))
+    }
+  }
+
+  return entries
+}
+
+/**
  * Extracts navigation entries from the router tree based on showInNavigation metadata.
  * @param routes Router records to inspect
  * @returns Flattened navigation entries in declaration order
@@ -122,4 +172,28 @@ export function routeCommandPaletteEntries(routes: RouteRecordRaw[]): WeFaRouteE
     include: (meta) => meta?.showInCommandPalette === true,
     excludeParameterizedRoutes: true,
   })
+}
+
+/**
+ * Extracts assistant manifest entries from the router tree based on assistant metadata.
+ * Routes are included when `meta.wefa.assistant.docId` is provided.
+ * @param routes Router records to inspect
+ * @returns Flattened assistant manifest entries in declaration order
+ */
+export function routeAssistantManifestEntries(
+  routes: RouteRecordRaw[]
+): WeFaAssistantManifestEntry[] {
+  const entries = collectAssistantManifestEntries(routes)
+  const uniqueEntries: WeFaAssistantManifestEntry[] = []
+  const seenDocIds = new Set<string>()
+
+  for (const entry of entries) {
+    if (seenDocIds.has(entry.docId)) {
+      continue
+    }
+    seenDocIds.add(entry.docId)
+    uniqueEntries.push(entry)
+  }
+
+  return uniqueEntries
 }

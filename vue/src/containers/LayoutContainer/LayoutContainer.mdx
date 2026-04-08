@@ -12,7 +12,7 @@ import * as LayoutContainerStories from './LayoutContainer.stories'
 - desktop side navigation
 - mobile drawer navigation
 - route-aware breadcrumb
-- global command palette (`Cmd/Ctrl + K`)
+- global command palette (`Cmd/Ctrl + K`) with optional assistant mode
 - child route content through `<router-view />`
 
 The stories below focus on router metadata setup, because navigation links are generated directly from the router tree.
@@ -40,6 +40,28 @@ Uses `meta.wefa.showInNavigation`, `meta.wefa.section`, and `meta.wefa.showInCom
     },
   },
 }
+```
+
+### Optional Assistant Mode
+
+You can enable a prompt-based assistant mode in the command palette by passing
+`commandPalette.assistant` to `LayoutContainer`.
+
+```ts
+const assistant = {
+  enabled: true,
+  async generateRecipe(request) {
+    return await fetch('/api/assistant/recipes/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(request),
+    }).then((response) => response.json())
+  },
+}
+```
+
+```vue
+<LayoutContainer project-title="My Project" :command-palette="{ assistant }" />
 ```
 
 ### Nested Routes

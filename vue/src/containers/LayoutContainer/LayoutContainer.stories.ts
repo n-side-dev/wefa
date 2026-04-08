@@ -148,6 +148,7 @@ const meta = {
     projectTitle: 'WeFa Storybook',
     projectLogo: undefined,
     projectLogoAlt: undefined,
+    commandPalette: undefined,
   },
   argTypes: {
     projectTitle: {
@@ -161,6 +162,11 @@ const meta = {
     projectLogoAlt: {
       control: 'text',
       description: 'Optional alt text used for the custom logo.',
+    },
+    commandPalette: {
+      control: false,
+      description:
+        'Optional command palette configuration. Set `commandPalette.assistant` to enable Ask mode.',
     },
   },
   decorators: [

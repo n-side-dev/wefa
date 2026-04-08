@@ -1,1 +1,5 @@
-export { default as LayoutContainer, type LayoutContainerProps } from './LayoutContainer.vue'
+export {
+  default as LayoutContainer,
+  type LayoutContainerCommandPaletteConfig,
+  type LayoutContainerProps,
+} from './LayoutContainer.vue'
