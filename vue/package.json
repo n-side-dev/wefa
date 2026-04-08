@@ -124,7 +124,7 @@
     "jsdom": "^29.0.1",
     "knip": "^6.1.0",
     "npm-run-all2": "^8.0.4",
-    "playwright": "^1.55.0",
+    "playwright": "^1.59.1",
     "postcss": "^8.5.8",
     "prettier": "3.8.1",
     "storybook": "^10.3.0",
