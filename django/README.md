@@ -109,7 +109,7 @@ Validation happens through Django system checks. Run `python manage.py check` to
 ## Requirements
 
 - Python >= 3.12
-- Django >= 5.2.6
+- Django >= 6.0.4
 - Django REST Framework >= 3.14.0
 - djangorestframework-simplejwt >= 5.5.1 (if you enable JWT support)
 
