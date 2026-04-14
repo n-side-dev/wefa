@@ -1,0 +1,4 @@
+interface:
+  display_name: "WeFa TanStack Query"
+  short_description: "Guide WeFa TanStack Query v5 usage"
+  default_prompt: "Use $wefa-tanstack-query to implement or review TanStack Query Vue v5 usage in the `vue/` workspace."
