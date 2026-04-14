@@ -3,7 +3,9 @@ updates:
   - package-ecosystem: "npm"
     directory: "/vue"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+    cooldown:
+      default-days: 3
     groups:
       patch:
         update-types:
@@ -11,7 +13,9 @@ updates:
   - package-ecosystem: "uv"
     directory: "/django"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+    cooldown:
+      default-days: 3
     groups:
       patch:
         update-types:
@@ -19,7 +23,9 @@ updates:
   - package-ecosystem: "uv"
     directory: "/bff"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+    cooldown:
+      default-days: 3
     groups:
       patch:
         update-types:
@@ -27,4 +33,6 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+    cooldown:
+      default-days: 3
