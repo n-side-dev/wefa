@@ -1,5 +1,5 @@
 <template>
-  <router-link v-slot="{ isActive, isExactActive }" :to="props.route" @click="emitNavigationClick">
+  <router-link v-slot="{ isActive, isExactActive }" :to="route" @click="emitNavigationClick">
     <div class="relative" @click="emitNavigationClick">
       <Transition
         enter-active-class="transition opacity-0 scale-y-75 duration-200 ease-out"
@@ -17,8 +17,8 @@
         class="flex w-full items-center rounded-lg cursor-pointer text-base px-2 py-2 gap-3 hover:bg-zinc-950/5"
         @click="emitNavigationClick"
       >
-        <i v-if="props.icon" class="pi" :class="props.icon" style="font-size: 1.5rem"></i>
-        <span class="block truncate text-zinc-950">{{ props.label }}</span>
+        <i v-if="icon" class="pi" :class="icon" style="font-size: 1.5rem"></i>
+        <span class="block truncate text-zinc-950">{{ label }}</span>
       </div>
     </div>
   </router-link>
@@ -31,9 +31,7 @@ export interface NavigationLinkComponentProps {
   label: string
 }
 
-const props = withDefaults(defineProps<NavigationLinkComponentProps>(), {
-  icon: undefined,
-})
+const { route, icon = undefined, label } = defineProps<NavigationLinkComponentProps>()
 const emit = defineEmits<{
   (event: 'navigation-item-click'): void
 }>()
