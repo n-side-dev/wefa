@@ -1,5 +1,5 @@
 import { ref, watch, type Ref } from 'vue'
-import type { AxiosResponse } from 'axios'
+import type { AxiosError, AxiosResponse } from 'axios'
 import axiosInstance from '@/network/axios.ts'
 import { createCommonAuthFunctions } from '../common.ts'
 import { localStorageKey, tokenLoginEndpoint } from '../constants.ts'
@@ -13,7 +13,7 @@ import type { BackendStore, BackendStoreOptions, Credentials } from '../types.ts
  * It also provides helper functions for handling authentication processes, like login, logout,
  * and post-login/logout callbacks. Additionally, it enables the setting of route guards to
  * respond to authentication status changes in a Vue.js application.
- * @param backendStoreOptions
+ * @param backendStoreOptions - Runtime configuration for endpoints and token-based auth hooks.
  * @returns An object containing authentication state, API client instance, and helper functions:
  * - `axiosInstance`: Pre-configured axios instance with authentication support
  * - `authenticated`: Reactive flag representing the authentication status
@@ -67,16 +67,15 @@ export function tokenAuthenticationBackendStoreSetup(
 
   axiosInstance.interceptors.response.use(
     (response) => response,
-    async (error) => {
-      if (error.response.status === 403) {
+    async (error: AxiosError<{ detail?: string }>) => {
+      if (error.response?.status === 403) {
         const data = error.response.data
         if (data?.detail === 'Authentication credentials were not provided.') {
           logout()
         }
-        return Promise.reject(error)
-      } else {
-        return Promise.reject(error)
       }
+
+      return Promise.reject(error)
     }
   )
 

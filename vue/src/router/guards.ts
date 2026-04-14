@@ -21,7 +21,7 @@ export function requiresAuth(
   next: NavigationGuardNext,
   redirect: RouteLocationRaw = { name: libRouteRecords.login?.name || 'authLogin' }
 ) {
-  // TODO SOFA-292 Implement when we have an authStore
+  // Tracked in SOFA-292: wire this guard to the authStore once it exists.
   const isAuthenticated = true
 
   const requiresAuth = to.matched.some((record) => record.meta.wefa?.requiresAuth === true)
@@ -47,7 +47,7 @@ export function requiresUnauth(
   next: NavigationGuardNext,
   redirect: RouteLocationRaw = { path: '/' }
 ) {
-  // TODO SOFA-292 Implement when we have an authStore
+  // Tracked in SOFA-292: wire this guard to the authStore once it exists.
   const isUnauthenticated = true
 
   const requiresUnauth = to.matched.some((record) => record.meta.wefa?.requiresUnauth === true)

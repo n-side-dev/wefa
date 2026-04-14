@@ -155,7 +155,7 @@ From the `vue/` directory:
 | `npm run lint` / `npm run lint-check` | Auto-fix or check ESLint rules |
 | `npm run format` / `npm run format-check` | Run Prettier in write/check mode |
 
-The project targets Node.js 20+. Use the included `.nvmrc` (to be added) or your preferred version manager to align with CI.
+The project supports Node.js `^20.19.0 || ^22.13.0 || >=24.0.0`. Use the included `.node-version` or `.nvmrc` to align with CI; the repository currently pins `24.9.0`.
 
 ## Testing and quality gates
 

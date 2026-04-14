@@ -31,7 +31,7 @@ export interface NavigationLinkComponentProps {
   label: string
 }
 
-const { route, icon, label } = defineProps<NavigationLinkComponentProps>()
+const { route, icon = undefined, label } = defineProps<NavigationLinkComponentProps>()
 const emit = defineEmits<{
   (event: 'navigation-item-click'): void
 }>()
