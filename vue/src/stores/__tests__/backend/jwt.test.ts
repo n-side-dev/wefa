@@ -110,7 +110,7 @@ describe('JWT Backend Store', () => {
     it('should authenticate user with valid credentials', async () => {
       const mockCredentials: Credentials = {
         username: 'testuser',
-        password: 'password123', // eslint-disable-line sonarjs/no-hardcoded-passwords
+        password: 'password123',
       }
       const mockResponse = {
         access: 'mock-access-token',
@@ -134,7 +134,7 @@ describe('JWT Backend Store', () => {
     it('should handle login failure correctly', async () => {
       const mockCredentials: Credentials = {
         username: 'wronguser',
-        password: 'wrongpassword', // eslint-disable-line sonarjs/no-hardcoded-passwords
+        password: 'wrongpassword',
       }
 
       axiosMock.onPost('/api/token/').reply(401, { error: 'Invalid credentials' })
@@ -151,7 +151,7 @@ describe('JWT Backend Store', () => {
 
       const mockCredentials: Credentials = {
         username: 'testuser',
-        password: 'password123', // eslint-disable-line sonarjs/no-hardcoded-passwords
+        password: 'password123',
       }
       const mockResponse = {
         access: 'mock-access-token',
@@ -199,7 +199,7 @@ describe('JWT Backend Store', () => {
       // Set up authenticated state
       const mockCredentials: Credentials = {
         username: 'testuser',
-        password: 'password123', // eslint-disable-line sonarjs/no-hardcoded-passwords
+        password: 'password123',
       }
       const mockResponse = {
         access: 'mock-access-token',
@@ -269,7 +269,7 @@ describe('JWT Backend Store', () => {
     beforeEach(async () => {
       const mockCredentials: Credentials = {
         username: 'testuser',
-        password: 'password123', // eslint-disable-line sonarjs/no-hardcoded-passwords
+        password: 'password123',
       }
       const mockResponse = {
         access: 'mock-access-token',
@@ -338,7 +338,7 @@ describe('JWT Backend Store', () => {
       // Authenticate the user
       const mockCredentials = {
         username: 'testuser',
-        password: 'password123', // eslint-disable-line sonarjs/no-hardcoded-passwords
+        password: 'password123',
       }
       const mockResponse = {
         access: 'mock-access-token',

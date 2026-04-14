@@ -18,4 +18,5 @@ dependencies = [
 [dependency-groups]
 dev = [
     "pytest",
+    "pygments>=2.20.0",
 ]

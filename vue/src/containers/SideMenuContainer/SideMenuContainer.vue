@@ -39,7 +39,7 @@
             @click="navigate"
           >
             <span v-if="item.icon" :class="item.icon" />
-            <span>{{ t(item.label) }}</span>
+            <span>{{ translateMenuLabel(item.label) }}</span>
           </a>
         </router-link>
       </template>
@@ -63,7 +63,7 @@
               :class="{ [item.icon]: true, 'text-(--p-highlight-color)': isActive }"
             />
             <span :class="{ 'text-(--p-highlight-color)': isActive }">{{
-              t(item.label as string)
+              translateMenuLabel(item.label)
             }}</span>
           </a>
         </router-link>
@@ -81,7 +81,7 @@
           <a v-bind="props.action">
             <span v-if="item.depth > 1" class="w-4"></span>
             <span v-if="item.icon" :class="{ [item.icon]: true }" />
-            <span>{{ t(item.label as string) }}</span>
+            <span>{{ translateMenuLabel(item.label) }}</span>
           </a>
         </div>
       </template>
@@ -96,6 +96,7 @@
 <script setup lang="ts">
 import Menu from 'primevue/menu'
 import Divider from 'primevue/divider'
+import type { MenuItem } from 'primevue/menuitem'
 
 import {
   makeEndSectionMenuItems,
@@ -118,6 +119,16 @@ const levelRoute: ComputedRef<RouteLocationMatched> = computed(() => {
 })
 
 const { t } = useI18nLib()
+
+/**
+ * Resolves a PrimeVue menu label into a translated string for display.
+ * @param label - Static or computed PrimeVue menu label value.
+ * @returns The translated label, or an empty string when no label is available.
+ */
+function translateMenuLabel(label: MenuItem['label']): string {
+  const resolvedLabel = typeof label === 'function' ? label() : label
+  return resolvedLabel ? t(resolvedLabel) : ''
+}
 
 export interface SideMenuContainerProps extends GenericContainerProps {
   depth?: 1 | 2

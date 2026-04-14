@@ -20,7 +20,7 @@ Thanks for helping shape the WeFa (Web Factory) frontend library. This guide cov
 
 ### Prerequisites
 
-- Node.js 20 or later (align with `.nvmrc` once added)
+- Node.js `^20.19.0 || ^22.13.0 || >=24.0.0` (use `.node-version` or `.nvmrc`; the repo currently pins `24.9.0`)
 - npm 10 or an alternative package manager (pnpm, yarn)
 - Git
 
@@ -55,6 +55,12 @@ From `vue/` install the toolchain:
 
 ```bash
 npm install
+```
+
+If you use a version manager, switch to the pinned runtime first:
+
+```bash
+fnm use
 ```
 
 To work with `pnpm` or `yarn`, delete `package-lock.json` and run the equivalent install command. Keep the lockfile consistent with the package manager you are using in the branch.

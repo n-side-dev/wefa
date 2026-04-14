@@ -25,7 +25,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Configure Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
 
       - name: Setup Node.js
         uses: ./.github/actions/setup-node
@@ -75,7 +75,7 @@ jobs:
           touch gh-pages/.nojekyll
 
       - name: Upload Pages Artifact
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v5
         with:
           path: gh-pages
 
@@ -89,4 +89,4 @@ jobs:
     steps:
       - name: Deploy
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

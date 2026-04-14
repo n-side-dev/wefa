@@ -74,7 +74,7 @@ describe('OAuth Backend Store', () => {
 
     const mockCredentials: Credentials = {
       username: 'testuser',
-      password: 'password123', // eslint-disable-line sonarjs/no-hardcoded-passwords
+      password: 'password123',
     }
 
     await backendStore.login(mockCredentials)
