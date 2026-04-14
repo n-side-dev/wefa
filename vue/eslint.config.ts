@@ -70,6 +70,7 @@ export default defineConfigWithVueTs(
       'jsdoc/require-param-description': 'off',
       'jsdoc/require-returns': 'off',
       'security/detect-object-injection': 'off',
+      'vue/one-component-per-file': 'off',
     },
   }
 )

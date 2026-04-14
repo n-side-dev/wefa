@@ -20,7 +20,7 @@ import type { BackendStore, BackendStoreOptions, Credentials } from '../types.ts
  * respond to authentication status changes in a Vue.js application.
  *
  * This implementation is designed to work with a backend offering JWT mechanism.
- * @param backendStoreOptions
+ * @param backendStoreOptions - Runtime configuration for endpoints and JWT-specific auth hooks.
  * @returns An object containing authentication state, API client instance, and helper functions:
  * - `axiosInstance`: Pre-configured axios instance with authentication support
  * - `authenticated`: Reactive flag representing the authentication status
@@ -83,8 +83,8 @@ export function jwtAuthenticationBackendStoreSetup(
   /**
    * Checks if the error is related to token authentication issues
    * @param error - The Axios error to check for token-related issues
-   * @param accessToken
-   * @param refreshToken
+   * @param accessToken - The current access token used for authenticated requests.
+   * @param refreshToken - The current refresh token used to obtain a new access token.
    * @returns True if the error is related to token authentication, false otherwise
    */
   function defaultIsTokenError(

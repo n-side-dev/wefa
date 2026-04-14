@@ -8,9 +8,18 @@ vi.mock('primevue/button', () => {
   const ButtonStub = defineComponent({
     name: 'PrimeVueButtonStub',
     props: {
-      label: [String],
-      icon: [String],
-      severity: String,
+      label: {
+        type: String,
+        default: null,
+      },
+      icon: {
+        type: String,
+        default: null,
+      },
+      severity: {
+        type: String,
+        default: null,
+      },
       loading: Boolean,
       disabled: Boolean,
     },
