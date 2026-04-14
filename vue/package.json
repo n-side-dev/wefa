@@ -14,6 +14,9 @@
     "url": "https://github.com/n-side-dev/wefa/issues"
   },
   "homepage": "https://github.com/n-side-dev/wefa#readme",
+  "engines": {
+    "node": "^20.19.0 || ^22.13.0 || >=24.0.0"
+  },
   "publishConfig": {
     "access": "public"
   },
@@ -87,9 +90,9 @@
     "vue-router": "^5.0.4"
   },
   "devDependencies": {
-    "@chromatic-com/storybook": "^5.1.1",
+    "@chromatic-com/storybook": "^5.1.2",
     "@hey-api/openapi-ts": "^0.94.5",
-    "@playwright/test": "^1.58.2",
+    "@playwright/test": "^1.59.1",
     "@storybook/addon-a11y": "^10.3.5",
     "@storybook/addon-docs": "^10.3.5",
     "@storybook/addon-onboarding": "^10.3.5",
@@ -102,7 +105,7 @@
     "@types/luxon": "^3.7.1",
     "@types/node": "^25.5.2",
     "@types/plotly.js-dist-min": "^2.3.4",
-    "@vitejs/plugin-vue": "^6.0.5",
+    "@vitejs/plugin-vue": "^6.0.6",
     "@vitest/browser": "4.1.4",
     "@vitest/browser-playwright": "^4.1.2",
     "@vitest/coverage-istanbul": "^4.1.2",
@@ -113,7 +116,7 @@
     "@vue/tsconfig": "^0.9.1",
     "autoprefixer": "^10.4.27",
     "axios-mock-adapter": "^2.1.0",
-    "eslint": "^10.0.3",
+    "eslint": "^10.1.0",
     "eslint-plugin-jsdoc": "^62.8.1",
     "eslint-plugin-playwright": "^2.10.1",
     "eslint-plugin-security": "^4.0.0",
@@ -124,14 +127,14 @@
     "jsdom": "^29.0.2",
     "knip": "^6.1.0",
     "npm-run-all2": "^8.0.4",
-    "playwright": "^1.55.0",
+    "playwright": "^1.59.1",
     "postcss": "^8.5.9",
     "prettier": "3.8.2",
     "storybook": "^10.3.0",
     "tailwindcss": "^4.2.1",
     "tidewave": "^0.6.0",
     "to-valid-identifier": "^1.0.0",
-    "typescript": "~5.9.3",
+    "typescript": "~6.0.2",
     "vite": "^7.3.1",
     "vite-plugin-dts": "^4.5.4",
     "vite-plugin-vue-devtools": "^8.1.1",
