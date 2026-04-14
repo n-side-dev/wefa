@@ -94,7 +94,7 @@ export function makeEndSectionMenuItems(endProps: GenericContainerProps['end']):
 
   if (endProps.showUser) {
     endItems.push({
-      label: 'John Doe', // TODO SOFA-292 Unhardcode and use authStore instead
+      label: 'John Doe', // Tracked in SOFA-292: replace with authStore-backed user data.
       icon: 'pi pi-user',
     })
   }

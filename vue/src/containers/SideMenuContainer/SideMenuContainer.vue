@@ -120,6 +120,11 @@ const levelRoute: ComputedRef<RouteLocationMatched> = computed(() => {
 
 const { t } = useI18nLib()
 
+/**
+ * Resolves a PrimeVue menu label into a translated string for display.
+ * @param label - Static or computed PrimeVue menu label value.
+ * @returns The translated label, or an empty string when no label is available.
+ */
 function translateMenuLabel(label: MenuItem['label']): string {
   const resolvedLabel = typeof label === 'function' ? label() : label
   return resolvedLabel ? t(resolvedLabel) : ''

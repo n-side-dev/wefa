@@ -32,7 +32,7 @@ export interface DashboardGroupComponentProps {
 }
 
 const {
-  orientation,
+  orientation = undefined,
   weight = 1,
   hugContent = false,
   maxWidth = '',

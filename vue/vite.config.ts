@@ -27,7 +27,6 @@ export default defineConfig({
     },
     tidewave(),
     vue({script: {defineModel: true}}),
-    // vueDevTools(),
     tailwindcss(),
     dts({
       include: ['src'],
