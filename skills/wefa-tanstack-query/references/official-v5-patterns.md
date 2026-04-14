@@ -22,12 +22,16 @@ This file distills the official Vue v5 docs into the guidance most likely to mat
 - Cached query data is stale by default.
 - Stale queries refetch automatically when a new instance mounts, the window refocuses, or the network reconnects.
 - Inactive queries remain cached and are garbage-collected after 5 minutes by default.
+  This 5-minute horizon is TanStack's default inactive-query `gcTime`, not a WeFa-specific policy.
 - Failed queries retry 3 times with exponential backoff by default.
+  These are TanStack defaults: `retry` defaults to `3`, and the default `retryDelay` doubles from 1000 ms up to 30000 ms.
 - Query results are structurally shared by default, which preserves references when JSON-compatible data has not meaningfully changed.
 
 Implication:
 
 - Set `staleTime` intentionally before disabling refetch triggers.
+- If your app needs a different inactive-query cache horizon, change the default query `gcTime`.
+- If your app needs different retry behavior, change the default query `retry` and `retryDelay` options globally or per-query. Use `retry: false`, a number, or a function; use `retryDelay` as either a fixed number or a function.
 - Change `gcTime`, `retry`, or refetch policies only when the UX or API cost justifies it.
 
 ## Reactivity Rules

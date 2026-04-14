@@ -67,15 +67,5 @@ Apply TanStack Query Vue v5 with official v5 patterns while preserving WeFa's pr
 
 1. For wrapper tests in `vue/src/network/__tests__`, mock `@tanstack/vue-query` directly and assert the wrapper configuration.
 2. For feature or component tests, mock `@/network` instead of TanStack internals unless the feature truly owns the hook configuration.
-3. Run the standard Vue quality gates after behavior changes:
-   `npm run lint-check`
-   `npm run type-check`
-   `npm run format-check`
-   `npm run test:unit -- --reporter=dot --silent`
-   `npm run build`
-   `npm run test:e2e -- --reporter=dot` when routed or browser-driven flows changed
-
-## References
-
-- `references/wefa-conventions.md` for local wrapper/setup/test guidance.
-- `references/official-v5-patterns.md` for distilled official TanStack Query Vue v5 rules and migration notes.
+3. Use `vue/CONTRIBUTE.md` as the source of truth for the current Vue quality gates and validation commands.
+4. If the task also changes frontend behavior outside the network layer, follow the matching validation expectations from `skills/wefa-vue-frontend/SKILL.md` instead of redefining them here.
