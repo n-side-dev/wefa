@@ -14,12 +14,12 @@ paths:
                   redirect:
                     type: string
                 required:
-                - redirect
+                  - redirect
       summary: Start login flow
       description: Creates a PKCE authorization URL and stores verifier/state in the
         session cookie.
       tags:
-      - auth
+        - auth
   /proxy/api/auth/callback:
     get:
       responses:
@@ -32,7 +32,7 @@ paths:
       description: Exchanges the authorization code for tokens and stores encrypted
         token cookies.
       tags:
-      - auth
+        - auth
   /proxy/api/auth/logout:
     get:
       responses:
@@ -48,13 +48,13 @@ paths:
                   message:
                     type: string
                 required:
-                - message
+                  - message
       summary: Logout and revoke tokens
       description: Log out from auth server and clear local session data.
       tags:
-      - auth
+        - auth
       security:
-      - sessionCookie: []
+        - sessionCookie: []
   /proxy/api/auth/userinfo:
     get:
       responses:
@@ -82,13 +82,13 @@ paths:
                   sub:
                     type: string
                 required:
-                - email
-                - email_verified
-                - family_name
-                - given_name
-                - name
-                - preferred_username
-                - sub
+                  - email
+                  - email_verified
+                  - family_name
+                  - given_name
+                  - name
+                  - preferred_username
+                  - sub
               examples:
                 default:
                   value:
@@ -102,9 +102,9 @@ paths:
       summary: Fetch user info
       description: Proxy userinfo endpoint for the authenticated session.
       tags:
-      - auth
+        - auth
       security:
-      - sessionCookie: []
+        - sessionCookie: []
   /proxy/api/auth/session:
     get:
       responses:
@@ -120,13 +120,13 @@ paths:
                   session:
                     type: boolean
                 required:
-                - session
+                  - session
       summary: Check session validity
       description: Validate whether the current browser session is still authenticated.
       tags:
-      - auth
+        - auth
       security:
-      - sessionCookie: []
+        - sessionCookie: []
   /proxy/api/request/{rest_of_url}:
     options:
       responses:
@@ -136,13 +136,13 @@ paths:
           description: Preflight response.
       summary: REST preflight
       tags:
-      - proxy
+        - proxy
     parameters:
-    - in: path
-      name: rest_of_url
-      required: true
-      schema:
-        type: string
+      - in: path
+        name: rest_of_url
+        required: true
+        schema:
+          type: string
     head:
       responses:
         default:
@@ -160,9 +160,9 @@ paths:
       description: Forward the incoming request to BACKEND_ENDPOINT with auth token
         passthrough.
       tags:
-      - proxy
+        - proxy
       security:
-      - sessionCookie: []
+        - sessionCookie: []
     get:
       responses:
         default:
@@ -180,9 +180,9 @@ paths:
       description: Forward the incoming request to BACKEND_ENDPOINT with auth token
         passthrough.
       tags:
-      - proxy
+        - proxy
       security:
-      - sessionCookie: []
+        - sessionCookie: []
     post:
       responses:
         default:
@@ -200,9 +200,9 @@ paths:
       description: Forward the incoming request to BACKEND_ENDPOINT with auth token
         passthrough.
       tags:
-      - proxy
+        - proxy
       security:
-      - sessionCookie: []
+        - sessionCookie: []
     put:
       responses:
         default:
@@ -220,9 +220,9 @@ paths:
       description: Forward the incoming request to BACKEND_ENDPOINT with auth token
         passthrough.
       tags:
-      - proxy
+        - proxy
       security:
-      - sessionCookie: []
+        - sessionCookie: []
     patch:
       responses:
         default:
@@ -240,9 +240,9 @@ paths:
       description: Forward the incoming request to BACKEND_ENDPOINT with auth token
         passthrough.
       tags:
-      - proxy
+        - proxy
       security:
-      - sessionCookie: []
+        - sessionCookie: []
     delete:
       responses:
         default:
@@ -260,9 +260,9 @@ paths:
       description: Forward the incoming request to BACKEND_ENDPOINT with auth token
         passthrough.
       tags:
-      - proxy
+        - proxy
       security:
-      - sessionCookie: []
+        - sessionCookie: []
   /ping:
     get:
       responses:
@@ -278,21 +278,21 @@ paths:
                   message:
                     type: string
                 required:
-                - message
+                  - message
       summary: Health check
       description: Return a basic healthcheck response.
       tags:
-      - health
+        - health
 info:
   title: BFF Flask API
   version: 1.0.0
 tags:
-- name: auth
-  description: Authentication endpoints for login, callback, logout and session checks.
-- name: proxy
-  description: Backend passthrough proxy endpoints.
-- name: health
-  description: Healthcheck endpoints.
+  - name: auth
+    description: Authentication endpoints for login, callback, logout and session checks.
+  - name: proxy
+    description: Backend passthrough proxy endpoints.
+  - name: health
+    description: Healthcheck endpoints.
 openapi: 3.0.3
 components:
   schemas:
@@ -318,18 +318,25 @@ components:
       properties:
         total:
           type: integer
+          description: Total number of items.
         total_pages:
           type: integer
+          description: Total number of pages.
         first_page:
           type: integer
+          description: First available page number.
         last_page:
           type: integer
+          description: Last available page number.
         page:
           type: integer
+          description: Current page number.
         previous_page:
           type: integer
+          description: Previous page number.
         next_page:
           type: integer
+          description: Next page number.
       additionalProperties: false
   responses:
     DEFAULT_ERROR:
@@ -346,4 +353,4 @@ components:
       description: Authentication uses encrypted token cookies with suffixes (_at,
         _rt, _it, _meta) derived from SESSION_COOKIE_NAME.
 servers:
-- url: /
+  - url: /
