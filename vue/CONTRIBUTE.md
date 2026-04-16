@@ -80,6 +80,7 @@ To work with `pnpm` or `yarn`, delete `package-lock.json` and run the equivalent
 | `npm run test:unit` | Execute Vitest unit tests once |
 | `npm run test:unit:watch` | Run unit tests in watch mode |
 | `npm run test:e2e` | Build the demo and run Playwright end-to-end tests |
+| `npm run test:package-types` | Build the package, pack it, and verify published subpath type declarations |
 
 ## Quality Gates
 
@@ -89,7 +90,8 @@ Before opening a pull request make sure:
 2. `npm run format-check` passes (or run `npm run format`).
 3. `npm run test:unit` succeeds.
 4. `npm run test:e2e` passes when your changes touch interactive flows or routing.
-5. `npm run build` finishes cleanly.
+5. `npm run test:package-types` passes when you change exports, packaging, or declaration generation.
+6. `npm run build` finishes cleanly.
 
 Document deviations from these gates in the pull request summary and explain the follow-up plan.
 
