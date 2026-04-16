@@ -51,6 +51,16 @@ jobs:
       - run: npm run lint-check
       - run: npm run format-check
 
+  package-types:
+    name: Package Types
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup-node
+      - run: npm ci
+      - name: Verify packaged type declarations
+        run: npm run test:package-types
+
   unit-tests:
     name: Unit Tests
     runs-on: ubuntu-latest

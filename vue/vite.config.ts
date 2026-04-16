@@ -1,5 +1,5 @@
 import { fileURLToPath, URL } from 'node:url'
-import { copyFileSync, existsSync, mkdirSync } from 'node:fs'
+import { copyFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs'
 import { defineConfig } from 'vite'
 import { resolve } from "path"
 import vue from '@vitejs/plugin-vue'
@@ -10,6 +10,41 @@ import tidewave from 'tidewave/vite-plugin'
 const bffOpenApiSource = resolve(__dirname, '../bff/bff_app/openapi/openapi.yaml')
 const bffOpenApiDistDir = resolve(__dirname, 'dist/bff')
 const bffOpenApiDistFile = resolve(bffOpenApiDistDir, 'openapi.yaml')
+const distDir = resolve(__dirname, 'dist')
+
+const libraryEntryPoints = {
+  lib: resolve(__dirname, 'src/lib.ts'),
+  router: resolve(__dirname, 'src/router/index.ts'),
+  containers: resolve(__dirname, 'src/containers/index.ts'),
+  network: resolve(__dirname, 'src/network/index.ts'),
+}
+
+const declarationEntryPoints = {
+  lib: [
+    "export * from './src/lib';",
+    "export { default } from './src/lib';",
+  ].join('\n'),
+  router: "export * from './src/router/index';",
+  containers: "export * from './src/containers/index';",
+  network: [
+    "export { default as axiosInstance } from './src/network/axios';",
+    "export { default as apiClient } from './src/network/apiClient';",
+    "export { default as typedApiClient } from './src/network/typedApiClient';",
+  ].join('\n'),
+}
+
+function writeDeclarationEntryPoints() {
+  return {
+    name: 'write-declaration-entry-points',
+    closeBundle() {
+      mkdirSync(distDir, { recursive: true })
+
+      for (const [entryName, declarationContent] of Object.entries(declarationEntryPoints)) {
+        writeFileSync(resolve(distDir, `${entryName}.d.ts`), `${declarationContent}\n`)
+      }
+    },
+  }
+}
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -30,9 +65,18 @@ export default defineConfig({
     tailwindcss(),
     dts({
       include: ['src'],
+      exclude: [
+        'src/**/*.mdx',
+        'src/**/*.stories.ts',
+        'src/**/*.spec.ts',
+        'src/**/*.test.ts',
+        'src/**/__tests__/**',
+        'src/demo/**',
+      ],
       tsconfigPath: './tsconfig.app.json',
-      rollupTypes: true
+      rollupTypes: false,
     }),
+    writeDeclarationEntryPoints(),
   ],
   resolve: {
     alias: {
@@ -43,12 +87,7 @@ export default defineConfig({
     outDir: 'dist',
     lib: {
       // src/lib.ts is where we have exported the component(s)
-      entry: {
-        lib: resolve(__dirname, "src/lib.ts"),
-        router: resolve(__dirname, "src/router/index.ts"),
-        containers: resolve(__dirname, "src/containers/index.ts"),
-        network: resolve(__dirname, "src/network/index.ts")
-      },
+      entry: libraryEntryPoints,
       name: "wefa",
       // the name of the output files when the build is run
       //fileName: "wefa",

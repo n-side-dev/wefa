@@ -104,6 +104,9 @@ jobs:
       - name: Build package
         run: npm run build --if-present
 
+      - name: Verify packaged type declarations
+        run: node ./scripts/verify-package-types.mjs
+
       - name: Publish to npm with trusted publishing
         run: npm publish --access public
 

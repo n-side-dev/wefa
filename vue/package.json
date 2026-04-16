@@ -30,18 +30,22 @@
   ],
   "exports": {
     ".": {
+      "types": "./dist/lib.d.ts",
       "import": "./dist/lib.js",
       "require": "./dist/lib.cjs"
     },
     "./router": {
+      "types": "./dist/router.d.ts",
       "import": "./dist/router.js",
       "require": "./dist/router.cjs"
     },
     "./containers": {
+      "types": "./dist/containers.d.ts",
       "import": "./dist/containers.js",
       "require": "./dist/containers.cjs"
     },
     "./network": {
+      "types": "./dist/network.d.ts",
       "import": "./dist/network.js",
       "require": "./dist/network.cjs"
     },
@@ -67,7 +71,8 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "openapi-codegen": "npx @hey-api/openapi-ts --input ./src/demo/openapi.yaml --output ./src/demo/openapi --client @hey-api/client-axios",
-    "knip": "knip"
+    "knip": "knip",
+    "test:package-types": "npm run build-only && node ./scripts/verify-package-types.mjs"
   },
   "dependencies": {
     "@primeuix/themes": "^2.0.3",

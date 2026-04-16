@@ -154,6 +154,7 @@ From the `vue/` directory:
 | `npm run build-storybook` | Build the static Storybook site |
 | `npm run lint` / `npm run lint-check` | Auto-fix or check ESLint rules |
 | `npm run format` / `npm run format-check` | Run Prettier in write/check mode |
+| `npm run test:package-types` | Build the package, pack it, and verify published type declarations |
 
 The project supports Node.js `^20.19.0 || ^22.13.0 || >=24.0.0`. Use the included `.node-version` or `.nvmrc` to align with CI; the repository currently pins `24.9.0`.
 
@@ -162,6 +163,7 @@ The project supports Node.js `^20.19.0 || ^22.13.0 || >=24.0.0`. Use the include
 - Unit tests: `npm run test:unit`
 - Unit tests in watch mode: `npm run test:unit:watch`
 - End-to-end tests (Playwright against the demo app): `npm run test:e2e`
+- Packaged declaration smoke test: `npm run test:package-types`
 
 Aim for meaningful coverage when adding or changing components. Update or create MDX docs and Storybook stories alongside code changes.
 
