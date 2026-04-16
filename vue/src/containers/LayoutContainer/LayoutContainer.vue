@@ -23,6 +23,7 @@
     </main>
 
     <!-- PrimeVue Dynamic Components Receptors -->
+    <CommandPaletteComponent />
     <Toast ref="toast" />
     <ConfirmDialog />
   </section>
@@ -32,6 +33,7 @@
 import SideNavigationComponent from '@/containers/LayoutContainer/SideNavigationComponent/SideNavigationComponent.vue'
 import { AutoroutedBreadcrumb } from '@/components/AutoroutedBreadcrumb'
 import MobileNavigationComponent from '@/containers/LayoutContainer/MobileNavigationComponent/MobileNavigationComponent.vue'
+import { CommandPaletteComponent } from '@/components/CommandPaletteComponent'
 import { setupDepthTracker } from '../helpers'
 import Toast from 'primevue/toast'
 import ConfirmDialog from 'primevue/confirmdialog'
