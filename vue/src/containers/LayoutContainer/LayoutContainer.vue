@@ -8,6 +8,7 @@
       :project-logo="projectLogo"
       :project-logo-alt="projectLogoAlt"
     />
+    I like the bass
     <main class="flex flex-1 flex-col pb-2 lg:min-w-0 lg:pt-2 lg:pr-2 lg:pl-64">
       <MobileNavigationComponent
         :project-title="projectTitle"
@@ -15,10 +16,12 @@
         :project-logo-alt="projectLogoAlt"
       />
       <section
-        class="grow p-6 lg:rounded-lg lg:bg-white lg:p-10 lg:shadow-xs lg:ring-1 lg:ring-zinc-950/5"
+        class="grow p-6 lg:rounded-lg lg:bg-white lg:p-10 lg:shadow-xs lg:ring-1 lg:ring-zinc-950/5 flex flex-col"
       >
         <AutoroutedBreadcrumb home-route="/home" />
-        <router-view />
+        <div class="grow">
+          <router-view />
+        </div>
       </section>
     </main>
 

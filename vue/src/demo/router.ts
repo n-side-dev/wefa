@@ -34,6 +34,18 @@ const routes: RouteRecordRaw[] = [
     },
   },
   {
+    path: '/grid-visu-poc',
+    name: 'grid-visu-poc',
+    component: () => import('@/components/EnergyGridComponent/EnergyGridComponent.vue'),
+    meta: {
+      wefa: {
+        title: 'Energy Grid Visu',
+        icon: 'pi pi-map',
+        showInNavigation: true,
+      },
+    },
+  },
+  {
     path: '/playground',
     name: 'playground',
     component: PlaygroundView,
