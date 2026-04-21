@@ -2,12 +2,7 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
-import {
-  createNsideTheme,
-  nsidePreset,
-  nsidePrimeVueTheme,
-  nsideThemeOptions,
-} from './nside'
+import { createNsideTheme, nsidePreset, nsidePrimeVueTheme, nsideThemeOptions } from './nside'
 
 const themeCss = readFileSync(resolve(process.cwd(), 'src/assets/main.css'), 'utf8')
 

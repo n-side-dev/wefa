@@ -470,11 +470,7 @@ export const nsidePreset = definePreset(Aura, {
         'rgba(5,181,200,0.22)',
         'var(--brand-text)'
       ),
-      info: createMessageTone(
-        'rgba(5,181,200,0.08)',
-        'rgba(5,181,200,0.18)',
-        'var(--brand-text)'
-      ),
+      info: createMessageTone('rgba(5,181,200,0.08)', 'rgba(5,181,200,0.18)', 'var(--brand-text)'),
     },
     toast: {
       root: {

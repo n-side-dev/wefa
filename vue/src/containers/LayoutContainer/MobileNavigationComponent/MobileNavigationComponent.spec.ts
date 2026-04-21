@@ -132,7 +132,11 @@ describe('MobileNavigationComponent', () => {
 
     expect(wrapper.find('[data-test="drawer-header"]').exists()).toBe(false)
     expect(wrapper.find('[data-test="mobile-navigation-content"]').exists()).toBe(true)
-    expect(wrapper.find('[data-test="mobile-navigation-actions"] [data-test="close-navigation"]').exists()).toBe(true)
+    expect(
+      wrapper
+        .find('[data-test="mobile-navigation-actions"] [data-test="close-navigation"]')
+        .exists()
+    ).toBe(true)
 
     await wrapper.get('[data-test="close-navigation"]').trigger('click')
 
