@@ -1,24 +1,37 @@
 <template>
-  <div class="flex flex-col border-b border-zinc-950/5 p-4">
-    <div class="flex flex-row items-center justify-between gap-3 rounded-lg px-2 py-2.5">
+  <div class="border-b border-[var(--brand-border-contrast-soft)] p-4 lg:p-6">
+    <div
+      class="flex items-start gap-4 rounded-[1.5rem] border border-[var(--brand-nav-card-border)] bg-[var(--brand-nav-card-bg)] px-4 py-4 text-[var(--brand-text-on-dark)] shadow-[var(--brand-nav-card-shadow)] backdrop-blur-sm"
+    >
       <template v-if="projectLogo">
-        <img
-          :src="projectLogo"
-          :alt="projectLogoAlt || projectTitle"
-          class="h-8 w-auto max-w-full object-contain"
-          data-test="project-logo"
-        />
+        <span
+          class="inline-flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-[var(--brand-logo-bg)]"
+        >
+          <img
+            :src="projectLogo"
+            :alt="projectLogoAlt || projectTitle"
+            class="h-8 w-auto max-w-full object-contain"
+            data-test="project-logo"
+          />
+        </span>
       </template>
       <template v-else>
         <span
-          class="inline-flex size-8 shrink-0 items-center justify-center rounded-sm border border-zinc-300 bg-orange-100 align-middle text-sm/5 font-semibold text-zinc-700"
+          class="inline-flex size-12 shrink-0 items-center justify-center rounded-2xl bg-[var(--brand-logo-bg)] text-base font-semibold tracking-[0.22em] text-[var(--brand-logo-text)]"
         >
           {{ projectAvatarLabel }}
         </span>
-        <span class="grow truncate">
-          <span class="block truncate text-md/5 font-medium text-zinc-950">{{ projectTitle }}</span>
-        </span>
       </template>
+      <span class="min-w-0 grow">
+        <span
+          class="block text-[0.7rem] font-medium uppercase tracking-[0.32em] text-[var(--brand-text-on-dark-muted)]"
+        >
+          Project
+        </span>
+        <span class="mt-1 block truncate text-base font-semibold tracking-[0.02em]">
+          {{ projectTitle }}
+        </span>
+      </span>
     </div>
   </div>
 </template>

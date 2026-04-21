@@ -2,23 +2,29 @@
   <router-link v-slot="{ isActive, isExactActive }" :to="route" @click="emitNavigationClick">
     <div class="relative" @click="emitNavigationClick">
       <Transition
-        enter-active-class="transition opacity-0 scale-y-75 duration-200 ease-out"
-        enter-to-class="opacity-100 scale-y-100"
-        leave-active-class="transition opacity-100 scale-y-100 duration-200 ease-in"
-        leave-to-class="opacity-0 scale-y-75"
+        enter-active-class="transition duration-200 ease-out"
+        enter-from-class="opacity-0 -translate-x-1"
+        enter-to-class="opacity-100 translate-x-0"
+        leave-active-class="transition duration-150 ease-in"
+        leave-from-class="opacity-100 translate-x-0"
+        leave-to-class="opacity-0 -translate-x-1"
       >
         <span
           v-if="isActive || isExactActive"
-          class="absolute inset-y-2 -left-4 rounded-full bg-zinc-950 w-1"
-        ></span>
+          class="absolute inset-y-2 left-0 w-1 rounded-full bg-[var(--brand-teal)] shadow-[0_0_18px_rgba(5,181,200,0.55)]"
+        />
       </Transition>
       <div
-        :class="[isExactActive ? 'bg-zinc-500/5' : '']"
-        class="flex w-full items-center rounded-lg cursor-pointer text-base px-2 py-2 gap-3 hover:bg-zinc-950/5"
+        :class="[
+          isActive || isExactActive
+            ? 'bg-[var(--brand-nav-active-bg)] text-[var(--brand-nav-active-text)] shadow-[var(--brand-nav-active-shadow)]'
+            : 'text-[var(--brand-nav-text)] hover:bg-[var(--brand-nav-hover-bg)] hover:text-[var(--brand-text-on-dark)]',
+        ]"
+        class="flex w-full cursor-pointer items-center gap-3 rounded-[1.1rem] px-4 py-3 text-sm font-medium transition"
         @click="emitNavigationClick"
       >
-        <i v-if="icon" class="pi" :class="icon" style="font-size: 1.5rem"></i>
-        <span class="block truncate text-zinc-950">{{ label }}</span>
+        <i v-if="icon" class="pi text-base" :class="icon" />
+        <span class="block truncate">{{ label }}</span>
       </div>
     </div>
   </router-link>

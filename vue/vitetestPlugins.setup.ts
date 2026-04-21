@@ -5,6 +5,27 @@ import { vi } from 'vitest'
 
 const i18n = createLibI18n()
 
+const localStorageState = new Map<string, string>()
+const localStorageMock = {
+  getItem: vi.fn((key: string) => (localStorageState.has(key) ? localStorageState.get(key)! : null)),
+  setItem: vi.fn((key: string, value: string) => {
+    localStorageState.set(key, String(value))
+  }),
+  removeItem: vi.fn((key: string) => {
+    localStorageState.delete(key)
+  }),
+  clear: vi.fn(() => {
+    localStorageState.clear()
+  }),
+  key: vi.fn((index: number) => Array.from(localStorageState.keys())[index] ?? null),
+}
+
+Object.defineProperty(localStorageMock, 'length', {
+  get: () => localStorageState.size,
+})
+
+vi.stubGlobal('localStorage', localStorageMock)
+
 config.global.plugins = [
   i18n,
   PrimeVue

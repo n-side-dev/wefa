@@ -1,6 +1,11 @@
 <template>
-  <div class="flex flex-col grow p-4 gap-4">
-    <section v-if="topLevelEntries.length > 0">
+  <div class="flex grow flex-col px-3 py-3 lg:px-4 lg:py-5">
+    <p
+      class="px-3 text-[0.7rem] font-medium uppercase tracking-[0.28em] text-[var(--brand-text-on-dark-soft)]"
+    >
+      Navigate
+    </p>
+    <section v-if="topLevelEntries.length > 0" class="mt-3 flex flex-col gap-1.5">
       <NavigationLinkComponent
         v-for="entry in topLevelEntries"
         :key="entry.path"
@@ -11,9 +16,17 @@
       />
     </section>
 
-    <section v-for="section in sectionEntries" :key="section.label" class="flex flex-col gap-2">
-      <h3 class="mb-1 px-2 text-sm font-medium text-zinc-500">{{ section.label }}</h3>
-      <div>
+    <section
+      v-for="section in sectionEntries"
+      :key="section.label"
+      class="mt-5 flex flex-col gap-2 first:mt-4"
+    >
+      <h3
+        class="px-3 text-[0.7rem] font-medium uppercase tracking-[0.28em] text-[var(--brand-text-on-dark-soft)]"
+      >
+        {{ section.label }}
+      </h3>
+      <div class="flex flex-col gap-1.5">
         <NavigationLinkComponent
           v-for="entry in section.entries"
           :key="entry.path"

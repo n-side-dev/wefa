@@ -55,6 +55,7 @@ describe('TopComponent', () => {
     const logo = wrapper.get('[data-test="project-logo"]')
     expect(logo.attributes('src')).toBe('https://example.test/logo.svg')
     expect(logo.attributes('alt')).toBe('North Side logo')
-    expect(wrapper.find('.inline-flex').exists()).toBe(false)
+    expect(wrapper.text()).toContain('North Side')
+    expect(wrapper.text()).not.toContain('NS')
   })
 })

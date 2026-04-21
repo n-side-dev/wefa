@@ -1,8 +1,176 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 @import 'tailwindcss';
 @import 'tailwindcss-primeui';
 @import 'primeicons/primeicons.css';
 
-/* Define here the default additional CSS
-you want to apply on the library
-AND projects using the library.
-Be careful about breaking changes */
+@source '../../dist/containers.js';
+@source '../../dist/lib.js';
+@source '../../src';
+
+@custom-variant dark (&:where(.app-dark-mode, .app-dark-mode *));
+
+:root {
+  --brand-navy: #182950;
+  --brand-navy-strong: #101c37;
+  --brand-slate: #66728c;
+  --brand-slate-soft: #858fa7;
+  --brand-mist: #e7ebf5;
+  --brand-border: #d6dfef;
+  --brand-border-strong: rgba(214, 223, 239, 0.95);
+  --brand-border-soft: rgba(214, 223, 239, 0.75);
+  --brand-border-contrast: rgba(255, 255, 255, 0.7);
+  --brand-border-contrast-soft: rgba(255, 255, 255, 0.1);
+  --brand-canvas: #f4f7fb;
+  --brand-canvas-strong: #edf2f8;
+  --brand-surface: #ffffff;
+  --brand-surface-strong: #f8fbff;
+  --brand-surface-elevated: #ffffff;
+  --brand-surface-glass: rgba(255, 255, 255, 0.98);
+  --brand-surface-glass-strong: rgba(248, 251, 255, 0.96);
+  --brand-surface-accent: rgba(5, 181, 200, 0.08);
+  --brand-surface-accent-strong: rgba(5, 181, 200, 0.1);
+  --brand-surface-hover: rgba(5, 181, 200, 0.05);
+  --brand-teal: #05b5c8;
+  --brand-gold: #bc994e;
+  --brand-magenta: #ff48a0;
+  --brand-text: #182950;
+  --brand-text-muted: #66728c;
+  --brand-link: #0c7a97;
+  --brand-text-on-dark: rgba(255, 255, 255, 0.94);
+  --brand-text-on-dark-muted: rgba(255, 255, 255, 0.6);
+  --brand-text-on-dark-soft: rgba(255, 255, 255, 0.45);
+  --brand-text-on-dark-subtle: rgba(255, 255, 255, 0.7);
+  --brand-body-gradient-start: #fbfcff;
+  --brand-body-gradient-end: var(--brand-canvas-strong);
+  --brand-panel-gradient-start: #fbfcff;
+  --brand-panel-gradient-end: #f4f7fb;
+  --brand-side-nav-gradient-start: var(--brand-navy);
+  --brand-side-nav-gradient-end: #12203d;
+  --brand-side-nav-highlight: rgba(255, 72, 160, 0.12);
+  --brand-side-nav-top-glow: rgba(255, 255, 255, 0.06);
+  --brand-nav-card-bg: rgba(255, 255, 255, 0.08);
+  --brand-nav-card-border: rgba(255, 255, 255, 0.12);
+  --brand-nav-card-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  --brand-nav-hover-bg: rgba(255, 255, 255, 0.08);
+  --brand-nav-text: rgba(255, 255, 255, 0.78);
+  --brand-nav-active-bg: #ffffff;
+  --brand-nav-active-text: var(--brand-navy);
+  --brand-nav-active-shadow: 0 22px 45px -28px rgba(9, 18, 41, 0.55);
+  --brand-logo-bg: #ffffff;
+  --brand-logo-text: var(--brand-navy);
+  --brand-accent-chip-bg: rgba(5, 181, 200, 0.08);
+  --brand-accent-chip-text: var(--brand-link);
+  --brand-empty-bg: rgba(248, 251, 255, 0.9);
+  --brand-empty-border: rgba(214, 223, 239, 0.95);
+  --brand-empty-icon-bg: rgba(5, 181, 200, 0.1);
+  --brand-error-border: rgba(255, 72, 160, 0.14);
+  --brand-error-bg: rgba(255, 72, 160, 0.06);
+  --brand-error-text: #b92d72;
+  --brand-orb-teal: rgba(5, 181, 200, 0.18);
+  --brand-orb-magenta: rgba(255, 72, 160, 0.14);
+  --brand-orb-gold: rgba(188, 153, 78, 0.12);
+  --brand-selection-bg: rgba(5, 181, 200, 0.2);
+  --brand-shadow-sm: 0 18px 42px -34px rgba(24, 41, 80, 0.4);
+  --brand-shadow-lg: 0 34px 90px -50px rgba(24, 41, 80, 0.42);
+  --brand-inset-shadow: inset 0 0 0 1px rgba(214, 223, 239, 0.85);
+  --brand-radius-md: 22px;
+  --brand-radius-lg: 28px;
+  --brand-spacing-page: clamp(1.2rem, 1rem + 1.1vw, 2.2rem);
+}
+
+.app-dark-mode {
+  color-scheme: dark;
+  --brand-border: #2a3d5f;
+  --brand-border-strong: rgba(122, 149, 193, 0.4);
+  --brand-border-soft: rgba(122, 149, 193, 0.28);
+  --brand-border-contrast: rgba(231, 235, 245, 0.14);
+  --brand-border-contrast-soft: rgba(231, 235, 245, 0.12);
+  --brand-canvas: #07101f;
+  --brand-canvas-strong: #040b16;
+  --brand-surface: #0f1b31;
+  --brand-surface-strong: #15233d;
+  --brand-surface-elevated: #1a2a48;
+  --brand-surface-glass: rgba(10, 18, 32, 0.92);
+  --brand-surface-glass-strong: rgba(18, 30, 53, 0.86);
+  --brand-surface-accent: rgba(5, 181, 200, 0.14);
+  --brand-surface-accent-strong: rgba(5, 181, 200, 0.18);
+  --brand-surface-hover: rgba(5, 181, 200, 0.12);
+  --brand-text: #e7ebf5;
+  --brand-text-muted: #a5bedb;
+  --brand-link: #69dceb;
+  --brand-body-gradient-start: #0b1426;
+  --brand-body-gradient-end: #040b16;
+  --brand-panel-gradient-start: #162543;
+  --brand-panel-gradient-end: #0f1b31;
+  --brand-side-nav-gradient-start: #0b1630;
+  --brand-side-nav-gradient-end: #081120;
+  --brand-side-nav-highlight: rgba(255, 72, 160, 0.16);
+  --brand-side-nav-top-glow: rgba(255, 255, 255, 0.08);
+  --brand-nav-card-bg: rgba(255, 255, 255, 0.08);
+  --brand-nav-card-border: rgba(255, 255, 255, 0.14);
+  --brand-nav-card-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  --brand-nav-hover-bg: rgba(255, 255, 255, 0.08);
+  --brand-nav-active-bg: rgba(231, 235, 245, 0.14);
+  --brand-nav-active-text: #ffffff;
+  --brand-nav-active-shadow: 0 24px 46px -32px rgba(0, 0, 0, 0.65);
+  --brand-logo-bg: rgba(255, 255, 255, 0.94);
+  --brand-accent-chip-bg: rgba(5, 181, 200, 0.14);
+  --brand-accent-chip-text: #86effc;
+  --brand-empty-bg: rgba(21, 35, 61, 0.78);
+  --brand-empty-border: rgba(122, 149, 193, 0.28);
+  --brand-empty-icon-bg: rgba(5, 181, 200, 0.18);
+  --brand-error-border: rgba(255, 72, 160, 0.26);
+  --brand-error-bg: rgba(255, 72, 160, 0.12);
+  --brand-error-text: #ff91c2;
+  --brand-orb-teal: rgba(5, 181, 200, 0.22);
+  --brand-orb-magenta: rgba(255, 72, 160, 0.18);
+  --brand-orb-gold: rgba(188, 153, 78, 0.18);
+  --brand-selection-bg: rgba(105, 220, 235, 0.28);
+  --brand-shadow-sm: 0 24px 56px -42px rgba(0, 0, 0, 0.75);
+  --brand-shadow-lg: 0 38px 100px -54px rgba(0, 0, 0, 0.78);
+  --brand-inset-shadow: inset 0 0 0 1px rgba(122, 149, 193, 0.28);
+}
+
+html {
+  font-size: 14px;
+  background: var(--brand-canvas);
+}
+
+body {
+  min-height: 100svh;
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  color: var(--brand-text);
+  background:
+    radial-gradient(circle at top left, var(--brand-orb-teal), transparent 30%),
+    radial-gradient(circle at top right, var(--brand-orb-magenta), transparent 22%),
+    linear-gradient(
+      180deg,
+      var(--brand-body-gradient-start) 0%,
+      var(--brand-canvas) 42%,
+      var(--brand-body-gradient-end) 100%
+    );
+}
+
+body,
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  font-family: 'Poppins', sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::selection {
+  background: var(--brand-selection-bg);
+  color: var(--brand-text);
+}
+
+#app {
+  min-height: 100svh;
+}

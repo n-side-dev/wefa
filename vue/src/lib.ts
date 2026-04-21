@@ -7,26 +7,26 @@ import PrimeVue from 'primevue/config'
 export { PrimeVue as PrimeVueLibConfig }
 
 // Export your library components, functions and props in this file
-export * from '@/components/AutoroutedBreadcrumb'
-export * from '@/components/ControlBarComponent'
-export * from '@/components/GanttChartComponent'
-export * from '@/components/DashboardComponent'
-export * from '@/components/FormComponent'
-export * from '@/components/NetworkButton'
-export * from '@/components/NotFound'
-export * from '@/components/PlotlyComponent'
-export * from '@/components/TableComponent'
-export * from '@/theme'
+export * from './components/AutoroutedBreadcrumb/index'
+export * from './components/ControlBarComponent/index'
+export * from './components/GanttChartComponent/index'
+export * from './components/DashboardComponent/index'
+export * from './components/FormComponent/index'
+export * from './components/NetworkButton/index'
+export * from './components/NotFound/index'
+export * from './components/PlotlyComponent/index'
+export * from './components/TableComponent/index'
+export * from './theme/index'
 
 // Export stores
-export * from '@/stores'
+export * from './stores/index'
 
 // Export plugins
-export * from '@/plugins'
+export * from './plugins/index'
 
 // Export utility functions
-export * from '@/locales'
-export * from '@/utils/markdown'
+export * from './locales/index'
+export * from './utils/markdown'
 
 // Install as plugin
 export default {
