@@ -18,7 +18,7 @@
         class="grow min-h-0 p-6 lg:rounded-lg lg:bg-white lg:p-10 lg:shadow-xs lg:ring-1 lg:ring-zinc-950/5 flex flex-col"
       >
         <AutoroutedBreadcrumb :home-route="breadcrumbHomeRouteComputed" />
-        <div class="flex-1 overflow-hidden">
+        <div class="flex-1 overflow-auto">
           <router-view />
         </div>
       </section>
