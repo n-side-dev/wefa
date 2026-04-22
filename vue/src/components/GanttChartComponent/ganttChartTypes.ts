@@ -3,9 +3,10 @@ export type GanttChartActivityData = {
   label?: string
   startDate: Date
   endDate: Date
-  visualType?: 'stripe' | 'bar' | 'mini'
+  visualType?: 'background' | 'stripe' | 'bar' | 'mini'
   color?: string
   colorClass?: string
+  barOffsetTopPx?: number
 }
 
 export type GanttChartRowData = {

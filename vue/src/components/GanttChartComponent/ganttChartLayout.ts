@@ -1,12 +1,13 @@
 import { DateTime } from 'luxon'
 
-export type GanttChartActivityType = 'stripe' | 'bar' | 'mini'
+export type GanttChartActivityType = 'background' | 'stripe' | 'bar' | 'mini'
 export type GanttChartViewMode = 'day' | 'week'
 
 export type GanttChartActivityLike = {
   startDate: Date
   endDate: Date
   visualType?: GanttChartActivityType
+  barOffsetTopPx?: number
 }
 
 export type MiniLaneItem<T extends GanttChartActivityLike> = {
@@ -94,6 +95,14 @@ export const computeMiniLanes = <T extends GanttChartActivityLike>(
   return { lanes, laneCount: laneEnds.length }
 }
 
+export const getBarSpacingOffsets = <T extends GanttChartActivityLike>(activities: T[]) => {
+  const bars = activities.filter((activity) => (activity.visualType ?? 'bar') === 'bar')
+
+  return {
+    topPx: Math.max(0, ...bars.map((activity) => activity.barOffsetTopPx ?? 0)),
+  }
+}
+
 // Computes the required row height based on mini activity max stacking.
 export const getRowHeight = <T extends GanttChartActivityLike>(
   activities: T[],
@@ -102,7 +111,9 @@ export const getRowHeight = <T extends GanttChartActivityLike>(
 ) => {
   const { laneCount } = computeMiniLanes(activities, stackMiniActivities, viewMode)
   const extraHeight = Math.max(0, laneCount - 1) * (MINI_HEIGHT_PX + MINI_GAP_PX)
-  return BASE_ROW_HEIGHT_PX + extraHeight
+  const barSpacingOffsets = getBarSpacingOffsets(activities)
+
+  return BASE_ROW_HEIGHT_PX + extraHeight + barSpacingOffsets.topPx
 }
 
 // Generates week columns covering the specified date range.
