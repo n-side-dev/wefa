@@ -54,12 +54,11 @@ const {
   projectTitle,
   projectLogo = undefined,
   projectLogoAlt = undefined,
-  breadcrumbHomeRoute = "/home",
-  breadcrumbShowHome = true
+  breadcrumbHomeRoute = '/home',
+  breadcrumbShowHome = true,
 } = defineProps<LayoutContainerProps>()
 
-const breadcrumbHomeRouteComputed: ComputedRef<string|undefined> = computed(() => {
+const breadcrumbHomeRouteComputed: ComputedRef<string | undefined> = computed(() => {
   return breadcrumbShowHome ? breadcrumbHomeRoute : undefined
 })
-
 </script>

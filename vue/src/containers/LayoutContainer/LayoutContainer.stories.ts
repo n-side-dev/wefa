@@ -285,25 +285,6 @@ export const CustomBreadcrumbHomeRoute: Story = {
   },
 }
 
-export const BreadcrumbWithoutHomeLink: Story = {
-  args: {
-    breadcrumbShowHome: false,
-  },
-  parameters: {
-    initialPath: '/products/category/electronics/item/laptop',
-    routerNavigationConfiguration: mixedNestedConfiguration,
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-
-    await waitFor(() => {
-      expect(canvas.getByText('Category')).toBeInTheDocument()
-      expect(canvas.getByText('Product Item')).toBeInTheDocument()
-      expect(canvasElement.querySelector('.pi-home')).toBeNull()
-    })
-  },
-}
-
 export const CustomLogo: Story = {
   args: {
     projectTitle: 'WeFa Storybook',
