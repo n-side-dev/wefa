@@ -1,6 +1,6 @@
 <template>
   <section
-    class="relative isolate flex min-h-svh w-full max-lg:flex-col lg:bg-zinc-100"
+    class="relative isolate flex h-svh w-full max-lg:flex-col lg:bg-zinc-100"
     :data-router-view-depth="routerViewDepth"
   >
     <SideNavigationComponent
@@ -8,17 +8,19 @@
       :project-logo="projectLogo"
       :project-logo-alt="projectLogoAlt"
     />
-    <main class="flex flex-1 flex-col pb-2 lg:min-w-0 lg:pt-2 lg:pr-2 lg:pl-64">
+    <main class="flex flex-1 flex-col pb-2 lg:min-w-0 lg:pt-2 lg:pr-2 lg:pl-64 min-h-0">
       <MobileNavigationComponent
         :project-title="projectTitle"
         :project-logo="projectLogo"
         :project-logo-alt="projectLogoAlt"
       />
       <section
-        class="grow p-6 lg:rounded-lg lg:bg-white lg:p-10 lg:shadow-xs lg:ring-1 lg:ring-zinc-950/5"
+        class="grow min-h-0 p-6 lg:rounded-lg lg:bg-white lg:p-10 lg:shadow-xs lg:ring-1 lg:ring-zinc-950/5 flex flex-col"
       >
-        <AutoroutedBreadcrumb home-route="/home" />
-        <router-view />
+        <AutoroutedBreadcrumb :home-route="breadcrumbHomeRouteComputed" />
+        <div class="flex-1 overflow-auto">
+          <router-view />
+        </div>
       </section>
     </main>
 
@@ -35,11 +37,14 @@ import MobileNavigationComponent from '@/containers/LayoutContainer/MobileNaviga
 import { setupDepthTracker } from '../helpers'
 import Toast from 'primevue/toast'
 import ConfirmDialog from 'primevue/confirmdialog'
+import { computed, type ComputedRef } from 'vue'
 
 export interface LayoutContainerProps {
   projectTitle: string
   projectLogo?: string
   projectLogoAlt?: string
+  breadcrumbHomeRoute?: string
+  breadcrumbShowHome?: boolean
 }
 
 // Calling setupDepthTracker() is mandatory for all components with a <RouterView />
@@ -49,5 +54,11 @@ const {
   projectTitle,
   projectLogo = undefined,
   projectLogoAlt = undefined,
+  breadcrumbHomeRoute = '/home',
+  breadcrumbShowHome = true,
 } = defineProps<LayoutContainerProps>()
+
+const breadcrumbHomeRouteComputed: ComputedRef<string | undefined> = computed(() => {
+  return breadcrumbShowHome ? breadcrumbHomeRoute : undefined
+})
 </script>
