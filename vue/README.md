@@ -156,7 +156,7 @@ From the `vue/` directory:
 | `npm run format` / `npm run format-check` | Run Prettier in write/check mode |
 | `npm run test:package-types` | Build the package, pack it, and verify published type declarations |
 
-The project supports Node.js `^20.19.0 || ^22.13.0 || >=24.0.0`. Use the included `.node-version` or `.nvmrc` to align with CI; the repository currently pins `24.9.0`.
+The project supports Node.js `^22.13.0 || >=24.0.0`. Use the included `.node-version` or `.nvmrc` to align with CI; the repository currently pins `24.9.0`.
 
 ## Testing and quality gates
 

@@ -20,7 +20,7 @@ Thanks for helping shape the WeFa (Web Factory) frontend library. This guide cov
 
 ### Prerequisites
 
-- Node.js `^20.19.0 || ^22.13.0 || >=24.0.0` (use `.node-version` or `.nvmrc`; the repo currently pins `24.9.0`)
+- Node.js `^22.13.0 || >=24.0.0` (use `.node-version` or `.nvmrc`; the repo currently pins `24.9.0`)
 - npm 10 or an alternative package manager (pnpm, yarn)
 - Git
 

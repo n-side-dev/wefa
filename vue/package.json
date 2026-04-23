@@ -15,7 +15,7 @@
   },
   "homepage": "https://github.com/n-side-dev/wefa#readme",
   "engines": {
-    "node": "^20.19.0 || ^22.13.0 || >=24.0.0"
+    "node": "^22.13.0 || >=24.0.0"
   },
   "publishConfig": {
     "access": "public"
@@ -97,7 +97,7 @@
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^5.1.2",
-    "@hey-api/openapi-ts": "^0.95.0",
+    "@hey-api/openapi-ts": "^0.96.0",
     "@playwright/test": "^1.59.1",
     "@storybook/addon-a11y": "^10.3.5",
     "@storybook/addon-docs": "^10.3.5",
