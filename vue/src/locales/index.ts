@@ -130,12 +130,7 @@ export function resolveBrowserLocale(supportedLocales: readonly string[]): strin
  * @returns Vue plugin / i18n instance
  */
 export function createLibI18n(options: CreateLibI18nOptions = {}) {
-  const {
-    glob,
-    messages: explicitMessages,
-    primevueLocaleOverrides,
-    ...i18nOptions
-  } = options
+  const { glob, messages: explicitMessages, primevueLocaleOverrides, ...i18nOptions } = options
   const projectMessages = glob ? loadTranslations(glob) : {}
 
   const mergedMessages: LocaleMessages<LocaleMessageValue> = {}
