@@ -72,7 +72,7 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
  * keys at every depth. Arrays and primitives from `source` replace the target value.
  */
 function deepMerge<T>(target: T, source: unknown): T {
-  if (!isPlainObject(source)) return (source === undefined ? target : (source as T))
+  if (!isPlainObject(source)) return source === undefined ? target : (source as T)
   const base: Record<string, unknown> = isPlainObject(target) ? { ...target } : {}
   for (const key of Object.keys(source)) {
     base[key] = deepMerge(base[key], source[key])
