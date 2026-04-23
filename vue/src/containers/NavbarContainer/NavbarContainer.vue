@@ -30,7 +30,9 @@
             }"
             @click.prevent="
               () => {
-                hasSubmenu ?? navigate()
+                if (!hasSubmenu) {
+                  navigate()
+                }
               }
             "
           >
