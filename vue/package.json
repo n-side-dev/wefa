@@ -49,6 +49,11 @@
       "import": "./dist/network.js",
       "require": "./dist/network.cjs"
     },
+    "./locales": {
+      "types": "./dist/locales.d.ts",
+      "import": "./dist/locales.js",
+      "require": "./dist/locales.cjs"
+    },
     "./bff-openapi": "./dist/bff/openapi.yaml",
     "./types": "./dist/lib.d.ts",
     "./style": "./src/assets/main.css"
