@@ -1,10 +1,15 @@
 import {
   createI18n,
   useI18n,
+  type I18n,
   type I18nOptions,
   type LocaleMessages,
   type LocaleMessageValue,
 } from 'vue-i18n'
+import { watch, type App } from 'vue'
+import { all as primeLocalesAll } from 'primelocale'
+
+type GlobResult = Record<string, { default: Record<string, LocaleMessageValue> }>
 
 const defaultMessages: LocaleMessages<Record<string, LocaleMessageValue>> = loadTranslations()
 
@@ -15,14 +20,11 @@ const defaultMessages: LocaleMessages<Record<string, LocaleMessageValue>> = load
  * @returns An object containing the loaded translations, structured by locale and root field.
  */
 export function loadTranslations(
-  glob: Record<string, { default: Record<string, LocaleMessageValue> }> | undefined = undefined
+  glob: GlobResult | undefined = undefined
 ): LocaleMessages<Record<string, LocaleMessageValue>> {
   const modules = glob
     ? glob
-    : (import.meta.glob('@/locales/*/*.json', { eager: true }) as Record<
-        string,
-        { default: LocaleMessages<LocaleMessageValue> }
-      >)
+    : (import.meta.glob('@/locales/*/*.json', { eager: true }) as GlobResult)
 
   const messages: LocaleMessages<Record<string, LocaleMessageValue>> = {}
   for (const path in modules) {
@@ -47,47 +49,118 @@ export function loadTranslations(
 }
 
 /**
- * Create the i18n instance with merged messages
- * This function merges library default translations with project-provided messages,
- * allowing project overrides to take precedence.
- * It supports dynamic loading of translations and provides a consistent i18n setup.
- * @param options I18nOptions
- * @returns I18n instance
+ * Resolve a consumer locale string (e.g. 'en', 'en-GB', 'fr_CA') to the best-matching
+ * primelocale bundle, falling back through hyphen/underscore variants, the primary
+ * subtag, and finally English.
  */
-export function createLibI18n(options: I18nOptions = {}) {
-  // Merge library defaults with project-provided messages (project overrides take precedence)
-  const mergedMessages: LocaleMessages<LocaleMessageValue> = {}
+export function resolvePrimeLocale(locale: string): Record<string, unknown> {
+  const map = primeLocalesAll as unknown as Record<string, Record<string, unknown>>
+  const primary = locale.split(/[-_]/)[0] ?? 'en'
+  const candidates = [locale, locale.replace('-', '_'), locale.replace('_', '-'), primary, 'en']
+  for (const candidate of candidates) {
+    if (candidate && map[candidate]) return map[candidate]
+  }
+  return map.en
+}
 
-  // Safe local assignation. No safeguard needed.
-  for (const locale in defaultMessages) {
-    mergedMessages[locale] = { ...defaultMessages[locale] }
-    if (options.messages?.[locale]) {
-      for (const rootField in options.messages[locale]) {
-        const override =
-          typeof options.messages[locale][rootField] === 'object' &&
-          options.messages[locale][rootField] !== null
-            ? options.messages[locale][rootField]
-            : {}
-        mergedMessages[locale][rootField] = {
-          ...mergedMessages[locale][rootField],
-          ...override,
-        }
-      }
+export type CreateLibI18nOptions = I18nOptions & {
+  /**
+   * Result of `import.meta.glob('./locales/**\/*.json', { eager: true })` from the
+   * consuming project. Files are expected to follow the `<locale>/<category>.json`
+   * naming convention. Any keys that collide with wefa's defaults will override them.
+   */
+  glob?: GlobResult
+}
+
+/**
+ * Resolve the best-matching supported locale from the browser's preferred
+ * languages. Walks `navigator.languages` (falling back to `navigator.language`),
+ * strips any region subtag (`fr-BE` → `fr`, `pt_BR` → `pt`), and returns the
+ * first entry from `supportedLocales` that matches on the primary subtag.
+ * Returns `undefined` when no candidate matches or `navigator` is unavailable.
+ * @param supportedLocales Locales the i18n instance knows about.
+ * @returns Matching locale tag from `supportedLocales`, or `undefined`.
+ */
+export function resolveBrowserLocale(supportedLocales: readonly string[]): string | undefined {
+  if (typeof navigator === 'undefined') return undefined
+  const preferences = navigator.languages?.length ? navigator.languages : [navigator.language]
+  for (const preference of preferences) {
+    const primary = preference?.toLowerCase().split(/[-_]/)[0]
+    if (!primary) continue
+    const match = supportedLocales.find(
+      (locale) => locale.toLowerCase().split(/[-_]/)[0] === primary
+    )
+    if (match) return match
+  }
+  return undefined
+}
+
+/**
+ * Create the i18n instance with merged messages from wefa defaults, the consumer's
+ * project translation files (passed via `options.glob`), and any explicit
+ * `options.messages`. The returned Vue plugin also keeps PrimeVue's `config.locale`
+ * in sync with the active vue-i18n locale — install PrimeVue before `app.use(i18n)`
+ * for the sync to activate.
+ * @param options CreateLibI18nOptions
+ * @returns Vue plugin / i18n instance
+ */
+export function createLibI18n(options: CreateLibI18nOptions = {}) {
+  const { glob, messages: explicitMessages, ...i18nOptions } = options
+  const projectMessages = glob ? loadTranslations(glob) : {}
+
+  const mergedMessages: LocaleMessages<LocaleMessageValue> = {}
+  const locales = new Set<string>([
+    ...Object.keys(defaultMessages),
+    ...Object.keys(projectMessages),
+    ...Object.keys(explicitMessages ?? {}),
+  ])
+  for (const locale of locales) {
+    mergedMessages[locale] = {
+      ...defaultMessages[locale],
+      ...projectMessages[locale],
+      ...(explicitMessages?.[locale] as Record<string, LocaleMessageValue> | undefined),
     }
   }
 
-  return createI18n({
-    legacy: false, // Use Composition API
-    locale: 'en', // Default locale
+  const supportedLocales = Array.from(locales)
+  const detectedLocale = resolveBrowserLocale(supportedLocales) ?? 'en'
+
+  const i18n = createI18n<false>({
+    legacy: false,
+    locale: detectedLocale,
     fallbackLocale: 'en',
-    formatFallbackMessages: true, // Enable fallback for missing translations
-    silentTranslationWarn: true, // Silence warnings for missing translations
-    warnHtmlMessage: false, // Disable warnings for HTML in translations
-    silentFallbackWarn: true, // Silence warnings for fallback
-    missingWarn: false, // Disable warnings for missing translations
+    formatFallbackMessages: true,
+    silentTranslationWarn: true,
+    warnHtmlMessage: false,
+    silentFallbackWarn: true,
+    missingWarn: false,
+    ...i18nOptions,
     messages: mergedMessages as LocaleMessages<Record<string, LocaleMessageValue>>,
-    ...options, // Merge other options (e.g., locale, numberFormats)
   })
+
+  const originalInstall = i18n.install.bind(i18n) as (app: App, ...args: unknown[]) => void
+  i18n.install = ((app: App, ...args: unknown[]) => {
+    originalInstall(app, ...args)
+
+    const primevue = app.config.globalProperties.$primevue as
+      | { config: { locale?: Record<string, unknown> } }
+      | undefined
+    if (!primevue) {
+      console.warn(
+        '[wefa] createLibI18n: PrimeVue is not installed on this app. ' +
+          'Install PrimeVue (app.use(PrimeVue, ...)) before app.use(i18n) to enable PrimeVue locale sync.'
+      )
+      return
+    }
+
+    const applyLocale = (loc: unknown) => {
+      primevue.config.locale = resolvePrimeLocale(String(loc))
+    }
+    applyLocale(i18n.global.locale.value)
+    watch(i18n.global.locale, applyLocale)
+  }) as I18n['install']
+
+  return i18n
 }
 
 /**

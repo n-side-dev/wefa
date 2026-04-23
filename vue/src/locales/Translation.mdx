@@ -21,7 +21,44 @@ This guide explains how to use the translation feature in the `wefa` project, le
 
 ## Overview
 
-The translation feature is powered by `vue-i18n@11.1.11` and configured in `src/locales/index.ts`. It dynamically loads JSON translation files from `src/locales/*/*.json`, supports multiple locales (e.g., `en`, `fr`), and provides fallback behavior for missing keys. The setup is globally integrated into tests via `vitestPlugins.setup.ts` and Storybook via `.storybook/vitest.setup.ts`.
+The translation feature is powered by `vue-i18n` and configured in `src/locales/index.ts`.
+
+`createLibI18n` bundles three layers of translations:
+
+1. **wefa defaults** — wefa's own English messages for its components (form labels, validation, breadcrumbs, etc.) are inlined into the library bundle at build time.
+2. **PrimeVue locale** — translations from [`primelocale`](https://github.com/primefaces/primelocale) for all supported languages. The plugin installs a watcher that syncs PrimeVue's `config.locale` with the active vue-i18n locale, so switching locale at runtime updates PrimeVue components (DatePicker day names, DataTable messages, etc.) automatically.
+3. **Project translations** — the consumer's own JSON files under `src/locales/<locale>/<category>.json`, passed via the `glob` option. These override wefa's defaults on a per-key basis.
+
+## Consumer setup
+
+```ts
+// main.ts
+import { createApp } from 'vue'
+import PrimeVue from 'primevue/config'
+import { createLibI18n } from '@nside/wefa'
+import App from './App.vue'
+
+const app = createApp(App)
+
+// PrimeVue MUST be installed before createLibI18n's result so the i18n plugin
+// can sync PrimeVue's `config.locale`.
+app.use(PrimeVue, {
+  theme: {
+    /* ... */
+  },
+})
+
+app.use(
+  createLibI18n({
+    glob: import.meta.glob('@/locales/**/*.json', { eager: true }),
+    locale: 'en',
+  })
+)
+
+app.mount('#app')
+```
+
+Drop your project's JSON files under `src/locales/<locale>/<category>.json`; they'll be merged in automatically.
 
 ## Setting Up Translation Files
 
