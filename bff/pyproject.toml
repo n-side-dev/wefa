@@ -1,6 +1,6 @@
 [project]
 name = "backend-for-frontend"
-version = "0.5.1"
+version = "0.6.0"
 description = "Flask backend-for-frontend"
 requires-python = ">=3.12,<3.13"
 dependencies = [
