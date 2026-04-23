@@ -119,7 +119,7 @@
     "@vue/eslint-config-typescript": "^14.7.0",
     "@vue/test-utils": "2.4.6",
     "@vue/tsconfig": "^0.9.1",
-    "autoprefixer": "^10.4.27",
+    "autoprefixer": "^10.5.0",
     "axios-mock-adapter": "^2.1.0",
     "eslint": "^10.2.1",
     "eslint-plugin-jsdoc": "^62.9.0",
