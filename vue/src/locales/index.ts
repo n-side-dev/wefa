@@ -152,15 +152,15 @@ export function createLibI18n(options: CreateLibI18nOptions = {}) {
   const detectedLocale = resolveBrowserLocale(supportedLocales) ?? 'en'
 
   const i18n = createI18n<false>({
-    legacy: false,
-    locale: detectedLocale,
+    legacy: false, // Use Composition API
+    locale: detectedLocale, // Default locale
     fallbackLocale: 'en',
-    formatFallbackMessages: true,
-    silentTranslationWarn: true,
-    warnHtmlMessage: false,
-    silentFallbackWarn: true,
-    missingWarn: false,
-    ...i18nOptions,
+    formatFallbackMessages: true, // Enable fallback for missing translations
+    silentTranslationWarn: true, // Silence warnings for missing translations
+    warnHtmlMessage: false, // Disable warnings for HTML in translations
+    silentFallbackWarn: true, // Silence warnings for fallback
+    missingWarn: false, // Disable warnings for missing translations
+    ...i18nOptions, // Merge other options (e.g., locale, numberFormats)
     messages: mergedMessages as LocaleMessages<Record<string, LocaleMessageValue>>,
   })
 
