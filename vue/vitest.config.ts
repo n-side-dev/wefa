@@ -60,6 +60,16 @@ const vitestConfig: UserConfig = {
         {
           extends: true,
           test: {
+            name: 'theme',
+            environment: 'jsdom',
+            include: ['src/theme/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+            testTimeout: 30000,
+            hookTimeout: 10000,
+          },
+        },
+        {
+          extends: true,
+          test: {
             name: 'locales',
             environment: 'jsdom',
             include: ['src/locales/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],

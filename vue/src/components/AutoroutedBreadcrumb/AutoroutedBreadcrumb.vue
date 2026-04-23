@@ -1,5 +1,5 @@
 <template>
-  <Breadcrumb :home="home" :model="items">
+  <Breadcrumb v-bind="attrs" :home="home" :model="items" :style="breadcrumbStyle">
     <template #item="{ item, props }">
       <router-link v-slot="{ href, navigate }" :to="item.route" custom>
         <a
@@ -26,8 +26,12 @@
 import Breadcrumb from 'primevue/breadcrumb'
 import { RouterLink } from 'vue-router'
 import { type RouteLocationMatched, type RouteLocationRaw, useRoute } from 'vue-router'
-import { computed, type ComputedRef } from 'vue'
+import { computed, type ComputedRef, useAttrs } from 'vue'
 import type { MenuItem } from 'primevue/menuitem'
+
+defineOptions({
+  inheritAttrs: false,
+})
 
 /**
  * Represents an item in the breadcrumb navigation
@@ -47,11 +51,22 @@ type AutoroutedBreadcrumbItem = {
 export interface AutoroutedBreadcrumbProps {
   /** Optional route path for the home icon. If provided, a home icon will be added at the beginning of the breadcrumb. */
   homeRoute?: string
+  /** Sets the PrimeVue breadcrumb background token to transparent by default. Disable it to use theme or custom background styling. */
+  transparentBackground?: boolean
 }
 
-const { homeRoute = null } = defineProps<AutoroutedBreadcrumbProps>()
+const attrs = useAttrs()
+
+const { homeRoute = null, transparentBackground = true } = defineProps<AutoroutedBreadcrumbProps>()
 
 const currentRoute = useRoute()
+
+const breadcrumbStyle = computed(() => {
+  return [
+    transparentBackground ? { '--p-breadcrumb-background': 'transparent' } : undefined,
+    attrs.style,
+  ]
+})
 
 /**
  * Computed property that returns the matched routes from the current route

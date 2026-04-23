@@ -113,15 +113,29 @@ The published package also includes the Backend-for-Frontend OpenAPI document at
 To apply the NSIDE Prime theme preset in your app:
 
 ```ts
+import '@nside/wefa/style'
 import PrimeVue from 'primevue/config'
-import { createNsideTheme } from '@nside/wefa'
+import { nsidePrimeVueTheme } from '@nside/wefa'
+
+app.use(PrimeVue, {
+  theme: nsidePrimeVueTheme,
+})
+```
+
+If you need to compose the PrimeVue config yourself, the lower-level exports are still available:
+
+```ts
+import { createNsideTheme, nsideThemeOptions } from '@nside/wefa'
 
 app.use(PrimeVue, {
   theme: {
-    preset: createNsideTheme('green'),
+    preset: createNsideTheme(),
+    options: nsideThemeOptions,
   },
 })
 ```
+
+`createNsideTheme(primary)` is still accepted for backward compatibility, but the argument is now ignored and the MMS-derived flagship theme is always returned.
 
 ### Icons and the registry helper
 

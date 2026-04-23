@@ -1,8 +1,54 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 @import 'tailwindcss';
 @import 'tailwindcss-primeui';
 @import 'primeicons/primeicons.css';
 
-/* Define here the default additional CSS
-you want to apply on the library
-AND projects using the library.
-Be careful about breaking changes */
+@source '../../dist/containers.js';
+@source '../../dist/lib.js';
+@source '../../src';
+
+@custom-variant dark (&:where(.app-dark-mode, .app-dark-mode *));
+
+html {
+  font-size: 14px;
+  background: var(--p-surface-canvas);
+}
+
+body {
+  min-height: 100svh;
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  color: var(--p-text-color);
+  background:
+    radial-gradient(circle at top left, var(--p-orb-teal), transparent 30%),
+    radial-gradient(circle at top right, var(--p-orb-magenta), transparent 22%),
+    linear-gradient(
+      180deg,
+      var(--p-gradient-body-start) 0%,
+      var(--p-surface-canvas) 42%,
+      var(--p-gradient-body-end) 100%
+    );
+}
+
+body,
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  font-family: 'Poppins', sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::selection {
+  background: rgba(5, 181, 200, 0.2);
+  color: var(--p-text-color);
+}
+
+#app {
+  min-height: 100svh;
+}

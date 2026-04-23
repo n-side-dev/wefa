@@ -108,7 +108,54 @@ describe('AutoroutedBreadcrumb', () => {
     await flushPromises()
 
     expect(wrapper.findComponent({ name: 'Breadcrumb' }).exists()).toBe(true)
+    expect(wrapper.get('.p-breadcrumb').attributes('style')).toContain(
+      '--p-breadcrumb-background: transparent;'
+    )
     expect(wrapper.findAll('a').length).toBe(0)
+  })
+
+  it('forwards additional classes to the breadcrumb root', async () => {
+    const mockRoute = createMockRoute([], '/')
+
+    vi.mocked(useRoute).mockReturnValue(mockRoute)
+
+    const wrapper = mount(AutoroutedBreadcrumb, {
+      attrs: {
+        class: 'custom-breadcrumb rounded-md',
+      },
+      global: {
+        plugins: [mockRouter],
+      },
+    })
+    await flushPromises()
+
+    expect(wrapper.get('.p-breadcrumb').classes()).toEqual(
+      expect.arrayContaining(['custom-breadcrumb', 'rounded-md'])
+    )
+  })
+
+  it('does not force a transparent background when transparentBackground is disabled', async () => {
+    const mockRoute = createMockRoute([], '/')
+
+    vi.mocked(useRoute).mockReturnValue(mockRoute)
+
+    const wrapper = mount(AutoroutedBreadcrumb, {
+      props: {
+        transparentBackground: false,
+      },
+      attrs: {
+        class: 'bg-white',
+      },
+      global: {
+        plugins: [mockRouter],
+      },
+    })
+    await flushPromises()
+
+    expect(wrapper.get('.p-breadcrumb').classes()).toContain('bg-white')
+    expect(wrapper.get('.p-breadcrumb').attributes('style') ?? '').not.toContain(
+      '--p-breadcrumb-background'
+    )
   })
 
   it('renders breadcrumb items based on matched routes', async () => {

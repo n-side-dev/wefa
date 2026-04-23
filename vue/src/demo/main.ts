@@ -41,13 +41,11 @@ import ConfirmationService from 'primevue/confirmationservice'
 app.use(ToastService)
 app.use(ConfirmationService)
 
-// Primevue
+// Primevue (install BEFORE i18n so vue-i18n can sync PrimeVue's locale)
 import PrimeVue from 'primevue/config'
-import { createNsideTheme } from '@/theme'
+import { nsidePrimeVueTheme } from '@/theme'
 app.use(PrimeVue, {
-  theme: {
-    preset: createNsideTheme('green'),
-  },
+  theme: nsidePrimeVueTheme,
 })
 
 // i18n (install AFTER PrimeVue so the plugin can sync PrimeVue's locale)

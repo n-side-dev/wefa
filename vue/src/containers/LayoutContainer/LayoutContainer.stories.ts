@@ -11,6 +11,7 @@ interface StoryRouteMeta extends RouteMeta {
 interface RouteNavigationConfiguration {
   showInNavigation: boolean
   section?: string
+  showBreadcrumb?: boolean
 }
 
 type RouterNavigationConfiguration = Record<string, RouteNavigationConfiguration>
@@ -90,6 +91,12 @@ function applyNavigationConfiguration(
       delete routeMeta.wefa.section
     }
 
+    if (routeConfiguration.showBreadcrumb !== undefined) {
+      routeMeta.wefa.showBreadcrumb = routeConfiguration.showBreadcrumb
+    } else {
+      delete routeMeta.wefa.showBreadcrumb
+    }
+
     route.meta = routeMeta
   })
 }
@@ -133,6 +140,10 @@ const mixedNestedConfiguration = {
   home: { showInNavigation: true },
   products: { showInNavigation: true, section: 'Catalog' },
   users: { showInNavigation: true, section: 'Accounts' },
+} satisfies RouterNavigationConfiguration
+
+const hiddenBreadcrumbConfiguration = {
+  showcase: { showInNavigation: true, showBreadcrumb: false },
 } satisfies RouterNavigationConfiguration
 
 const customLogoDataUri =
@@ -319,5 +330,15 @@ export const NameOnlyFallback: Story = {
     await waitFor(() => {
       expect(canvas.getByText('NS')).toBeInTheDocument()
     })
+  },
+}
+
+export const HiddenBreadcrumb: Story = {
+  args: {
+    projectTitle: 'WeFa Storybook',
+  },
+  parameters: {
+    initialPath: '/showcase',
+    routerNavigationConfiguration: hiddenBreadcrumbConfiguration,
   },
 }

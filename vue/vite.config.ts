@@ -1,7 +1,7 @@
 import { fileURLToPath, URL } from 'node:url'
 import { copyFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs'
 import { defineConfig } from 'vite'
-import { resolve } from "path"
+import { dirname, resolve } from 'path'
 import vue from '@vitejs/plugin-vue'
 import tailwindcss from '@tailwindcss/vite'
 import dts from 'vite-plugin-dts'
@@ -11,6 +11,7 @@ const bffOpenApiSource = resolve(__dirname, '../bff/bff_app/openapi/openapi.yaml
 const bffOpenApiDistDir = resolve(__dirname, 'dist/bff')
 const bffOpenApiDistFile = resolve(bffOpenApiDistDir, 'openapi.yaml')
 const distDir = resolve(__dirname, 'dist')
+const distSrcDir = resolve(distDir, 'src')
 
 const libraryEntryPoints = {
   lib: resolve(__dirname, 'src/lib.ts'),
@@ -48,6 +49,33 @@ function writeDeclarationEntryPoints() {
   }
 }
 
+function rewriteDeclarationImportPath(filePath: string, importPath: string) {
+  if (!filePath.startsWith(distSrcDir) || !importPath.startsWith('../')) {
+    return importPath
+  }
+
+  const sourceDir = dirname(filePath)
+  const resolvedCurrentTarget = resolve(sourceDir, importPath)
+  if (resolvedCurrentTarget.startsWith(distSrcDir)) {
+    return importPath
+  }
+
+  const correctedImportPath = importPath.replace(/^((?:\.\.\/)+)(?!src\/)/, '$1src/')
+  if (correctedImportPath === importPath) {
+    return importPath
+  }
+
+  const resolvedCorrectedTarget = resolve(sourceDir, correctedImportPath)
+  return resolvedCorrectedTarget.startsWith(distSrcDir) ? correctedImportPath : importPath
+}
+
+function rewriteDeclarationContent(filePath: string, content: string) {
+  return content.replace(/(from\s+['"])([^'"]+)(['"])/g, (_match, prefix, importPath, suffix) => {
+    const rewrittenImportPath = rewriteDeclarationImportPath(filePath, importPath)
+    return `${prefix}${rewrittenImportPath}${suffix}`
+  })
+}
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
@@ -77,6 +105,9 @@ export default defineConfig({
       ],
       tsconfigPath: './tsconfig.app.json',
       rollupTypes: false,
+      beforeWriteFile: (filePath, content) => ({
+        content: rewriteDeclarationContent(filePath, content),
+      }),
     }),
     writeDeclarationEntryPoints(),
   ],

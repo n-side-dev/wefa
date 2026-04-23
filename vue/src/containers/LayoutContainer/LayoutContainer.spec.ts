@@ -1,7 +1,22 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { defineComponent } from 'vue'
 import LayoutContainer from './LayoutContainer.vue'
+
+const routeState = vi.hoisted(() => ({
+  route: {
+    matched: [{ meta: {} }],
+  },
+}))
+
+vi.mock('vue-router', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('vue-router')>()
+
+  return {
+    ...actual,
+    useRoute: () => routeState.route,
+  }
+})
 
 const SideNavigationStub = defineComponent({
   name: 'SideNavigationComponent',
@@ -15,7 +30,12 @@ const SideNavigationStub = defineComponent({
       default: undefined,
     },
   },
-  template: '<div data-test="side-navigation">{{ projectTitle }}|{{ projectLogo }}</div>',
+  template: `
+    <div data-test="side-navigation">
+      {{ projectTitle }}|{{ projectLogo }}
+      <slot name="bottom" />
+    </div>
+  `,
 })
 
 const MobileNavigationStub = defineComponent({
@@ -30,7 +50,12 @@ const MobileNavigationStub = defineComponent({
       default: undefined,
     },
   },
-  template: '<div data-test="mobile-navigation">{{ projectTitle }}|{{ projectLogo }}</div>',
+  template: `
+    <div data-test="mobile-navigation">
+      {{ projectTitle }}|{{ projectLogo }}
+      <slot name="bottom" />
+    </div>
+  `,
 })
 
 const BreadcrumbStub = defineComponent({
@@ -60,7 +85,82 @@ const ConfirmDialogStub = defineComponent({
 })
 
 describe('LayoutContainer', () => {
+  it('renders breadcrumbs by default', () => {
+    routeState.route.matched = [{ meta: {} }]
+
+    const wrapper = mount(LayoutContainer, {
+      props: {
+        projectTitle: 'My Project',
+      },
+      global: {
+        stubs: {
+          SideNavigationComponent: SideNavigationStub,
+          MobileNavigationComponent: MobileNavigationStub,
+          AutoroutedBreadcrumb: BreadcrumbStub,
+          RouterView: RouterViewStub,
+          Toast: ToastStub,
+          ConfirmDialog: ConfirmDialogStub,
+        },
+      },
+    })
+
+    expect(wrapper.get('[data-test="breadcrumb"]').text()).toBe('/home')
+  })
+
+  it('hides breadcrumbs when the deepest matched route disables them', () => {
+    routeState.route.matched = [
+      { meta: { wefa: { showBreadcrumb: true } } },
+      { meta: { wefa: { showBreadcrumb: false } } },
+    ]
+
+    const wrapper = mount(LayoutContainer, {
+      props: {
+        projectTitle: 'My Project',
+      },
+      global: {
+        stubs: {
+          SideNavigationComponent: SideNavigationStub,
+          MobileNavigationComponent: MobileNavigationStub,
+          AutoroutedBreadcrumb: BreadcrumbStub,
+          RouterView: RouterViewStub,
+          Toast: ToastStub,
+          ConfirmDialog: ConfirmDialogStub,
+        },
+      },
+    })
+
+    expect(wrapper.find('[data-test="breadcrumb"]').exists()).toBe(false)
+  })
+
+  it('uses the deepest explicit breadcrumb preference from matched routes', () => {
+    routeState.route.matched = [
+      { meta: { wefa: { showBreadcrumb: false } } },
+      { meta: {} },
+      { meta: { wefa: { showBreadcrumb: true } } },
+    ]
+
+    const wrapper = mount(LayoutContainer, {
+      props: {
+        projectTitle: 'My Project',
+      },
+      global: {
+        stubs: {
+          SideNavigationComponent: SideNavigationStub,
+          MobileNavigationComponent: MobileNavigationStub,
+          AutoroutedBreadcrumb: BreadcrumbStub,
+          RouterView: RouterViewStub,
+          Toast: ToastStub,
+          ConfirmDialog: ConfirmDialogStub,
+        },
+      },
+    })
+
+    expect(wrapper.find('[data-test="breadcrumb"]').exists()).toBe(true)
+  })
+
   it('passes project title to side and mobile navigation components', () => {
+    routeState.route.matched = [{ meta: {} }]
+
     const wrapper = mount(LayoutContainer, {
       props: {
         projectTitle: 'My Project',
@@ -81,10 +181,15 @@ describe('LayoutContainer', () => {
     expect(wrapper.get('[data-test="mobile-navigation"]').text()).toBe('My Project|')
   })
 
-  it('renders breadcrumb with the expected home route', () => {
+  it('forwards the navigation bottom slot to desktop and mobile navigation', () => {
+    routeState.route.matched = [{ meta: {} }]
+
     const wrapper = mount(LayoutContainer, {
       props: {
         projectTitle: 'My Project',
+      },
+      slots: {
+        'navigation-bottom': '<div data-test="custom-navigation-bottom">Bottom slot</div>',
       },
       global: {
         stubs: {
@@ -98,10 +203,12 @@ describe('LayoutContainer', () => {
       },
     })
 
-    expect(wrapper.get('[data-test="breadcrumb"]').text()).toBe('/home')
+    expect(wrapper.findAll('[data-test="custom-navigation-bottom"]')).toHaveLength(2)
   })
 
   it('renders router outlet and dynamic PrimeVue receptor components', () => {
+    routeState.route.matched = [{ meta: {} }]
+
     const wrapper = mount(LayoutContainer, {
       props: {
         projectTitle: 'My Project',
@@ -124,6 +231,8 @@ describe('LayoutContainer', () => {
   })
 
   it('passes custom logo to side and mobile navigation components', () => {
+    routeState.route.matched = [{ meta: {} }]
+
     const wrapper = mount(LayoutContainer, {
       props: {
         projectTitle: 'My Project',

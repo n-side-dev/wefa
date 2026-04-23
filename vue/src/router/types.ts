@@ -8,6 +8,7 @@ export interface WeFaRouteMeta {
   requiresUnauth?: boolean
   showInNavigation?: boolean
   section?: string
+  showBreadcrumb?: boolean
 }
 
 export type WeFaRouteRecordRaw = RouteRecordRaw & {

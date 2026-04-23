@@ -56,7 +56,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "authlib" },
+    { name = "authlib", specifier = ">=1.6.11" },
     { name = "cryptography" },
     { name = "flask", specifier = "~=3.1.2" },
     { name = "flask-cors" },
