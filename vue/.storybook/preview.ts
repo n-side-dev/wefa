@@ -131,6 +131,7 @@ setup((app: App) => {
   // Provide TanStack Query client for components/stories using useQuery/useMutation
   const queryClient = new QueryClient()
   app.use(VueQueryPlugin, { queryClient })
+  // i18n must be installed AFTER PrimeVue so it can sync PrimeVue's locale
   app.use(i18n)
 })
 

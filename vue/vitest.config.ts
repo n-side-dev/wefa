@@ -70,6 +70,18 @@ const vitestConfig: UserConfig = {
         {
           extends: true,
           test: {
+            name: 'locales',
+            environment: 'jsdom',
+            include: ['src/locales/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+            testTimeout: 30000,
+            hookTimeout: 10000,
+            // Intentionally NO setupFiles: createLibI18n tests install their own
+            // plugins per-test to exercise install ordering.
+          },
+        },
+        {
+          extends: true,
+          test: {
             name: 'network',
             environment: 'jsdom',
             include: ['src/network/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],

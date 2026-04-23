@@ -159,6 +159,8 @@ const meta = {
     projectTitle: 'WeFa Storybook',
     projectLogo: undefined,
     projectLogoAlt: undefined,
+    breadcrumbHomeRoute: '/home',
+    breadcrumbShowHome: true,
   },
   argTypes: {
     projectTitle: {
@@ -172,6 +174,16 @@ const meta = {
     projectLogoAlt: {
       control: 'text',
       description: 'Optional alt text used for the custom logo.',
+    },
+    breadcrumbHomeRoute: {
+      control: 'text',
+      description:
+        'Route path used by the automatically rendered breadcrumb home icon. Defaults to `/home`.',
+    },
+    breadcrumbShowHome: {
+      control: 'boolean',
+      description:
+        'Shows or hides the breadcrumb home icon while keeping autorouted route segments visible.',
     },
   },
   decorators: [
@@ -261,6 +273,25 @@ export const MixedNestedRoutes: Story = {
     await waitFor(() => {
       expect(canvas.getByText('Category')).toBeInTheDocument()
       expect(canvas.getByText('Product Item')).toBeInTheDocument()
+    })
+  },
+}
+
+export const CustomBreadcrumbHomeRoute: Story = {
+  args: {
+    breadcrumbHomeRoute: '/products',
+  },
+  parameters: {
+    initialPath: '/products/category/electronics/item/laptop',
+    routerNavigationConfiguration: mixedNestedConfiguration,
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await waitFor(() => {
+      expect(canvas.getByText('Category')).toBeInTheDocument()
+      expect(canvas.getByText('Product Item')).toBeInTheDocument()
+      expect(canvasElement.querySelector('.pi-home')).not.toBeNull()
     })
   },
 }

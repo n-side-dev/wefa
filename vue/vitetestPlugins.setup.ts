@@ -26,9 +26,12 @@ Object.defineProperty(localStorageMock, 'length', {
 
 vi.stubGlobal('localStorage', localStorageMock)
 
+// PrimeVue must come before i18n: createLibI18n's install hook syncs PrimeVue's
+// `config.locale` with the active vue-i18n locale, which requires PrimeVue to
+// already be installed on the app.
 config.global.plugins = [
-  i18n,
-  PrimeVue
+  PrimeVue,
+  i18n
 ]
 
 // Mock the ResizeObserver

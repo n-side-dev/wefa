@@ -11,11 +11,22 @@ import * as LayoutContainerStories from './LayoutContainer.stories'
 
 - desktop side navigation
 - mobile drawer navigation
-- route-aware breadcrumb
+- an automatically rendered route-aware breadcrumb
 - optional route-controlled breadcrumb hiding via `meta.wefa.showBreadcrumb`
 - child route content through `<router-view />`
 
 The stories below focus on router metadata setup, because navigation links are generated directly from the router tree.
+
+## Automatic Breadcrumb
+
+`LayoutContainer` now mounts `AutoroutedBreadcrumb` for you above the routed page content. By default it shows a home icon that links to `/home`, then appends the current matched route hierarchy.
+
+Use the layout props below to adjust that default:
+
+- `breadcrumbHomeRoute` changes the route used by the breadcrumb home icon.
+- `breadcrumbShowHome` hides the home icon while keeping the current route trail visible.
+
+<Canvas of={LayoutContainerStories.CustomBreadcrumbHomeRoute} />
 
 ## Router Configurations
 
@@ -111,6 +122,18 @@ import { LayoutContainer, setupDepthTracker } from '@nside/wefa/containers'
 
 const routerViewDepth = setupDepthTracker()
 </script>
+```
+
+If you need to customize the breadcrumb home entry from the layout shell:
+
+```vue
+<template>
+  <LayoutContainer
+    project-title="My Project"
+    breadcrumb-home-route="/dashboard"
+    :breadcrumb-show-home="false"
+  />
+</template>
 ```
 
 Then keep your application routes as regular page routes (do not use `LayoutContainer` as a route component):

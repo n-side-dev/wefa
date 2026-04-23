@@ -36,7 +36,7 @@
       <section
         class="min-h-[calc(100svh-0.75rem)] rounded-(--p-radius-lg) border border-(--p-border-contrast) bg-[linear-gradient(180deg,var(--p-surface-glass),var(--p-surface-glass-strong)),var(--p-surface-0)] p-(--p-spacing-page) shadow-(--p-shadow-lg) backdrop-blur-[14px] lg:min-h-[calc(100svh-2rem)]"
       >
-        <AutoroutedBreadcrumb v-if="showBreadcrumb" home-route="/home" />
+        <AutoroutedBreadcrumb v-if="showBreadcrumb" :home-route="breadcrumbHomeRouteComputed" />
         <router-view />
       </section>
     </main>
@@ -61,6 +61,8 @@ export interface LayoutContainerProps {
   projectTitle: string
   projectLogo?: string
   projectLogoAlt?: string
+  breadcrumbHomeRoute?: string
+  breadcrumbShowHome?: boolean
 }
 
 // Calling setupDepthTracker() is mandatory for all components with a <RouterView />
@@ -72,6 +74,8 @@ const {
   projectTitle,
   projectLogo = undefined,
   projectLogoAlt = undefined,
+  breadcrumbHomeRoute = '/home',
+  breadcrumbShowHome = true,
 } = defineProps<LayoutContainerProps>()
 
 const hasNavigationBottomSlot = computed<boolean>(() => {
@@ -84,5 +88,9 @@ const showBreadcrumb = computed(() => {
     .find((matchedRoute) => matchedRoute.meta.wefa?.showBreadcrumb !== undefined)
 
   return matchedRouteWithBreadcrumbPreference?.meta.wefa?.showBreadcrumb ?? true
+})
+
+const breadcrumbHomeRouteComputed = computed<string | undefined>(() => {
+  return breadcrumbShowHome ? breadcrumbHomeRoute : undefined
 })
 </script>
