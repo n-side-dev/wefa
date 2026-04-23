@@ -87,6 +87,14 @@ export type CreateLibI18nOptions = I18nOptions & {
    * naming convention. Any keys that collide with wefa's defaults will override them.
    */
   glob?: GlobResult
+  /**
+   * Per-locale overrides for PrimeVue's `config.locale`. Deep-merged on top of the
+   * primelocale bundle every time the active locale changes, so consumer-supplied
+   * terminology, branding, or compliance wording survives locale swaps. Keys may be
+   * keyed by exact tag (`'en-GB'`), primary subtag (`'fr'`), or `'*'` to apply to
+   * every locale.
+   */
+  primevueLocaleOverrides?: Record<string, Record<string, unknown>>
 }
 
 /**
@@ -122,7 +130,12 @@ export function resolveBrowserLocale(supportedLocales: readonly string[]): strin
  * @returns Vue plugin / i18n instance
  */
 export function createLibI18n(options: CreateLibI18nOptions = {}) {
-  const { glob, messages: explicitMessages, ...i18nOptions } = options
+  const {
+    glob,
+    messages: explicitMessages,
+    primevueLocaleOverrides,
+    ...i18nOptions
+  } = options
   const projectMessages = glob ? loadTranslations(glob) : {}
 
   const mergedMessages: LocaleMessages<LocaleMessageValue> = {}
@@ -171,8 +184,23 @@ export function createLibI18n(options: CreateLibI18nOptions = {}) {
       return
     }
 
+    const resolveOverrides = (loc: string): Record<string, unknown> => {
+      if (!primevueLocaleOverrides) return {}
+      const primary = loc.split(/[-_]/)[0] ?? ''
+      // Most general → most specific; later layers win.
+      const layers = ['*', primary, loc.replace('_', '-'), loc.replace('-', '_'), loc]
+      let merged: Record<string, unknown> = {}
+      for (const key of layers) {
+        if (key && primevueLocaleOverrides[key]) {
+          merged = deepMerge(merged, primevueLocaleOverrides[key])
+        }
+      }
+      return merged
+    }
+
     const applyLocale = (loc: unknown) => {
-      primevue.config.locale = resolvePrimeLocale(String(loc))
+      const tag = String(loc)
+      primevue.config.locale = deepMerge(resolvePrimeLocale(tag), resolveOverrides(tag))
     }
     applyLocale(i18n.global.locale.value)
     watch(i18n.global.locale, applyLocale)
