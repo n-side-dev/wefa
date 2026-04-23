@@ -63,6 +63,23 @@ export function resolvePrimeLocale(locale: string): Record<string, unknown> {
   return map.en
 }
 
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+/**
+ * Recursively merge `source` into `target`, so partial overrides preserve sibling
+ * keys at every depth. Arrays and primitives from `source` replace the target value.
+ */
+function deepMerge<T>(target: T, source: unknown): T {
+  if (!isPlainObject(source)) return (source === undefined ? target : (source as T))
+  const base: Record<string, unknown> = isPlainObject(target) ? { ...target } : {}
+  for (const key of Object.keys(source)) {
+    base[key] = deepMerge(base[key], source[key])
+  }
+  return base as T
+}
+
 export type CreateLibI18nOptions = I18nOptions & {
   /**
    * Result of `import.meta.glob('./locales/**\/*.json', { eager: true })` from the
@@ -115,11 +132,12 @@ export function createLibI18n(options: CreateLibI18nOptions = {}) {
     ...Object.keys(explicitMessages ?? {}),
   ])
   for (const locale of locales) {
-    mergedMessages[locale] = {
-      ...defaultMessages[locale],
-      ...projectMessages[locale],
-      ...(explicitMessages?.[locale] as Record<string, LocaleMessageValue> | undefined),
+    let merged: Record<string, LocaleMessageValue> = {
+      ...(defaultMessages[locale] ?? {}),
     }
+    merged = deepMerge(merged, projectMessages[locale])
+    merged = deepMerge(merged, explicitMessages?.[locale])
+    mergedMessages[locale] = merged
   }
 
   const supportedLocales = Array.from(locales)

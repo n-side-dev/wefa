@@ -36,6 +36,16 @@ describe('createLibI18n', () => {
     expect(i18n.global.t('form.submit')).toBe('Envoyer')
   })
 
+  it('preserves sibling default keys when a partial override is provided', () => {
+    const i18n = createLibI18n({
+      messages: { en: { form: { submit: 'Send' } } },
+    })
+    // The override provides only form.submit — other default form.* keys must survive.
+    expect(i18n.global.t('form.submit')).toBe('Send')
+    // `username` is a default key in wefa's en/form.json; it must not be dropped.
+    expect(i18n.global.t('form.username')).toBe('Username')
+  })
+
   it('explicit options.messages wins over glob and defaults', () => {
     const glob = {
       '/src/locales/en/form.json': { default: { submit: 'From glob' } },
