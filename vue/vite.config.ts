@@ -17,6 +17,7 @@ const libraryEntryPoints = {
   router: resolve(__dirname, 'src/router/index.ts'),
   containers: resolve(__dirname, 'src/containers/index.ts'),
   network: resolve(__dirname, 'src/network/index.ts'),
+  locales: resolve(__dirname, 'src/locales/index.ts'),
 }
 
 const declarationEntryPoints = {
@@ -31,6 +32,7 @@ const declarationEntryPoints = {
     "export { default as apiClient } from './src/network/apiClient';",
     "export { default as typedApiClient } from './src/network/typedApiClient';",
   ].join('\n'),
+  locales: "export * from './src/locales/index';",
 }
 
 function writeDeclarationEntryPoints() {
