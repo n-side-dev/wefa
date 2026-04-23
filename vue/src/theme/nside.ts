@@ -638,11 +638,7 @@ export const nsidePreset = definePreset(Aura, {
         'rgba(188,153,78,0.26)',
         'var(--p-text-color)'
       ),
-      error: createMessageTone(
-        'var(--p-error-bg)',
-        'var(--p-error-border)',
-        'var(--p-error-text)'
-      ),
+      error: createMessageTone('var(--p-error-bg)', 'var(--p-error-border)', 'var(--p-error-text)'),
       success: createMessageTone(
         'rgba(5,181,200,0.1)',
         'rgba(5,181,200,0.22)',
@@ -678,11 +674,7 @@ export const nsidePreset = definePreset(Aura, {
         'var(--p-text-color)',
         'var(--p-text-muted-color)'
       ),
-      error: createToastTone(
-        'var(--p-error-bg)',
-        'var(--p-error-border)',
-        'var(--p-error-text)'
-      ),
+      error: createToastTone('var(--p-error-bg)', 'var(--p-error-border)', 'var(--p-error-text)'),
       warn: createToastTone(
         'rgba(188,153,78,0.12)',
         'rgba(188,153,78,0.26)',

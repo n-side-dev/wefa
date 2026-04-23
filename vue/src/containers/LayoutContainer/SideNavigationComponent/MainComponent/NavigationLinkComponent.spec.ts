@@ -66,9 +66,7 @@ describe('NavigationLinkComponent', () => {
 
     expect(
       wrapper
-        .find(
-          'span.bg-\\(--p-teal\\).shadow-\\[0_0_18px_rgba\\(5\\,181\\,200\\,0\\.55\\)\\]'
-        )
+        .find('span.bg-\\(--p-teal\\).shadow-\\[0_0_18px_rgba\\(5\\,181\\,200\\,0\\.55\\)\\]')
         .exists()
     ).toBe(true)
   })
@@ -89,9 +87,7 @@ describe('NavigationLinkComponent', () => {
 
     expect(
       wrapper
-        .find(
-          'span.bg-\\(--p-teal\\).shadow-\\[0_0_18px_rgba\\(5\\,181\\,200\\,0\\.55\\)\\]'
-        )
+        .find('span.bg-\\(--p-teal\\).shadow-\\[0_0_18px_rgba\\(5\\,181\\,200\\,0\\.55\\)\\]')
         .exists()
     ).toBe(false)
   })
