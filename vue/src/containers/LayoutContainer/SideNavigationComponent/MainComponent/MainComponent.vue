@@ -1,7 +1,7 @@
 <template>
   <div class="flex grow flex-col px-3 py-3 lg:px-4 lg:py-5">
     <p
-      class="px-3 text-[0.7rem] font-medium uppercase tracking-[0.28em] text-[var(--brand-text-on-dark-soft)]"
+      class="px-3 text-[0.7rem] font-medium uppercase tracking-[0.28em] text-(--p-text-on-dark-soft)"
     >
       Navigate
     </p>
@@ -22,7 +22,7 @@
       class="mt-5 flex flex-col gap-2 first:mt-4"
     >
       <h3
-        class="px-3 text-[0.7rem] font-medium uppercase tracking-[0.28em] text-[var(--brand-text-on-dark-soft)]"
+        class="px-3 text-[0.7rem] font-medium uppercase tracking-[0.28em] text-(--p-text-on-dark-soft)"
       >
         {{ section.label }}
       </h3>

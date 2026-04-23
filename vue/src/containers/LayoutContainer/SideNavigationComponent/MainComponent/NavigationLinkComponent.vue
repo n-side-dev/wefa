@@ -11,14 +11,14 @@
       >
         <span
           v-if="isActive || isExactActive"
-          class="absolute inset-y-2 left-0 w-1 rounded-full bg-[var(--brand-teal)] shadow-[0_0_18px_rgba(5,181,200,0.55)]"
+          class="absolute inset-y-2 left-0 w-1 rounded-full bg-(--p-teal) shadow-[0_0_18px_rgba(5,181,200,0.55)]"
         />
       </Transition>
       <div
         :class="[
           isActive || isExactActive
-            ? 'bg-[var(--brand-nav-active-bg)] text-[var(--brand-nav-active-text)] shadow-[var(--brand-nav-active-shadow)]'
-            : 'text-[var(--brand-nav-text)] hover:bg-[var(--brand-nav-hover-bg)] hover:text-[var(--brand-text-on-dark)]',
+            ? 'bg-(--p-nav-active-bg) text-(--p-nav-active-text) shadow-(--p-nav-active-shadow)'
+            : 'text-(--p-nav-text) hover:bg-(--p-nav-hover-bg) hover:text-(--p-text-on-dark)',
         ]"
         class="flex w-full cursor-pointer items-center gap-3 rounded-[1.1rem] px-4 py-3 text-sm font-medium transition"
         @click="emitNavigationClick"

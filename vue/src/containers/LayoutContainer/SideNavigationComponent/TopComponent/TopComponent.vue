@@ -1,11 +1,11 @@
 <template>
-  <div class="border-b border-[var(--brand-border-contrast-soft)] p-4 lg:p-6">
+  <div class="border-b border-(--p-border-contrast-soft) p-4 lg:p-6">
     <div
-      class="flex items-start gap-4 rounded-[1.5rem] border border-[var(--brand-nav-card-border)] bg-[var(--brand-nav-card-bg)] px-4 py-4 text-[var(--brand-text-on-dark)] shadow-[var(--brand-nav-card-shadow)] backdrop-blur-sm"
+      class="flex items-start gap-4 rounded-[1.5rem] border border-(--p-nav-card-border) bg-(--p-nav-card-bg) px-4 py-4 text-(--p-text-on-dark) shadow-(--p-nav-card-shadow) backdrop-blur-sm"
     >
       <template v-if="projectLogo">
         <span
-          class="inline-flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-[var(--brand-logo-bg)]"
+          class="inline-flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-(--p-nav-logo-bg)"
         >
           <img
             :src="projectLogo"
@@ -17,14 +17,14 @@
       </template>
       <template v-else>
         <span
-          class="inline-flex size-12 shrink-0 items-center justify-center rounded-2xl bg-[var(--brand-logo-bg)] text-base font-semibold tracking-[0.22em] text-[var(--brand-logo-text)]"
+          class="inline-flex size-12 shrink-0 items-center justify-center rounded-2xl bg-(--p-nav-logo-bg) text-base font-semibold tracking-[0.22em] text-(--p-nav-logo-text)"
         >
           {{ projectAvatarLabel }}
         </span>
       </template>
       <span class="min-w-0 grow">
         <span
-          class="block text-[0.7rem] font-medium uppercase tracking-[0.32em] text-[var(--brand-text-on-dark-muted)]"
+          class="block text-[0.7rem] font-medium uppercase tracking-[0.32em] text-(--p-text-on-dark-muted)"
         >
           Project
         </span>

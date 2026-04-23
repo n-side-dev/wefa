@@ -26,7 +26,7 @@
     <template #container>
       <nav
         data-test="mobile-navigation-content"
-        class="relative flex h-full min-h-full w-full flex-col overflow-hidden bg-[linear-gradient(180deg,var(--brand-side-nav-top-glow),transparent_24%),linear-gradient(160deg,var(--brand-side-nav-highlight),transparent_24%),linear-gradient(180deg,var(--brand-side-nav-gradient-start)_0%,var(--brand-side-nav-gradient-end)_100%)]"
+        class="relative flex h-full min-h-full w-full flex-col overflow-hidden bg-[linear-gradient(180deg,var(--p-nav-side-top-glow),transparent_24%),linear-gradient(160deg,var(--p-nav-side-highlight),transparent_24%),linear-gradient(180deg,var(--p-nav-side-gradient-start)_0%,var(--p-nav-side-gradient-end)_100%)]"
       >
         <div data-test="mobile-navigation-actions" class="flex justify-end px-4 pt-4">
           <Button
@@ -36,7 +36,7 @@
             text
             rounded
             severity="secondary"
-            class="size-10 shrink-0 border border-(--brand-border-contrast-soft) bg-white/10 text-(--brand-text-on-dark) shadow-[0_12px_32px_-18px_rgba(8,16,38,0.9)] backdrop-blur-sm"
+            class="size-10 shrink-0 border border-(--p-border-contrast-soft) bg-white/10 text-(--p-text-on-dark) shadow-[0_12px_32px_-18px_rgba(8,16,38,0.9)] backdrop-blur-sm"
             :aria-label="t('navigation.close_navigation_menu')"
             @click="closeDrawer"
           />
@@ -47,7 +47,7 @@
           :project-logo-alt="projectLogoAlt"
         />
         <MainComponent @navigation-item-click="closeDrawer" />
-        <div class="mt-auto border-t border-[var(--brand-border-contrast-soft)] px-4 py-4">
+        <div class="mt-auto border-t border-(--p-border-contrast-soft) px-4 py-4">
           <slot name="bottom">
             <BottomComponent />
           </slot>

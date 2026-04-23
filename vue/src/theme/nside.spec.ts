@@ -25,19 +25,15 @@ describe('N-SIDE theme exports', () => {
 })
 
 describe('N-SIDE shared stylesheet', () => {
-  it('contains the flagship light-mode token contract', () => {
+  it('keeps the font import, Tailwind wiring, and dark-mode custom variant', () => {
     expect(themeCss).toContain("@import url('https://fonts.googleapis.com/css2?family=Poppins")
-    expect(themeCss).toContain('--brand-navy: #182950;')
-    expect(themeCss).toContain('--brand-surface: #ffffff;')
-    expect(themeCss).toContain('--brand-teal: #05b5c8;')
-    expect(themeCss).toContain('--brand-shadow-lg: 0 34px 90px -50px rgba(24, 41, 80, 0.42);')
+    expect(themeCss).toContain("@import 'tailwindcss';")
+    expect(themeCss).toContain('@custom-variant dark (&:where(.app-dark-mode, .app-dark-mode *));')
   })
 
-  it('contains the shared dark-mode wiring and dark token overrides', () => {
-    expect(themeCss).toContain('@custom-variant dark (&:where(.app-dark-mode, .app-dark-mode *));')
-    expect(themeCss).toContain('.app-dark-mode {')
-    expect(themeCss).toContain('color-scheme: dark;')
-    expect(themeCss).toContain('--brand-surface: #0f1b31;')
-    expect(themeCss).toContain('--brand-link: #69dceb;')
+  it('references PrimeVue-generated theme variables rather than brand reference tokens', () => {
+    expect(themeCss).not.toMatch(/--brand-/)
+    expect(themeCss).toContain('var(--p-surface-canvas)')
+    expect(themeCss).toContain('var(--p-text-color)')
   })
 })

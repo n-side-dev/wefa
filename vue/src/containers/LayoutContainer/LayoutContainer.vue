@@ -5,13 +5,13 @@
   >
     <div class="pointer-events-none absolute inset-0 overflow-hidden">
       <div
-        class="absolute top-0 left-[-4rem] h-[22rem] w-[22rem] rounded-full bg-[var(--brand-orb-teal)] opacity-55 blur-[80px]"
+        class="absolute top-0 left-[-4rem] h-[22rem] w-[22rem] rounded-full bg-(--p-orb-teal) opacity-55 blur-[80px]"
       />
       <div
-        class="absolute top-48 right-[-8rem] h-[20rem] w-[20rem] rounded-full bg-[var(--brand-orb-magenta)] opacity-55 blur-[80px]"
+        class="absolute top-48 right-[-8rem] h-[20rem] w-[20rem] rounded-full bg-(--p-orb-magenta) opacity-55 blur-[80px]"
       />
       <div
-        class="absolute bottom-8 left-[30%] h-[16rem] w-[16rem] rounded-full bg-[var(--brand-orb-gold)] opacity-55 blur-[80px]"
+        class="absolute bottom-8 left-[30%] h-[16rem] w-[16rem] rounded-full bg-(--p-orb-gold) opacity-55 blur-[80px]"
       />
     </div>
     <SideNavigationComponent
@@ -34,7 +34,7 @@
         </template>
       </MobileNavigationComponent>
       <section
-        class="min-h-[calc(100svh-0.75rem)] rounded-[var(--brand-radius-lg)] border border-[var(--brand-border-contrast)] bg-[linear-gradient(180deg,var(--brand-surface-glass),var(--brand-surface-glass-strong)),var(--brand-surface)] p-[var(--brand-spacing-page)] shadow-[var(--brand-shadow-lg)] backdrop-blur-[14px] lg:min-h-[calc(100svh-2rem)]"
+        class="min-h-[calc(100svh-0.75rem)] rounded-(--p-radius-lg) border border-(--p-border-contrast) bg-[linear-gradient(180deg,var(--p-surface-glass),var(--p-surface-glass-strong)),var(--p-surface-0)] p-(--p-spacing-page) shadow-(--p-shadow-lg) backdrop-blur-[14px] lg:min-h-[calc(100svh-2rem)]"
       >
         <AutoroutedBreadcrumb v-if="showBreadcrumb" home-route="/home" />
         <router-view />
