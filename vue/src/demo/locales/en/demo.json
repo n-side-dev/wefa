@@ -1,12 +1,4 @@
 {
-  "login": {
-    "title": "Sign in to WeFa",
-    "subtitle": "Use your Django demo credentials.",
-    "password": "Password",
-    "submit": "Sign in",
-    "error_summary": "Sign in failed",
-    "error_detail": "Please check your credentials and try again."
-  },
   "theme": {
     "label": "Theme",
     "system": "System",

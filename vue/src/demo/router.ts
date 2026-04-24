@@ -4,7 +4,7 @@ import DemoView from '@/demo/views/DemoView.vue'
 import ShowcaseView from '@/demo/views/ShowcaseView.vue'
 import PlaygroundView from '@/demo/views/PlaygroundView.vue'
 import DemoContent from '@/demo/views/DemoContent.vue'
-import LoginView from '@/demo/views/LoginView.vue'
+import LoginView from '@/views/LoginView.vue'
 import { backendStore } from '@/demo/backendStore'
 
 const routes: RouteRecordRaw[] = [
@@ -16,6 +16,11 @@ const routes: RouteRecordRaw[] = [
     path: '/login',
     name: 'login',
     component: LoginView,
+    props: () => ({
+      backendStore,
+      logoAlt: 'N-SIDE',
+      defaultRedirect: '/home',
+    }),
     meta: {
       wefa: {
         title: 'Sign in',

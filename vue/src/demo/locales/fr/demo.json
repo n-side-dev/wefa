@@ -1,12 +1,4 @@
 {
-  "login": {
-    "title": "Connexion à WeFa",
-    "subtitle": "Utilisez vos identifiants de la démo Django.",
-    "password": "Mot de passe",
-    "submit": "Se connecter",
-    "error_summary": "Échec de la connexion",
-    "error_detail": "Veuillez vérifier vos identifiants et réessayer."
-  },
   "theme": {
     "label": "Thème",
     "system": "Système",
