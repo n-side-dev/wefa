@@ -20,6 +20,7 @@ WeFa (Web Factory) delivers a set of modular Django apps that cover recurring we
 - Shared utilities that power the higher-level apps (`nside_wefa.common`)
 - Plug-and-play Django REST Framework authentication configuration (token and JWT) (`nside_wefa.authentication`)
 - Legal consent tracking with automatic user onboarding and templated documents (`nside_wefa.legal_consent`)
+- Per-user locale persistence with a public discovery endpoint (`nside_wefa.locale`)
 - System checks and sensible defaults so configuration mistakes surface early
 
 ## Installation
@@ -50,6 +51,10 @@ Automatically wires Django REST Framework authentication classes, URLs, and depe
 
 Tracks acceptance of privacy and terms documents with templating support and REST endpoints. See `nside_wefa/legal_consent/README.md` for details.
 
+### Locale
+
+Persists each user's preferred locale and exposes the supported locales for the project over REST. See `nside_wefa/locale/README.md` for details.
+
 ## Quick Start
 
 1. Install the package.
@@ -64,6 +69,7 @@ Tracks acceptance of privacy and terms documents with templating support and RES
        "nside_wefa.common",
        "nside_wefa.authentication",
        "nside_wefa.legal_consent",
+       "nside_wefa.locale",
    ]
    ```
 
@@ -82,6 +88,7 @@ Tracks acceptance of privacy and terms documents with templating support and RES
        # ...your URLs
        path("auth/", include("nside_wefa.authentication.urls")),
        path("legal-consent/", include("nside_wefa.legal_consent.urls")),
+       path("locale/", include("nside_wefa.locale.urls")),
    ]
    ```
 
@@ -100,6 +107,10 @@ NSIDE_WEFA = {
         "VERSION": 1,
         "EXPIRY_LIMIT": 365,  # days
         # "TEMPLATES": BASE_DIR / "templates/legal_consent",  # Optional overrides
+    },
+    "LOCALE": {
+        "AVAILABLE": ["en", "fr"],
+        "DEFAULT": "en",
     },
 }
 ```
