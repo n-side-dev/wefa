@@ -1,3 +1,7 @@
 export * from './types'
-export { libRouteRecords } from './libRoutes'
+export {
+  libRouteRecords,
+  createLibRouteRecords,
+  type CreateLibRouteRecordsOptions,
+} from './libRoutes'
 export * from './guards'

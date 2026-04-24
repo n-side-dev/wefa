@@ -1,16 +1,25 @@
 <template>
-  <PageComponent title="Demo Content" subtitle="This is the subtitle" :show-breadcrumb="true">
-    <div
-      class="size-100 bg-surface-50 border border-surface-950 rounded flex items-center justify-center"
-    >
-      <span
-        >This is demo content <br />
-        to fill your screens</span
-      >
+  <div
+    class="flex size-full flex-col gap-4 rounded-xl border border-(--p-border-color) bg-(--p-surface-elevated) p-6 text-(--p-text-color)"
+  >
+    <div>
+      <h2 class="text-2xl font-semibold">{{ t('demo.demo_content.title') }}</h2>
+      <p class="text-sm text-(--p-text-muted-color)">{{ t('demo.demo_content.subtitle') }}</p>
     </div>
-  </PageComponent>
+
+    <div
+      class="flex size-100 items-center justify-center rounded border border-(--p-border-color) bg-(--p-surface-100) text-(--p-text-color)"
+    >
+      <span class="text-center">
+        {{ t('demo.demo_content.body_line1') }}<br />
+        {{ t('demo.demo_content.body_line2') }}
+      </span>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { PageComponent } from '@/components/PageComponent'
+import { useI18nLib } from '@/locales'
+
+const { t } = useI18nLib()
 </script>

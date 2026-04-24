@@ -1,22 +1,26 @@
 <template>
-  <div class="flex flex-col items-center justify-center gap-4 bg-white rounded-3xl p-8 shadow-xl">
-    <h1>Hi ! You've reached the demo view of N-SIDE WeFa</h1>
+  <div class="flex items-center justify-center p-4">
+    <div
+      class="flex w-full max-w-3xl flex-col items-center justify-center gap-4 rounded-3xl border border-(--p-border-color) bg-(--p-surface-elevated) p-8 text-(--p-text-color) shadow-xl"
+    >
+      <h1 class="text-center text-xl font-semibold">{{ t('demo.home.title') }}</h1>
 
-    <Divider></Divider>
+      <Divider />
 
-    <span>
-      If you're looking for the Storybook documentation, you need to run<span
-        class="font-mono bg-primary-100 px-2"
-        >npm run storybook</span
-      >
-      instead
-    </span>
+      <span class="text-center">
+        {{ t('demo.home.storybook_intro') }}
+        <code class="rounded bg-(--p-surface-100) px-2 py-0.5 font-mono text-(--p-text-color)"
+          >npm run storybook</code
+        >
+        {{ t('demo.home.storybook_instead') }}
+      </span>
 
-    <Divider></Divider>
+      <Divider />
 
-    <RouterLink :to="{ name: 'showcase' }">
-      <Button label="Access the local Showcase"></Button>
-    </RouterLink>
+      <RouterLink :to="{ name: 'showcase' }">
+        <Button :label="t('demo.home.access_showcase')" />
+      </RouterLink>
+    </div>
   </div>
 </template>
 
@@ -25,4 +29,7 @@ import { RouterLink } from 'vue-router'
 
 import Divider from 'primevue/divider'
 import Button from 'primevue/button'
+import { useI18nLib } from '@/locales'
+
+const { t } = useI18nLib()
 </script>

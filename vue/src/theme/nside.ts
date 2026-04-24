@@ -13,12 +13,15 @@ const TABLE_HEADER_BACKGROUND =
 const INPUT_RADIUS = '1rem'
 
 /**
- *
- * @param background
- * @param borderColor
- * @param color
- * @param hoverBackground
- * @param activeBackground
+ * Build a PrimeVue button variant token set (idle / hover / active) with a
+ * consistent focus ring. Hover and active default to the base background when
+ * callers only want a single flat colour.
+ * @param background CSS colour used for the resting state background.
+ * @param borderColor CSS colour used for the resting state border.
+ * @param color CSS colour used for label + icon text in every state.
+ * @param hoverBackground Background applied on pointer hover; defaults to `background`.
+ * @param activeBackground Background applied while pressed; defaults to `hoverBackground`.
+ * @returns Token object shaped for PrimeVue's `button.*` variant slot.
  */
 function createButtonVariant(
   background: string,
@@ -45,10 +48,13 @@ function createButtonVariant(
 }
 
 /**
- *
- * @param background
- * @param borderColor
- * @param color
+ * Build a PrimeVue Message severity tone, including its outlined and simple
+ * sub-variants. Every tone shares the same text colour so outlined/simple
+ * rendering stays legible against transparent backgrounds.
+ * @param background CSS colour applied to the filled Message surface.
+ * @param borderColor CSS colour applied to the Message border in every sub-variant.
+ * @param color CSS colour applied to the Message text and icon.
+ * @returns Token object shaped for PrimeVue's `message.<severity>` slot.
  */
 function createMessageTone(background: string, borderColor: string, color: string) {
   return {
@@ -67,11 +73,14 @@ function createMessageTone(background: string, borderColor: string, color: strin
 }
 
 /**
- *
- * @param background
- * @param borderColor
- * @param color
- * @param detailColor
+ * Build a PrimeVue Toast severity tone. Detail text can diverge from the
+ * summary colour (typically muted) so callers can dim secondary copy without
+ * weakening the summary line.
+ * @param background CSS colour applied to the Toast surface.
+ * @param borderColor CSS colour applied to the Toast border.
+ * @param color CSS colour applied to the summary text.
+ * @param detailColor CSS colour applied to the detail text; defaults to `color`.
+ * @returns Token object shaped for PrimeVue's `toast.<severity>` slot.
  */
 function createToastTone(
   background: string,

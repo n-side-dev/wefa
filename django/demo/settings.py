@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "nside_wefa.common",
     "nside_wefa.authentication",
     "nside_wefa.legal_consent",
+    "nside_wefa.locale",
     "drf_spectacular",
 ]
 
@@ -55,6 +56,10 @@ NSIDE_WEFA = {
         # "TEMPLATES": BASE_DIR / "demo" / "templates" / "legal_consent",
     },
     "AUTHENTICATION": {"TYPES": ["TOKEN", "JWT"]},
+    "LOCALE": {
+        "AVAILABLE": ["en", "fr"],
+        "DEFAULT": "en",
+    },
 }
 
 REST_FRAMEWORK = {

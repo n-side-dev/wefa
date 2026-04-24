@@ -1,0 +1,46 @@
+{
+  "theme": {
+    "label": "Thème",
+    "system": "Système",
+    "light": "Clair",
+    "dark": "Sombre"
+  },
+  "navigation": {
+    "signed_in_as": "Connecté en tant que {username}",
+    "logout": "Se déconnecter"
+  },
+  "legal": {
+    "terms_of_use": "Conditions d'utilisation",
+    "privacy_notice": "Politique de confidentialité"
+  },
+  "home": {
+    "title": "Bonjour ! Vous êtes sur la vue de démonstration de N-SIDE WeFa",
+    "storybook_intro": "Si vous cherchez la documentation Storybook, exécutez plutôt",
+    "storybook_instead": "à la place",
+    "access_showcase": "Accéder à la vitrine locale"
+  },
+  "showcase": {
+    "welcome": "Bienvenue dans la vitrine locale.",
+    "edit_intro": "Vous pouvez modifier le contenu de cette page dans",
+    "try_wefa": "N'hésitez pas à essayer les composants WeFa,",
+    "try_primevue": "les composants PrimeVue,",
+    "try_tailwind": "les classes Tailwind,",
+    "try_other": "ainsi que d'autres stores, helpers, utils, …",
+    "like_this": "Comme ceci :",
+    "primevue_button": "Ceci est un bouton PrimeVue"
+  },
+  "demo_content": {
+    "title": "Contenu de démonstration",
+    "subtitle": "Ceci est le sous-titre",
+    "body_line1": "Ceci est du contenu de démonstration",
+    "body_line2": "pour remplir vos écrans"
+  },
+  "playground": {
+    "planned": "Planifié",
+    "optimized": "Optimisé",
+    "desired": "Souhaité",
+    "alt": "Alt.",
+    "row_label": "Rangée {n}",
+    "row_header": "Ligne {n}"
+  }
+}

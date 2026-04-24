@@ -1,0 +1,7 @@
+{
+  "title": "Sign in",
+  "password": "Password",
+  "submit": "Sign in",
+  "error_summary": "Sign in failed",
+  "error_detail": "Please check your credentials and try again."
+}
