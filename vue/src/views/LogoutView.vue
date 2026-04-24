@@ -18,7 +18,7 @@ export interface LogoutViewProps {
   backendStore: BackendStore
   /**
    * Where to send the user after logout completes. Defaults to the library's
-   * named login route (`authLogin` from `libRouteRecords.login`).
+   * named login route (`authLogin` — see `libRouteRecords.login.name`).
    */
   redirectTo?: RouteLocationRaw
 }
