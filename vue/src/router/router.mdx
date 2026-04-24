@@ -34,11 +34,12 @@ import {
   type RouteRecordRaw,
 } from 'vue-router'
 import {
-  libRouteRecords,
+  createLibRouteRecords,
   type WefaRouteRecordRaw,
   type WefaRouteMeta,
   defaultRouteGuards,
 } from '@nside/wefa/router'
+import { backendStore } from '@/stores/backend'
 
 const appRoutes: RouteRecordRaw[] = [
   {
@@ -58,16 +59,17 @@ const appRoutes: RouteRecordRaw[] = [
   },
 ]
 
+// `createLibRouteRecords` binds your `backendStore` into the Login/Logout view
+// props so the routes are safe to spread directly into the router. Override
+// individual props (e.g. `gdpr`, logos, redirect targets) via `loginProps` /
+// `logoutProps` — no need to respread the record afterwards.
 const routes: RouteRecordRaw[] = [
-  // Load common routes from WeFa
-  ...Object.values(libRouteRecords),
-
-  // Override WeFa routes with your own config
-  {
-    ...(libRouteRecords.login as WefaRouteRecordRaw),
-    props: { gdpr: false }, // e.g. disable GDPR on lib-provided Login view
-  },
-
+  ...Object.values(
+    createLibRouteRecords({
+      backendStore,
+      loginProps: { gdpr: false }, // e.g. disable GDPR on lib-provided Login view
+    })
+  ),
   ...appRoutes,
 ]
 

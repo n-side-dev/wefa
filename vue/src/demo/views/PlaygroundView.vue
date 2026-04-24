@@ -15,6 +15,9 @@ import type {
   GanttChartActivityData,
   GanttChartRowData,
 } from '@/components/GanttChartComponent/ganttChartTypes'
+import { useI18nLib } from '@/locales'
+
+const { t } = useI18nLib()
 
 const startDate = new Date(2026, 0, 1)
 const endDate = new Date(2026, 1, 28)
@@ -26,7 +29,7 @@ const rows = computed<GanttChartRowData[]>(() =>
     const baseActivities: GanttChartActivityData[] = [
       {
         id: `planned-${index}`,
-        label: 'Planned',
+        label: t('demo.playground.planned'),
         startDate: new Date(baseDate),
         endDate: new Date(2026, 0, 6 + startDay),
         visualType: 'stripe',
@@ -34,7 +37,7 @@ const rows = computed<GanttChartRowData[]>(() =>
       },
       {
         id: `optimized-${index}`,
-        label: 'Optimized',
+        label: t('demo.playground.optimized'),
         startDate: new Date(2026, 0, 3 + startDay),
         endDate: new Date(2026, 0, 9 + startDay),
         visualType: 'bar',
@@ -42,7 +45,7 @@ const rows = computed<GanttChartRowData[]>(() =>
       },
       {
         id: `desired-${index}`,
-        label: 'Desired',
+        label: t('demo.playground.desired'),
         startDate: new Date(2026, 0, 5 + startDay),
         endDate: new Date(2026, 0, 12 + startDay),
         visualType: 'mini',
@@ -54,7 +57,7 @@ const rows = computed<GanttChartRowData[]>(() =>
         ? [
             {
               id: `desired-2-${index}`,
-              label: 'Alt',
+              label: t('demo.playground.alt'),
               startDate: new Date(2026, 0, 7 + startDay),
               endDate: new Date(2026, 0, 10 + startDay),
               visualType: 'mini',
@@ -65,8 +68,8 @@ const rows = computed<GanttChartRowData[]>(() =>
 
     return {
       id: index,
-      label: `Row ${index + 1}`,
-      header: `Line ${index + 1}`,
+      label: t('demo.playground.row_label', { n: index + 1 }),
+      header: t('demo.playground.row_header', { n: index + 1 }),
       activities: [...baseActivities, ...extraActivities],
     }
   })

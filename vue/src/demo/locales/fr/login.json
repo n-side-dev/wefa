@@ -1,0 +1,7 @@
+{
+  "title": "Connexion à WeFa",
+  "password": "Mot de passe",
+  "submit": "Se connecter",
+  "error_summary": "Échec de la connexion",
+  "error_detail": "Veuillez vérifier vos identifiants et réessayer."
+}

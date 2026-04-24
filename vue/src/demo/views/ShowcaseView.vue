@@ -1,30 +1,32 @@
 <template>
   <section>
     <div
-      class="m-4 p-4 h-[calc(100%-var(--spacing)*8)] w-[calc(100%-var(--spacing)*8)] rounded shadow bg-(--p-content-background) flex-col"
+      class="m-4 flex h-[calc(100%-var(--spacing)*8)] w-[calc(100%-var(--spacing)*8)] flex-col rounded-xl border border-(--p-border-color) bg-(--p-surface-elevated) p-4 text-(--p-text-color) shadow"
     >
       <!-- Write your custom content below -->
 
       <div class="flex flex-col gap-1">
-        <span>Welcome to the local showcase.</span>
+        <span>{{ t('demo.showcase.welcome') }}</span>
 
-        <span>You can modify the content of this page in </span>
+        <span>{{ t('demo.showcase.edit_intro') }}</span>
 
-        <span class="font-mono bg-primary-100 text-center">vue/src/demo/ShowcaseView.vue</span>
+        <span class="rounded bg-(--p-surface-100) px-2 py-0.5 text-center font-mono"
+          >vue/src/demo/ShowcaseView.vue</span
+        >
 
-        <span>Feel free to try out WeFa components,</span>
+        <span>{{ t('demo.showcase.try_wefa') }}</span>
 
-        <span>PrimeVue components,</span>
+        <span>{{ t('demo.showcase.try_primevue') }}</span>
 
-        <span>Tailwind classes,</span>
+        <span>{{ t('demo.showcase.try_tailwind') }}</span>
 
-        <span>and other stores, helpers, utils, ...</span>
+        <span>{{ t('demo.showcase.try_other') }}</span>
 
-        <span>Like this :</span>
+        <span>{{ t('demo.showcase.like_this') }}</span>
 
         <Divider></Divider>
 
-        <Button label="This is a PrimeVue button"></Button>
+        <Button :label="t('demo.showcase.primevue_button')"></Button>
       </div>
 
       <!-- Write your custom content above -->
@@ -33,9 +35,9 @@
 </template>
 
 <script setup lang="ts">
-// Import components here
 import Divider from 'primevue/divider'
 import Button from 'primevue/button'
+import { useI18nLib } from '@/locales'
 
-// Write your TypeScript here
+const { t } = useI18nLib()
 </script>
