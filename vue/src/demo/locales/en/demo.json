@@ -1,0 +1,54 @@
+{
+  "login": {
+    "title": "Sign in to WeFa",
+    "subtitle": "Use your Django demo credentials.",
+    "password": "Password",
+    "submit": "Sign in",
+    "error_summary": "Sign in failed",
+    "error_detail": "Please check your credentials and try again."
+  },
+  "theme": {
+    "label": "Theme",
+    "system": "System",
+    "light": "Light",
+    "dark": "Dark"
+  },
+  "navigation": {
+    "signed_in_as": "Signed in as {username}",
+    "logout": "Sign out"
+  },
+  "legal": {
+    "terms_of_use": "Terms of Use",
+    "privacy_notice": "Privacy Notice"
+  },
+  "home": {
+    "title": "Hi! You've reached the demo view of N-SIDE WeFa",
+    "storybook_intro": "If you're looking for the Storybook documentation, you need to run",
+    "storybook_instead": "instead",
+    "access_showcase": "Access the local Showcase"
+  },
+  "showcase": {
+    "welcome": "Welcome to the local showcase.",
+    "edit_intro": "You can modify the content of this page in",
+    "try_wefa": "Feel free to try out WeFa components,",
+    "try_primevue": "PrimeVue components,",
+    "try_tailwind": "Tailwind classes,",
+    "try_other": "and other stores, helpers, utils, …",
+    "like_this": "Like this:",
+    "primevue_button": "This is a PrimeVue button"
+  },
+  "demo_content": {
+    "title": "Demo Content",
+    "subtitle": "This is the subtitle",
+    "body_line1": "This is demo content",
+    "body_line2": "to fill your screens"
+  },
+  "playground": {
+    "planned": "Planned",
+    "optimized": "Optimized",
+    "desired": "Desired",
+    "alt": "Alt",
+    "row_label": "Row {n}",
+    "row_header": "Line {n}"
+  }
+}

@@ -7,3 +7,12 @@ export {
   type LegalConsent,
   type LegalConsentOptions,
 } from './legalConsent'
+
+export {
+  default as localeSelectorPlugin,
+  LocaleSelector,
+  useLocaleStore,
+  type AvailableLocales,
+  type LocaleSelectorOptions,
+  type UserLocale,
+} from './localeSelector'
