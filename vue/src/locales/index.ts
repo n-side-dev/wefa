@@ -52,6 +52,8 @@ export function loadTranslations(
  * Resolve a consumer locale string (e.g. 'en', 'en-GB', 'fr_CA') to the best-matching
  * primelocale bundle, falling back through hyphen/underscore variants, the primary
  * subtag, and finally English.
+ * @param locale BCP-47-style locale tag (hyphen or underscore separator accepted).
+ * @returns The matching primelocale translations dictionary; never `undefined`.
  */
 export function resolvePrimeLocale(locale: string): Record<string, unknown> {
   const map = primeLocalesAll as unknown as Record<string, Record<string, unknown>>
@@ -63,6 +65,13 @@ export function resolvePrimeLocale(locale: string): Record<string, unknown> {
   return map.en
 }
 
+/**
+ * Type guard that narrows `value` to a plain `Record<string, unknown>` —
+ * i.e. a non-null object that is not an array. Used by `deepMerge` to decide
+ * whether to recurse into a node or treat it as a scalar replacement.
+ * @param value Arbitrary value to test.
+ * @returns `true` when `value` is a plain object.
+ */
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
@@ -70,6 +79,9 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
 /**
  * Recursively merge `source` into `target`, so partial overrides preserve sibling
  * keys at every depth. Arrays and primitives from `source` replace the target value.
+ * @param target Base object; values survive unless overridden by `source`.
+ * @param source Overlay whose keys win on conflict; non-objects replace `target`.
+ * @returns A new object with `source` merged on top of `target`.
  */
 function deepMerge<T>(target: T, source: unknown): T {
   if (!isPlainObject(source)) return source === undefined ? target : (source as T)

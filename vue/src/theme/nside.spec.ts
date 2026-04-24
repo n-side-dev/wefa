@@ -4,6 +4,10 @@ import { describe, expect, it } from 'vitest'
 
 import { createNsideTheme, nsidePreset, nsidePrimeVueTheme, nsideThemeOptions } from './nside'
 
+// Path is fully static at the call site: `process.cwd()` is vitest's root
+// (`vue/`) joined with a string literal. Disabling the non-literal-fs lint
+// because the concern does not apply to a hard-coded, test-time-only read.
+// eslint-disable-next-line security/detect-non-literal-fs-filename
 const themeCss = readFileSync(resolve(process.cwd(), 'src/assets/main.css'), 'utf8')
 
 describe('N-SIDE theme exports', () => {
