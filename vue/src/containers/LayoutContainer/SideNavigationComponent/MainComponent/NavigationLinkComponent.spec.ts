@@ -64,7 +64,11 @@ describe('NavigationLinkComponent', () => {
       },
     })
 
-    expect(wrapper.find('.absolute.inset-y-2.-left-4').exists()).toBe(true)
+    expect(
+      wrapper
+        .find('span.bg-\\(--p-teal\\).shadow-\\[0_0_18px_rgba\\(5\\,181\\,200\\,0\\.55\\)\\]')
+        .exists()
+    ).toBe(true)
   })
 
   it('does not show active indicator for inactive links', () => {
@@ -81,7 +85,11 @@ describe('NavigationLinkComponent', () => {
       },
     })
 
-    expect(wrapper.find('.absolute.inset-y-2.-left-4').exists()).toBe(false)
+    expect(
+      wrapper
+        .find('span.bg-\\(--p-teal\\).shadow-\\[0_0_18px_rgba\\(5\\,181\\,200\\,0\\.55\\)\\]')
+        .exists()
+    ).toBe(false)
   })
 
   it('emits navigation-item-click when clicked', async () => {

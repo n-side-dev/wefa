@@ -1,6 +1,6 @@
 {
   "name": "@nside/wefa",
-  "version": "0.4.6",
+  "version": "0.6.0",
   "type": "module",
   "main": "./dist/lib.umd.cjs",
   "module": "./dist/lib.js",
@@ -15,7 +15,7 @@
   },
   "homepage": "https://github.com/n-side-dev/wefa#readme",
   "engines": {
-    "node": "^20.19.0 || ^22.13.0 || >=24.0.0"
+    "node": "^22.13.0 || >=24.0.0"
   },
   "publishConfig": {
     "access": "public"
@@ -49,6 +49,11 @@
       "import": "./dist/network.js",
       "require": "./dist/network.cjs"
     },
+    "./locales": {
+      "types": "./dist/locales.d.ts",
+      "import": "./dist/locales.js",
+      "require": "./dist/locales.cjs"
+    },
     "./bff-openapi": "./dist/bff/openapi.yaml",
     "./types": "./dist/lib.d.ts",
     "./style": "./src/assets/main.css"
@@ -79,15 +84,16 @@
     "@primevue/forms": "^4.5.5",
     "@tailwindcss/cli": "^4.2.2",
     "@tailwindcss/vite": "^4.2.2",
-    "@tanstack/vue-query": "^5.99.0",
+    "@tanstack/vue-query": "^5.99.2",
     "@vee-validate/zod": "^4.15.1",
     "@vueuse/core": "^14.2.1",
-    "axios": "^1.13.6",
+    "axios": "^1.15.1",
     "luxon": "^3.7.2",
-    "marked": "^18.0.0",
+    "marked": "^18.0.2",
     "pinia": "^3.0.4",
     "plotly.js-dist-min": "^3.5.0",
     "primeicons": "^7.0.0",
+    "primelocale": "^2.3.1",
     "primevue": "^4.5.5",
     "tailwindcss-primeui": "^0.6.1",
     "vue": "^3.5.32",
@@ -96,7 +102,7 @@
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^5.1.2",
-    "@hey-api/openapi-ts": "^0.95.0",
+    "@hey-api/openapi-ts": "^0.96.0",
     "@playwright/test": "^1.59.1",
     "@storybook/addon-a11y": "^10.3.5",
     "@storybook/addon-docs": "^10.3.5",
@@ -114,18 +120,18 @@
     "@vitest/browser": "4.1.4",
     "@vitest/browser-playwright": "^4.1.2",
     "@vitest/coverage-istanbul": "^4.1.2",
-    "@vitest/eslint-plugin": "^1.6.15",
+    "@vitest/eslint-plugin": "^1.6.16",
     "@vue/eslint-config-prettier": "^10.2.0",
     "@vue/eslint-config-typescript": "^14.7.0",
     "@vue/test-utils": "2.4.6",
     "@vue/tsconfig": "^0.9.1",
-    "autoprefixer": "^10.4.27",
+    "autoprefixer": "^10.5.0",
     "axios-mock-adapter": "^2.1.0",
-    "eslint": "^10.1.0",
+    "eslint": "^10.2.1",
     "eslint-plugin-jsdoc": "^62.9.0",
-    "eslint-plugin-playwright": "^2.10.1",
+    "eslint-plugin-playwright": "^2.10.2",
     "eslint-plugin-security": "^4.0.0",
-    "eslint-plugin-sonarjs": "^4.0.2",
+    "eslint-plugin-sonarjs": "^4.0.3",
     "eslint-plugin-storybook": "^10.3.5",
     "eslint-plugin-vue": "~10.8.0",
     "jiti": "^2.6.1",
@@ -133,17 +139,17 @@
     "knip": "^6.4.0",
     "npm-run-all2": "^8.0.4",
     "playwright": "^1.59.1",
-    "postcss": "^8.5.9",
-    "prettier": "3.8.2",
+    "postcss": "^8.5.10",
+    "prettier": "3.8.3",
     "storybook": "^10.3.0",
     "tailwindcss": "^4.2.1",
     "tidewave": "^0.6.0",
     "to-valid-identifier": "^1.0.0",
-    "typescript": "~6.0.2",
-    "vite": "^8.0.2",
+    "typescript": "~6.0.3",
+    "vite": "^8.0.9",
     "vite-plugin-dts": "^4.5.4",
     "vitest": "^4.1.0",
-    "vue-tsc": "^3.2.6"
+    "vue-tsc": "^3.2.7"
   },
   "bundlesize": [
     {

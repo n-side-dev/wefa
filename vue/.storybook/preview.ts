@@ -3,7 +3,7 @@ import { setup } from '@storybook/vue3-vite'
 import { createRouter, createWebHistory } from 'vue-router'
 import type { App } from 'vue'
 import PrimeVue from 'primevue/config'
-import { createNsideTheme } from '../src/theme'
+import { nsidePrimeVueTheme } from '../src/theme'
 import { VueQueryPlugin, QueryClient } from '@tanstack/vue-query'
 import { createLibI18n } from '../src/locales'
 import '../src/assets/main.css'
@@ -126,13 +126,12 @@ const i18n = createLibI18n()
 setup((app: App) => {
   app.use(router)
   app.use(PrimeVue, {
-    theme: {
-      preset: createNsideTheme('green'),
-    },
+    theme: nsidePrimeVueTheme,
   })
   // Provide TanStack Query client for components/stories using useQuery/useMutation
   const queryClient = new QueryClient()
   app.use(VueQueryPlugin, { queryClient })
+  // i18n must be installed AFTER PrimeVue so it can sync PrimeVue's locale
   app.use(i18n)
 })
 

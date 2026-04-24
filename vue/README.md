@@ -113,15 +113,29 @@ The published package also includes the Backend-for-Frontend OpenAPI document at
 To apply the NSIDE Prime theme preset in your app:
 
 ```ts
+import '@nside/wefa/style'
 import PrimeVue from 'primevue/config'
-import { createNsideTheme } from '@nside/wefa'
+import { nsidePrimeVueTheme } from '@nside/wefa'
+
+app.use(PrimeVue, {
+  theme: nsidePrimeVueTheme,
+})
+```
+
+If you need to compose the PrimeVue config yourself, the lower-level exports are still available:
+
+```ts
+import { createNsideTheme, nsideThemeOptions } from '@nside/wefa'
 
 app.use(PrimeVue, {
   theme: {
-    preset: createNsideTheme('green'),
+    preset: createNsideTheme(),
+    options: nsideThemeOptions,
   },
 })
 ```
+
+`createNsideTheme(primary)` is still accepted for backward compatibility, but the argument is now ignored and the MMS-derived flagship theme is always returned.
 
 ### Icons and the registry helper
 
@@ -156,7 +170,7 @@ From the `vue/` directory:
 | `npm run format` / `npm run format-check` | Run Prettier in write/check mode |
 | `npm run test:package-types` | Build the package, pack it, and verify published type declarations |
 
-The project supports Node.js `^20.19.0 || ^22.13.0 || >=24.0.0`. Use the included `.node-version` or `.nvmrc` to align with CI; the repository currently pins `24.9.0`.
+The project supports Node.js `^22.13.0 || >=24.0.0`. Use the included `.node-version` or `.nvmrc` to align with CI; the repository currently pins `24.9.0`.
 
 ## Testing and quality gates
 

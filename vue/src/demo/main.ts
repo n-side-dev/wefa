@@ -41,7 +41,14 @@ import ConfirmationService from 'primevue/confirmationservice'
 app.use(ToastService)
 app.use(ConfirmationService)
 
-// i18n
+// Primevue (install BEFORE i18n so vue-i18n can sync PrimeVue's locale)
+import PrimeVue from 'primevue/config'
+import { nsidePrimeVueTheme } from '@/theme'
+app.use(PrimeVue, {
+  theme: nsidePrimeVueTheme,
+})
+
+// i18n (install AFTER PrimeVue so the plugin can sync PrimeVue's locale)
 import { createLibI18n } from '@/locales'
 const i18n = createLibI18n({})
 app.use(i18n)
@@ -54,14 +61,5 @@ import { legalConsentPlugin } from '@/plugins'
 app.use(router)
 app.use(legalConsentPlugin, { router: router, backendStore: backendStore, path: 'legal-consent' })
 app.use(cookiesPlugin, { cookies: cookies })
-
-// Primevue
-import PrimeVue from 'primevue/config'
-import { createNsideTheme } from '@/theme'
-app.use(PrimeVue, {
-  theme: {
-    preset: createNsideTheme('green'),
-  },
-})
 
 app.mount('#app')

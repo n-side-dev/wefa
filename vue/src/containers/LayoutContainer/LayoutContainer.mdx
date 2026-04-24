@@ -12,6 +12,7 @@ import * as LayoutContainerStories from './LayoutContainer.stories'
 - desktop side navigation
 - mobile drawer navigation
 - an automatically rendered route-aware breadcrumb
+- optional route-controlled breadcrumb hiding via `meta.wefa.showBreadcrumb`
 - child route content through `<router-view />`
 
 The stories below focus on router metadata setup, because navigation links are generated directly from the router tree.
@@ -31,10 +32,11 @@ Use the layout props below to adjust that default:
 
 ### Wefa Route Metadata
 
-Uses `meta.wefa.showInNavigation` and `meta.wefa.section`.
+Uses `meta.wefa.showInNavigation`, `meta.wefa.section`, and optional `meta.wefa.showBreadcrumb`.
 
 <Canvas of={LayoutContainerStories.WefaNavigationMeta} />
 <Canvas of={LayoutContainerStories.WefaSectionedMeta} />
+<Canvas of={LayoutContainerStories.HiddenBreadcrumb} />
 
 ```ts
 {
@@ -46,6 +48,7 @@ Uses `meta.wefa.showInNavigation` and `meta.wefa.section`.
       icon: 'pi pi-chart-line',
       showInNavigation: true,
       section: 'Insights',
+      showBreadcrumb: true,
     },
   },
 }
@@ -90,6 +93,20 @@ When only `projectTitle` is provided, the top area falls back to the avatar + ap
 ## Props
 
 <ArgTypes of={LayoutContainerStories} />
+
+## Footer Slot
+
+Use the `navigation-bottom` slot to inject application-specific footer content into both the desktop side navigation and the mobile drawer footer.
+
+```vue
+<template>
+  <LayoutContainer project-title="My Project">
+    <template #navigation-bottom>
+      <UserProfileMenu class="w-full" />
+    </template>
+  </LayoutContainer>
+</template>
+```
 
 ## Usage
 
@@ -144,6 +161,7 @@ const routes = [
         title: 'Showcase',
         icon: 'pi pi-bars',
         showInNavigation: true,
+        showBreadcrumb: false,
       },
     },
   },
