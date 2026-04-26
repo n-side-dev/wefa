@@ -41,10 +41,12 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "rest_framework_simplejwt",
+    "auditlog",
     "nside_wefa.common",
     "nside_wefa.authentication",
     "nside_wefa.legal_consent",
     "nside_wefa.locale",
+    "nside_wefa.audit",
     "drf_spectacular",
 ]
 
@@ -59,6 +61,16 @@ NSIDE_WEFA = {
     "LOCALE": {
         "AVAILABLE": ["en", "fr"],
         "DEFAULT": "en",
+    },
+    "AUDIT": {
+        # Path D: declare third-party / framework models you want audited.
+        "MODELS": {
+            "auth.Group": {"include_fields": ["name"]},
+        },
+        # Optional: keep events around forever (None) or set N days.
+        "RETENTION_DAYS": None,
+        # Tamper-evidence is off by default; flip to True to use WefaLogEntry.
+        "TAMPER_EVIDENT": False,
     },
 }
 
@@ -83,6 +95,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "auditlog.middleware.AuditlogMiddleware",
 ]
 
 ROOT_URLCONF = "demo.urls"

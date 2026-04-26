@@ -6,12 +6,18 @@ project configuration and application ordering:
 
 - check_nside_wefa_settings: validates NSIDE_WEFA.<SECTION> configuration.
 - check_apps_dependencies_order: verifies INSTALLED_APPS ordering for dependent apps.
+- Primitive validators (validate_bool, validate_optional_positive_int,
+  validate_string_list, validate_dotted_path_callable, validate_model_label)
+  composable inside ``custom_validators`` mappings.
 
 See also
 - Django system check framework: https://docs.djangoproject.com/en/stable/topics/checks/
 """
 
-from typing import Any, Dict, List, Callable, Optional
+from importlib import import_module
+from typing import Any, Callable, Dict, List, Optional
+
+from django.apps import apps as django_apps
 from django.conf import settings
 from django.core.checks import Error
 
@@ -121,3 +127,195 @@ def check_apps_dependencies_order(dependencies: list[str]) -> list[Error]:
                 )
 
     return errors
+
+
+# ---------------------------------------------------------------------------
+# Primitive validators — composable inside ``check_nside_wefa_settings``'s
+# ``custom_validators`` mapping. They share a small partial-application pattern
+# so each one returns a callable suitable for that mapping.
+# ---------------------------------------------------------------------------
+
+
+def validate_bool(setting_path: str) -> Callable[[Any], List[Error]]:
+    """Return a validator that ensures the value is a boolean."""
+
+    def _validator(value: Any) -> List[Error]:
+        if not isinstance(value, bool):
+            return [
+                Error(
+                    f"{setting_path} must be a boolean, got {type(value).__name__}.",
+                )
+            ]
+        return []
+
+    return _validator
+
+
+def validate_optional_positive_int(
+    setting_path: str,
+) -> Callable[[Any], List[Error]]:
+    """Return a validator that accepts ``None`` or a positive integer."""
+
+    def _validator(value: Any) -> List[Error]:
+        if value is None:
+            return []
+        if isinstance(value, bool) or not isinstance(value, int):
+            return [
+                Error(
+                    f"{setting_path} must be a positive integer or None, "
+                    f"got {value!r}.",
+                )
+            ]
+        if value <= 0:
+            return [
+                Error(
+                    f"{setting_path} must be a positive integer or None, "
+                    f"got {value!r}.",
+                )
+            ]
+        return []
+
+    return _validator
+
+
+def validate_string_list(
+    setting_path: str, allowed: Optional[List[str]] = None
+) -> Callable[[Any], List[Error]]:
+    """Return a validator that ensures the value is a list of non-empty strings.
+
+    When ``allowed`` is provided, every entry must additionally be one of the
+    allowed values.
+    """
+
+    def _validator(value: Any) -> List[Error]:
+        errors: List[Error] = []
+        if not isinstance(value, list):
+            return [
+                Error(
+                    f"{setting_path} must be a list of strings, "
+                    f"got {type(value).__name__}.",
+                )
+            ]
+        for entry in value:
+            if not isinstance(entry, str) or not entry:
+                errors.append(
+                    Error(
+                        f"{setting_path} entries must be non-empty strings, "
+                        f"got {entry!r}.",
+                    )
+                )
+                continue
+            if allowed is not None and entry not in allowed:
+                errors.append(
+                    Error(
+                        f"{setting_path} entry {entry!r} is not allowed. "
+                        f"Expected one of {allowed}.",
+                    )
+                )
+        return errors
+
+    return _validator
+
+
+def validate_dotted_path_callable(
+    setting_path: str,
+) -> Callable[[Any], List[Error]]:
+    """Return a validator that resolves the value as a dotted-path callable."""
+
+    def _validator(value: Any) -> List[Error]:
+        if not isinstance(value, str) or "." not in value:
+            return [
+                Error(
+                    f"{setting_path} must be a dotted Python path string, "
+                    f"got {value!r}.",
+                )
+            ]
+        module_path, _, attr = value.rpartition(".")
+        try:
+            module = import_module(module_path)
+        except ImportError as exc:
+            return [
+                Error(
+                    f"{setting_path} could not be imported: {exc}.",
+                )
+            ]
+        target = getattr(module, attr, None)
+        if target is None:
+            return [
+                Error(
+                    f"{setting_path} resolved {module_path!r} but it has no "
+                    f"attribute {attr!r}.",
+                )
+            ]
+        if not callable(target):
+            return [
+                Error(
+                    f"{setting_path} resolved to {value!r} but it is not callable.",
+                )
+            ]
+        return []
+
+    return _validator
+
+
+def validate_model_label(label: Any) -> Optional[Error]:
+    """Resolve an ``"app_label.ModelName"`` string via the Django app registry.
+
+    Returns ``None`` on success, an :class:`~django.core.checks.Error` instance
+    when the label is malformed or unresolvable. Useful inside higher-level
+    validators that walk a settings dict of model labels.
+    """
+    if not isinstance(label, str) or "." not in label:
+        return Error(
+            f"Model label {label!r} must be a string of the form 'app_label.ModelName'.",
+        )
+    try:
+        django_apps.get_model(label)
+    except LookupError as exc:
+        return Error(
+            f"Model label {label!r} could not be resolved: {exc}.",
+        )
+    except ValueError as exc:
+        return Error(
+            f"Model label {label!r} is invalid: {exc}.",
+        )
+    return None
+
+
+def validate_model_label_dict(
+    setting_path: str,
+) -> Callable[[Any], List[Error]]:
+    """Return a validator that ensures the value is a ``{label: dict}`` mapping.
+
+    Each key must be a resolvable ``"app_label.ModelName"`` string. Each value
+    must be a (possibly empty) dict — option contents are validated by callers
+    that know which keys make sense for them.
+    """
+
+    def _validator(value: Any) -> List[Error]:
+        errors: List[Error] = []
+        if not isinstance(value, dict):
+            return [
+                Error(
+                    f"{setting_path} must be a dict mapping 'app.Model' labels to options, "
+                    f"got {type(value).__name__}.",
+                )
+            ]
+        for label, options in value.items():
+            label_error = validate_model_label(label)
+            if label_error is not None:
+                errors.append(
+                    Error(
+                        f"{setting_path}: {label_error.msg}",
+                    )
+                )
+            if not isinstance(options, dict):
+                errors.append(
+                    Error(
+                        f"{setting_path}[{label!r}] options must be a dict, "
+                        f"got {type(options).__name__}.",
+                    )
+                )
+        return errors
+
+    return _validator
