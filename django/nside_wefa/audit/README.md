@@ -215,11 +215,22 @@ for the `WefaLogEntry` subclass. Each new event includes:
 A `pre_save` handler computes both inside a row-level lock. To verify:
 
 ```bash
-python manage.py wefa_audit_verify           # walk the whole chain
+python manage.py wefa_audit_verify                    # walk the whole chain
 python manage.py wefa_audit_verify --from 1000 --to 2000
+python manage.py wefa_audit_verify --strict-head      # also require the chain origin to still be present
 ```
 
 Non-zero exit on the first divergence, with the offending id reported.
+
+**Verification is purge-aware.** `wefa_audit_verify` checks two things on
+every row — that the row's own `hash` matches its content (self-consistency)
+and that its `prev_hash` matches the previous row's `hash` (chain link). The
+first row in the verification window is treated as an *anchor*: its stored
+`prev_hash` is trusted as-is, but its own hash is still verified. This means
+verification stays useful after `wefa_audit_purge` deletes old rows — the
+new earliest row simply becomes the anchor. Pass `--strict-head` to opt out
+and require the absolute chain origin (a row whose `prev_hash` is the
+all-zeros sentinel) to still be present.
 
 For regulated deployments, also run `REVOKE UPDATE, DELETE` on the table at
 the database level — the model-layer guard catches application bugs but a

@@ -99,7 +99,7 @@ class SettingsTranslationTest(TestCase):
 
             self.assertEqual(
                 settings.AUDITLOG_LOGENTRY_MODEL,
-                "nside_wefa.audit.models.WefaLogEntry",
+                "audit.WefaLogEntry",
             )
 
     @override_settings(

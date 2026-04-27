@@ -54,9 +54,11 @@ def apply_to_django_auditlog() -> None:
         section.get("REQUEST_ID_HEADER"),
     )
     if section.get("TAMPER_EVIDENT"):
+        # auditlog.get_logentry_model expects the Django ``app_label.ModelName``
+        # form, NOT the dotted Python import path.
         _set_if_absent(
             "AUDITLOG_LOGENTRY_MODEL",
-            "nside_wefa.audit.models.WefaLogEntry",
+            "audit.WefaLogEntry",
         )
 
 

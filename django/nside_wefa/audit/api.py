@@ -21,8 +21,9 @@ import enum
 import logging
 from typing import Any, Dict, Optional
 
+from auditlog import get_logentry_model
 from auditlog.context import set_actor as _auditlog_set_actor
-from auditlog.models import LogEntry
+from auditlog.models import AbstractLogEntry
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
@@ -66,8 +67,13 @@ def log(
     changes: Optional[Dict[str, Any]] = None,
     metadata: Optional[Dict[str, Any]] = None,
     outcome: Outcome = Outcome.SUCCESS,
-) -> Optional[LogEntry]:
-    """Write an audit event and return the resulting :class:`LogEntry`.
+) -> Optional[AbstractLogEntry]:
+    """Write an audit event and return the resulting log entry.
+
+    Returns an instance of whichever model auditlog has been told to use —
+    :class:`auditlog.models.LogEntry` by default,
+    :class:`nside_wefa.audit.models.WefaLogEntry` when
+    ``NSIDE_WEFA.AUDIT.TAMPER_EVIDENT`` is True.
 
     :param action: Free-form action identifier, conventionally
         ``"<domain>.<verb>"`` (``"auth.login"``, ``"order.cancel"``).
@@ -99,8 +105,13 @@ def log(
     if redacted_metadata:
         additional_data["metadata"] = redacted_metadata
 
+    # Resolve the active LogEntry model so manual writes go to WefaLogEntry
+    # when tamper-evidence is enabled. The Action enum lives on the abstract
+    # base, so it's safe to read off the active class.
+    log_model = get_logentry_model()
+
     create_kwargs: Dict[str, Any] = {
-        "action": LogEntry.Action.UPDATE,
+        "action": log_model.Action.UPDATE,
         "additional_data": additional_data,
     }
 
@@ -114,11 +125,12 @@ def log(
     if resolved_actor is not None:
         create_kwargs["actor"] = resolved_actor
 
-    # auditlog.LogEntry has non-nullable content_type / object_pk / object_repr.
-    # When the caller doesn't supply a target, fall back through:
+    # LogEntry / WefaLogEntry have non-nullable content_type / object_pk /
+    # object_repr. When the caller doesn't supply a target, fall back through:
     # 1. the actor (the user is the implicit subject of their own action),
-    # 2. a system sentinel that points at the LogEntry table itself with
-    #    object_pk="0" — filterable as target_type="auditlog.logentry".
+    # 2. a system sentinel pointing at the active LogEntry table itself with
+    #    object_pk="0" — filterable as target_type="auditlog.logentry"
+    #    (or "audit.wefalogentry" under tamper-evidence).
     effective_target = target if target is not None else resolved_actor
     if effective_target is not None:
         create_kwargs["content_type"] = ContentType.objects.get_for_model(
@@ -130,13 +142,13 @@ def log(
         create_kwargs["object_repr"] = str(effective_target)
     else:
         # Neither target nor actor: a true system / anonymous event.
-        create_kwargs["content_type"] = ContentType.objects.get_for_model(LogEntry)
+        create_kwargs["content_type"] = ContentType.objects.get_for_model(log_model)
         create_kwargs["object_pk"] = "0"
         create_kwargs["object_id"] = 0
         create_kwargs["object_repr"] = "system"
 
     try:
-        return LogEntry.objects.create(**create_kwargs)
+        return log_model.objects.create(**create_kwargs)
     except Exception as exc:  # noqa: BLE001 — by design; see RAISE_ON_FAILURE
         if raise_on_failure:
             raise AuditWriteError(

@@ -141,3 +141,47 @@ class SetActorReExportTest(TestCase):
         with set_actor(user):
             event = audit.log("demo.via_ctx", target=user)
         self.assertEqual(event.actor_id, user.id)
+
+
+@override_settings(AUDITLOG_LOGENTRY_MODEL="audit.WefaLogEntry")
+class TamperEvidentWritePathTest(TestCase):
+    """Regression: ``audit.log()`` must write to the active LogEntry model.
+
+    When ``AUDITLOG_LOGENTRY_MODEL`` swaps the storage class, manual
+    ``audit.log()`` calls (and the built-in event sources that delegate to
+    them) need to land rows in the swapped table. Hard-coding
+    ``LogEntry.objects.create`` would silently drop those events into the
+    unused base table when ``RAISE_ON_FAILURE`` is False, leaving them
+    invisible to the REST endpoints and outside the hash chain.
+    """
+
+    def test_log_writes_to_wefa_log_entry_when_swapped(self):
+        from nside_wefa.audit.models import WefaLogEntry
+
+        user = User.objects.create_user(username="te")
+
+        before_wefa = WefaLogEntry.objects.count()
+        event = audit.log("demo.tamper_evident", actor=user)
+
+        # The row must land in the swapped model — not silently dropped into
+        # the now-disabled base table (auditlog raises AttributeError when you
+        # try to use the swapped-out base manager, so accessing it here would
+        # itself signal regression).
+        self.assertIsNotNone(event)
+        self.assertIsInstance(event, WefaLogEntry)
+        self.assertEqual(WefaLogEntry.objects.count(), before_wefa + 1)
+
+        # Hash chain populated by the WefaLogEntry pre_save handler.
+        event.refresh_from_db()
+        self.assertEqual(len(event.hash), 64)
+        self.assertEqual(len(event.prev_hash), 64)
+
+    def test_system_event_uses_active_model_for_sentinel_content_type(self):
+        """The "system" sentinel ContentType reflects the active LogEntry model."""
+        from nside_wefa.audit.models import WefaLogEntry
+
+        event = audit.log("demo.system_under_te")
+
+        self.assertIsInstance(event, WefaLogEntry)
+        self.assertEqual(event.object_repr, "system")
+        self.assertEqual(event.content_type.model, "wefalogentry")
