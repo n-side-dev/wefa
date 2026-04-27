@@ -1,0 +1,21 @@
+{
+  "title": "Consentement légal requis",
+  "intro": "Pour continuer à utiliser nos services, vous devez accepter nos conditions d'utilisation et notre avis de confidentialité.",
+  "terms_of_use": "Conditions d'utilisation",
+  "privacy_notice": "Avis de confidentialité",
+  "open_in_new_tab": "Ouvre dans un nouvel onglet",
+  "back_to_consent": "Retour au consentement",
+  "checkbox_label": "J'ai lu et j'accepte les conditions d'utilisation et l'avis de confidentialité",
+  "accept": "Accepter",
+  "cancel": "Annuler",
+  "toast_accept_summary": "Consentement accepté",
+  "toast_accept_detail": "Merci d'avoir accepté nos conditions. Vous pouvez maintenant continuer à utiliser nos services.",
+  "error_summary": "Erreur",
+  "error_detail": "Une erreur est survenue lors du traitement de votre consentement. Veuillez réessayer.",
+  "confirm_message": "Si vous refusez les conditions d'utilisation et l'avis de confidentialité, vous serez déconnecté de nos services. Voulez-vous vraiment annuler ?",
+  "confirm_header": "Confirmer l'annulation",
+  "reject_label": "Non, revenir en arrière",
+  "accept_label": "Oui, me déconnecter",
+  "disconnected_summary": "Déconnecté",
+  "disconnected_detail": "Vous avez été déconnecté à la suite du refus du consentement."
+}

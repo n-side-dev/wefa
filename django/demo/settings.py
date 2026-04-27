@@ -51,7 +51,7 @@ INSTALLED_APPS = [
 NSIDE_WEFA = {
     "APP_NAME": "WEFA",
     "LEGAL_CONSENT": {
-        "VERSION": 1,
+        "VERSION": 4,
         "EXPIRY_LIMIT": 365,
         # "TEMPLATES": BASE_DIR / "demo" / "templates" / "legal_consent",
     },

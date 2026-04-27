@@ -25,6 +25,11 @@ vi.mock('../../index', () => ({
   useCookiesStore: () => mockStore,
 }))
 
+// Mock i18n util to return the key itself for easier assertions
+vi.mock('@/locales', () => ({
+  useI18nLib: () => ({ t: (key: string) => key }),
+}))
+
 // Import the component AFTER mocking the store
 import CookieBar from '../CookieBar.vue'
 
@@ -50,9 +55,9 @@ describe('CookieBar.vue', () => {
     // Presence of three action buttons
     const buttons = wrapper.findAll('button')
     expect(buttons).toHaveLength(3)
-    expect(buttons[0]!.text()).toContain('Accept All')
-    expect(buttons[1]!.text()).toContain('Reject All')
-    expect(buttons[2]!.text()).toContain('Manage Preferences')
+    expect(buttons[0]!.text()).toContain('cookies.manage_preferences')
+    expect(buttons[1]!.text()).toContain('cookies.reject_all')
+    expect(buttons[2]!.text()).toContain('cookies.accept_all')
   })
 
   it('does not render cookie bar when reviewNeeded is false', async () => {
@@ -79,13 +84,13 @@ describe('CookieBar.vue', () => {
 
     const buttons = wrapper.findAll('button')
 
-    await buttons[0]!.trigger('click') // Accept All
-    expect(mockStore.acceptAllCookies).toHaveBeenCalledTimes(1)
+    await buttons[0]!.trigger('click') // Manage Preferences
+    expect(mockStore.showDialog).toHaveBeenCalledTimes(1)
 
     await buttons[1]!.trigger('click') // Reject All
     expect(mockStore.rejectAllCookies).toHaveBeenCalledTimes(1)
 
-    await buttons[2]!.trigger('click') // Manage Preferences
-    expect(mockStore.showDialog).toHaveBeenCalledTimes(1)
+    await buttons[2]!.trigger('click') // Accept All
+    expect(mockStore.acceptAllCookies).toHaveBeenCalledTimes(1)
   })
 })

@@ -3,6 +3,8 @@
   "intro": "To continue using our services, you must accept our terms of use and privacy notice.",
   "terms_of_use": "Terms of Use",
   "privacy_notice": "Privacy Notice",
+  "open_in_new_tab": "Opens in a new tab",
+  "back_to_consent": "Back to consent",
   "checkbox_label": "I have read and accept the Terms of Use and Privacy Notice",
   "accept": "Accept",
   "cancel": "Cancel",
