@@ -406,6 +406,7 @@ describe('legalConsent Plugin', () => {
         name: 'terms-of-use',
         component: expect.any(Function),
         props: { documentEndpoint: 'terms-of-use' },
+        meta: { wefa: { title: 'Terms of Use', fullscreen: true } },
       })
     })
 
@@ -415,6 +416,7 @@ describe('legalConsent Plugin', () => {
         name: 'privacy-notice',
         component: expect.any(Function),
         props: { documentEndpoint: 'privacy-notice' },
+        meta: { wefa: { title: 'Privacy Notice', fullscreen: true } },
       })
     })
 
@@ -423,6 +425,7 @@ describe('legalConsent Plugin', () => {
         path: '/legal-consent',
         name: 'legal-consent',
         component: expect.any(Function),
+        meta: { wefa: { title: 'Legal Consent', fullscreen: true } },
       })
     })
   })

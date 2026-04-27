@@ -103,9 +103,7 @@
             class="mt-6 flex cursor-pointer items-center gap-3 rounded-[1rem] border border-(--p-border-soft) bg-(--p-surface-0) px-4 py-3.5 transition-colors duration-150 hover:border-(--p-border-color) dark:border-[rgba(255,255,255,0.08)] dark:bg-[rgba(13,21,37,0.78)] dark:hover:border-[rgba(255,255,255,0.14)]"
           >
             <Checkbox v-model="acceptedTerms" input-id="consent-checkbox" :binary="true" />
-            <span
-              class="text-[0.95rem] text-(--p-surface-700) dark:text-[rgba(233,239,255,0.85)]"
-            >
+            <span class="text-[0.95rem] text-(--p-surface-700) dark:text-[rgba(233,239,255,0.85)]">
               {{ t('legal_consent.checkbox_label') }}
             </span>
           </label>

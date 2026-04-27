@@ -33,9 +33,7 @@
           </div>
         </div>
 
-        <div
-          class="flex flex-shrink-0 flex-wrap items-center justify-end gap-2 sm:flex-nowrap"
-        >
+        <div class="flex flex-shrink-0 flex-wrap items-center justify-end gap-2 sm:flex-nowrap">
           <Button
             :label="t('cookies.manage_preferences')"
             severity="secondary"
