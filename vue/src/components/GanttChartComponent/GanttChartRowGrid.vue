@@ -5,6 +5,25 @@
       :style="gridStyle"
     >
       <template
+        v-for="(activity, index) in backgroundActivities"
+        :key="activity.id ?? `background-${index}`"
+      >
+        <slot
+          name="activity"
+          :activity="activity"
+          :style="backgroundStyle(activity)"
+          :visual-type="'background'"
+        >
+          <div
+            v-tooltip="tooltipForActivity(activity)"
+            class="absolute z-0 cursor-pointer"
+            :class="activity.colorClass"
+            :style="backgroundStyle(activity)"
+            @click="emit('activityClick', activity, rowData)"
+          />
+        </slot>
+      </template>
+      <template
         v-for="(activity, index) in stripeActivities"
         :key="activity.id ?? `${activity.startDate.toISOString()}-${index}`"
       >
@@ -74,6 +93,7 @@ import {
   STRIPE_SIZE_PX,
   WEEK_CELL_WIDTH_PX,
   computeMiniLanes,
+  getBarSpacingOffsets,
   getActivitySpanPx,
   getWeekColumns,
   type GanttChartActivityType,
@@ -131,6 +151,7 @@ const WEEK_DAYS = 7
 const isWeekView = computed(() => viewMode === 'week')
 // Lane assignment for stacked mini activities.
 const miniLayout = computed(() => computeMiniLanes(activities, stackMiniActivities, viewMode))
+const barSpacingOffsets = computed(() => getBarSpacingOffsets(activities))
 // Row height grows with overlapping minis.
 const resolvedRowHeightPx = computed(() => {
   if (rowHeightPx !== undefined) {
@@ -138,8 +159,14 @@ const resolvedRowHeightPx = computed(() => {
   }
 
   const extraHeight = Math.max(0, miniLayout.value.laneCount - 1) * (MINI_HEIGHT_PX + MINI_GAP_PX)
-  return BASE_ROW_HEIGHT_PX + extraHeight
+  return BASE_ROW_HEIGHT_PX + extraHeight + barSpacingOffsets.value.topPx
 })
+const resolvedBarHeightPx = computed(() =>
+  Math.max(
+    0,
+    resolvedRowHeightPx.value - BAR_VERTICAL_PADDING_PX * 2 - barSpacingOffsets.value.topPx
+  )
+)
 
 // Pixel width for each column (day or week).
 const columnWidthPx = computed(() => (isWeekView.value ? WEEK_CELL_WIDTH_PX : DAY_CELL_WIDTH_PX))
@@ -228,6 +255,9 @@ const activityPositionStyle = (activity: GanttChartActivityData) => {
 const activityType = (activity: GanttChartActivityData): GanttChartActivityType =>
   activity.visualType ?? 'bar'
 
+const backgroundActivities = computed(() =>
+  activities.filter((activity) => activityType(activity) === 'background')
+)
 const stripeActivities = computed(() =>
   activities.filter((activity) => activityType(activity) === 'stripe')
 )
@@ -254,12 +284,26 @@ const stripeStyle = (activity: GanttChartActivityData) => {
   }
 }
 
-const barStyle = (activity: GanttChartActivityData) => {
-  const height = Math.max(0, resolvedRowHeightPx.value - BAR_VERTICAL_PADDING_PX * 2)
+const backgroundStyle = (activity: GanttChartActivityData) => {
   const style: Record<string, string> = {
     ...activityPositionStyle(activity),
-    top: `${BAR_VERTICAL_PADDING_PX}px`,
-    height: `${height}px`,
+    top: '0px',
+    height: `${resolvedRowHeightPx.value}px`,
+  }
+
+  if (activity.color) {
+    style.backgroundColor = activity.color
+  }
+
+  return style
+}
+
+const barStyle = (activity: GanttChartActivityData) => {
+  const topOffsetPx = activity.barOffsetTopPx ?? 0
+  const style: Record<string, string> = {
+    ...activityPositionStyle(activity),
+    top: `${BAR_VERTICAL_PADDING_PX + topOffsetPx}px`,
+    height: `${resolvedBarHeightPx.value}px`,
   }
 
   if (activity.color) {

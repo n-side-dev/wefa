@@ -6,6 +6,7 @@ import {
   MINI_HEIGHT_PX,
   computeMiniLanes,
   getActivitySpanPx,
+  getBarSpacingOffsets,
   type WeekColumn,
 } from '@/components/GanttChartComponent/ganttChartLayout'
 import type {
@@ -68,6 +69,11 @@ export const useGanttLinks = ({
       const rowHeight = rowHeights.value[rowIndex] ?? BASE_ROW_HEIGHT_PX
       const rowTop = (rowOffsets.value[rowIndex] ?? 0) - virtualOffsetPx.value
       const miniLayout = computeMiniLanes(row.activities, stackMiniActivities.value, viewMode.value)
+      const barSpacingTopPx = getBarSpacingOffsets(row.activities).topPx
+      const resolvedBarHeightPx = Math.max(
+        0,
+        rowHeight - BAR_VERTICAL_PADDING_PX * 2 - barSpacingTopPx
+      )
 
       for (const activity of row.activities) {
         if (activity.id === undefined || activity.id === null) {
@@ -91,6 +97,12 @@ export const useGanttLinks = ({
           const stackHeight = laneCount * MINI_HEIGHT_PX + (laneCount - 1) * MINI_GAP_PX
           const topStart = Math.max(BAR_VERTICAL_PADDING_PX, (rowHeight - stackHeight) / 2)
           y = rowTop + topStart + lane * (MINI_HEIGHT_PX + MINI_GAP_PX) + MINI_HEIGHT_PX / 2
+        } else if (activity.visualType !== 'background' && activity.visualType !== 'stripe') {
+          y =
+            rowTop +
+            BAR_VERTICAL_PADDING_PX +
+            (activity.barOffsetTopPx ?? 0) +
+            resolvedBarHeightPx / 2
         }
 
         positions.set(activity.id, { startX, endX, y, visualType: activity.visualType })

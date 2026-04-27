@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
+import { h } from 'vue'
 import GanttChartComponent from './GanttChartComponent.vue'
 import GanttChartRowGrid from './GanttChartRowGrid.vue'
 import { BASE_ROW_HEIGHT_PX, MINI_GAP_PX, MINI_HEIGHT_PX, getWeekColumns } from './ganttChartLayout'
@@ -90,6 +91,31 @@ describe('GanttChartComponent', () => {
 
     expect(wrapper.text()).toContain('Line')
     expect(wrapper.text()).toContain('Line A')
+  })
+
+  it('renders a custom row-label slot instead of the default row header', () => {
+    const wrapper = mount(GanttChartComponent, {
+      props: {
+        startDate: new Date(2026, 0, 1),
+        endDate: new Date(2026, 0, 7),
+        rows: baseRows,
+      },
+      slots: {
+        'row-label': ({ rowData }: { rowData: GanttChartRowData }) =>
+          h('div', { class: 'custom-row-label' }, `Run ${rowData.header}`),
+      },
+      global: {
+        directives: {
+          tooltip: () => {
+            /* no-op */
+          },
+        },
+      },
+    })
+
+    expect(wrapper.find('.custom-row-label').exists()).toBe(true)
+    expect(wrapper.text()).toContain('Run Line A')
+    expect(wrapper.text()).not.toContain('gantt_chart.row')
   })
 
   it('emits activityClick with activity and row data', async () => {
@@ -253,5 +279,62 @@ describe('GanttChartComponent', () => {
     expect(dayRow?.attributes('style')).toContain(`height: ${BASE_ROW_HEIGHT_PX}px`)
     const expectedWeekHeight = BASE_ROW_HEIGHT_PX + MINI_HEIGHT_PX + MINI_GAP_PX
     expect(weekRow?.attributes('style')).toContain(`height: ${expectedWeekHeight}px`)
+  })
+
+  it('renders background activities as solid full-row blocks', () => {
+    const wrapper = mount(GanttChartRowGrid, {
+      props: {
+        dateRange: [new Date(2026, 0, 1), new Date(2026, 0, 2), new Date(2026, 0, 3)],
+        activities: [
+          {
+            id: 'background-1',
+            startDate: new Date(2026, 0, 1),
+            endDate: new Date(2026, 0, 2),
+            visualType: 'background',
+            color: 'rgb(255, 0, 0)',
+          },
+        ],
+      },
+      global: {
+        directives: {
+          tooltip: () => {
+            /* no-op */
+          },
+        },
+      },
+    })
+
+    expect(wrapper.html()).toContain('background-color: rgb(255, 0, 0)')
+    expect(wrapper.html()).toContain(`height: ${BASE_ROW_HEIGHT_PX}px`)
+  })
+
+  it('adds row height and bar top offset when barOffsetTopPx is provided', () => {
+    const wrapper = mount(GanttChartRowGrid, {
+      props: {
+        dateRange: [new Date(2026, 0, 1), new Date(2026, 0, 2), new Date(2026, 0, 3)],
+        activities: [
+          {
+            id: 'bar-offset',
+            label: 'Offset',
+            startDate: new Date(2026, 0, 1),
+            endDate: new Date(2026, 0, 2),
+            visualType: 'bar',
+            colorClass: 'bg-emerald-400/80',
+            barOffsetTopPx: 8,
+          },
+        ],
+      },
+      global: {
+        directives: {
+          tooltip: () => {
+            /* no-op */
+          },
+        },
+      },
+    })
+
+    expect(wrapper.attributes('style')).toContain(`height: ${BASE_ROW_HEIGHT_PX + 8}px`)
+    const barElement = wrapper.get('span').element.parentElement
+    expect(barElement?.getAttribute('style')).toContain('top: 12px;')
   })
 })

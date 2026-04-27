@@ -29,13 +29,21 @@
         />
       </template>
       <template #body-left>
-        <GanttChartRowLabel
-          v-for="(item, idx) in list"
-          :key="item.data.id ?? idx"
-          :row-label="item.data.header ?? item.data.label"
-          :row-height-px="rowHeights[item.index]"
-          :left-header-width-px="leftHeaderWidthPx"
-        />
+        <template v-for="(item, idx) in list" :key="item.data.id ?? idx">
+          <slot
+            name="row-label"
+            :row-data="item.data"
+            :row-index="item.index"
+            :row-height-px="rowHeights[item.index]"
+            :left-header-width-px="leftHeaderWidthPx"
+          >
+            <GanttChartRowLabel
+              :row-label="item.data.header ?? item.data.label"
+              :row-height-px="rowHeights[item.index]"
+              :left-header-width-px="leftHeaderWidthPx"
+            />
+          </slot>
+        </template>
       </template>
       <template #body-right>
         <GanttChartRowGrid

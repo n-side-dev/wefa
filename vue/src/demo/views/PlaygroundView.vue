@@ -1,11 +1,13 @@
 <template>
-  <GanttChartComponent
-    :start-date="startDate"
-    :end-date="endDate"
-    :rows="rows"
-    :links="links"
-    header-label="gantt_chart.header"
-  />
+  <div class="h-[calc(100svh-12rem)] min-h-[400px]">
+    <GanttChartComponent
+      :start-date="startDate"
+      :end-date="endDate"
+      :rows="rows"
+      :links="links"
+      header-label="gantt_chart.header"
+    />
+  </div>
 </template>
 
 <script setup lang="ts">

@@ -89,6 +89,7 @@ const links = ref([{ fromId: 'planned', toId: 'optimized' }])
 
 Activities support a `visualType`:
 
+- `background`: solid full-row background block
 - `stripe`: diagonal background context
 - `bar`: primary rounded bar
 - `mini`: compact bar, stacked into lanes when overlapping
@@ -106,6 +107,31 @@ Activities support a `visualType`:
 />
 ```
 
+## Custom Row Labels
+
+Use the `row-label` slot to replace the default left-hand row label with your own content, such as checkboxes or action buttons.
+
+```vue
+<GanttChartComponent :start-date="startDate" :end-date="endDate" :rows="rows">
+  <template #row-label="{ rowData, rowHeightPx, leftHeaderWidthPx }">
+    <div
+      class="flex items-center gap-2 border-b border-surface-200 bg-surface-0 px-3"
+      :style="{ height: `${rowHeightPx}px`, width: `${leftHeaderWidthPx}px` }"
+    >
+      <Button icon="pi pi-play" text @click="runForRow(rowData)" />
+      <span>{{ rowData.header }}</span>
+    </div>
+  </template>
+</GanttChartComponent>
+```
+
+Slot props:
+
+- `rowData`: the full row object
+- `rowIndex`: source row index
+- `rowHeightPx`: computed row height
+- `leftHeaderWidthPx`: configured width of the left column
+
 ## API Reference
 
 <ArgTypes of={GanttChartStories} />
@@ -116,9 +142,10 @@ export type GanttChartActivityData = {
   label?: string
   startDate: Date
   endDate: Date
-  visualType?: 'stripe' | 'bar' | 'mini'
+  visualType?: 'background' | 'stripe' | 'bar' | 'mini'
   color?: string
   colorClass?: string
+  barOffsetTopPx?: number
 }
 
 export type GanttChartRowData = {
