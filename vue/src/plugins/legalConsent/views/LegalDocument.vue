@@ -14,6 +14,7 @@
 
     <div class="relative z-10 mx-auto flex w-full max-w-[52rem] flex-col">
       <router-link
+        v-if="!legalStore.legalConsent?.valid"
         to="/legal-consent"
         class="mb-6 inline-flex w-fit items-center gap-2 text-[0.9rem] font-medium text-(--p-link-color) hover:underline dark:text-[rgba(91,192,235,0.95)]"
       >

@@ -6,10 +6,12 @@ import { ref, nextTick } from 'vue'
 import LegalDocument from '../LegalDocument.vue'
 
 // Mocks for dependencies used by LegalDocument.vue
+const legalStoreMock: { legalEndpoint: string; legalConsent: { valid: boolean } | null } = {
+  legalEndpoint: 'api/legal',
+  legalConsent: null,
+}
 vi.mock('@/plugins/legalConsent', () => ({
-  useLegalStore: () => ({
-    legalEndpoint: 'api/legal',
-  }),
+  useLegalStore: () => legalStoreMock,
 }))
 
 // We'll spy on applyMarkdownClasses to ensure it is called with the container element
@@ -42,6 +44,7 @@ describe('LegalDocument.vue', () => {
     // reset refs and spies before each test
     dataRef.value = undefined
     loadingRef.value = true
+    legalStoreMock.legalConsent = null
     applyMarkdownClassesSpy.mockClear()
   })
 
@@ -84,5 +87,31 @@ describe('LegalDocument.vue', () => {
 
     // No data provided, so our class applier should not be called
     expect(applyMarkdownClassesSpy).not.toHaveBeenCalled()
+  })
+
+  it('shows the back-to-consent link when consent is missing or invalid', () => {
+    legalStoreMock.legalConsent = null
+    const wrapperMissing = mount(LegalDocument, {
+      props: { documentEndpoint: 'terms-of-use' },
+      global: { stubs: { 'router-link': { template: '<a><slot /></a>' } } },
+    })
+    expect(wrapperMissing.find('a').exists()).toBe(true)
+
+    legalStoreMock.legalConsent = { valid: false }
+    const wrapperInvalid = mount(LegalDocument, {
+      props: { documentEndpoint: 'terms-of-use' },
+      global: { stubs: { 'router-link': { template: '<a><slot /></a>' } } },
+    })
+    expect(wrapperInvalid.find('a').exists()).toBe(true)
+  })
+
+  it('hides the back-to-consent link when consent is already valid', () => {
+    legalStoreMock.legalConsent = { valid: true }
+    const wrapper = mount(LegalDocument, {
+      props: { documentEndpoint: 'terms-of-use' },
+      global: { stubs: { 'router-link': { template: '<a><slot /></a>' } } },
+    })
+    // The guard would deny navigation to /legal-consent, so the link must not render.
+    expect(wrapper.find('a').exists()).toBe(false)
   })
 })
