@@ -1,11 +1,6 @@
 <template>
   <section
-    class="
-      relative isolate
-      h-svh w-full
-      flex
-      lg:gap-4 lg:p-4
-    "
+    class="relative isolate h-svh w-full flex lg:gap-4 lg:p-4"
     :data-router-view-depth="routerViewDepth"
   >
     <div class="pointer-events-none absolute inset-0 overflow-hidden">
@@ -29,14 +24,7 @@
       </template>
     </SideNavigationComponent>
     <main
-      class="
-        flex-1
-        relative z-[1]
-        min-h-0 min-w-0
-        px-3 pb-3 pt-0
-        lg:px-0 lg:py-0
-        flex flex-col
-      "
+      class="flex-1 relative z-[1] min-h-0 min-w-0 px-3 pb-3 pt-0 lg:px-0 lg:py-0 flex flex-col"
     >
       <MobileNavigationComponent
         :project-title="projectTitle"
@@ -48,18 +36,7 @@
         </template>
       </MobileNavigationComponent>
       <section
-        class="
-          grow
-          size-full
-          min-h-0
-          rounded-(--p-radius-lg)
-          border border-(--p-border-contrast)
-          bg-[linear-gradient(180deg,var(--p-surface-glass),var(--p-surface-glass-strong)),var(--p-surface-0)]
-          p-(--p-spacing-page)
-          shadow-(--p-shadow-lg)
-          backdrop-blur-[14px]
-          flex flex-col
-        "
+        class="grow size-full min-h-0 rounded-(--p-radius-lg) border border-(--p-border-contrast) bg-[linear-gradient(180deg,var(--p-surface-glass),var(--p-surface-glass-strong)),var(--p-surface-0)] p-(--p-spacing-page) shadow-(--p-shadow-lg) backdrop-blur-[14px] flex flex-col"
       >
         <div class="shrink-0">
           <AutoroutedBreadcrumb v-if="showBreadcrumb" :home-route="breadcrumbHomeRouteComputed" />
