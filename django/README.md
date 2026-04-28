@@ -21,6 +21,7 @@ WeFa (Web Factory) delivers a set of modular Django apps that cover recurring we
 - Plug-and-play Django REST Framework authentication configuration (token and JWT) (`nside_wefa.authentication`)
 - Legal consent tracking with automatic user onboarding and templated documents (`nside_wefa.legal_consent`)
 - Per-user locale persistence with a public discovery endpoint (`nside_wefa.locale`)
+- Append-only audit log with REST endpoints, model-registration UX, built-in event sources, and optional tamper-evident hash chain — built on `django-auditlog` (`nside_wefa.audit`)
 - System checks and sensible defaults so configuration mistakes surface early
 
 ## Installation
@@ -55,6 +56,10 @@ Tracks acceptance of privacy and terms documents with templating support and RES
 
 Persists each user's preferred locale and exposes the supported locales for the project over REST. See `nside_wefa/locale/README.md` for details.
 
+### Audit
+
+Wraps `django-auditlog` to give every product an append-only audit store with four ergonomic ways to register models, REST endpoints (`/audit/events/` for staff, `/audit/me/` for end users), built-in event sources for `auth` / `legal_consent` / `locale`, an optional SHA-256 tamper-evident chain, and management commands for purge / verify / GDPR export. See `nside_wefa/audit/README.md` for details.
+
 ## Quick Start
 
 1. Install the package.
@@ -66,10 +71,12 @@ Persists each user's preferred locale and exposes the supported locales for the 
        "rest_framework",
        "rest_framework.authtoken",  # For token auth
        "rest_framework_simplejwt",  # For JWT auth
+       "auditlog",                  # Required by nside_wefa.audit
        "nside_wefa.common",
        "nside_wefa.authentication",
        "nside_wefa.legal_consent",
        "nside_wefa.locale",
+       "nside_wefa.audit",
    ]
    ```
 
@@ -89,6 +96,7 @@ Persists each user's preferred locale and exposes the supported locales for the 
        path("auth/", include("nside_wefa.authentication.urls")),
        path("legal-consent/", include("nside_wefa.legal_consent.urls")),
        path("locale/", include("nside_wefa.locale.urls")),
+       path("audit/", include("nside_wefa.audit.urls")),
    ]
    ```
 
@@ -111,6 +119,13 @@ NSIDE_WEFA = {
     "LOCALE": {
         "AVAILABLE": ["en", "fr"],
         "DEFAULT": "en",
+    },
+    "AUDIT": {
+        # All keys are optional. See nside_wefa/audit/README.md.
+        # Track third-party models you can't edit:
+        # "MODELS": {"auth.Group": {"include_fields": ["name"]}},
+        # "TAMPER_EVIDENT": True,   # SHA-256 hash chain (opt-in)
+        # "RETENTION_DAYS": 365,    # used by wefa_audit_purge
     },
 }
 ```

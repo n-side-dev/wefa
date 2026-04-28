@@ -23,4 +23,5 @@ urlpatterns = [
     path("legal-consent/", include("nside_wefa.legal_consent.urls")),
     path("authentication/", include("nside_wefa.authentication.urls")),
     path("locale/", include("nside_wefa.locale.urls")),
+    path("audit/", include("nside_wefa.audit.urls")),
 ]

@@ -3,6 +3,7 @@
 .vscode
 *.code-workspace
 *.iml
+.claude/settings.local.json
 django/docs/source/api/*
 django/docs/output/**/*
 .env
