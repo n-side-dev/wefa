@@ -10,7 +10,6 @@ Apply the WeFa Vue workspace standards with predictable discovery, implementatio
 ## First Reads
 1. Read `vue/README.md` for package capabilities, exports, and workspace scripts.
 2. Read `vue/CONTRIBUTE.md` for quality gates and contribution expectations.
-3. Read `vue/scripts/files/copilot-instructions.md` when the task changes UI composition patterns or component selection.
 
 ## Workspace Map
 1. Start public-surface discovery at `vue/src/lib.ts` and `vue/src/containers/index.ts`.
@@ -27,8 +26,9 @@ Apply the WeFa Vue workspace standards with predictable discovery, implementatio
 5. Prefer Tailwind utility classes for routine styling. Do not add new CSS imports. Use scoped styles or bound style objects only when the existing feature pattern needs layout math, chart sizing, or other cases Tailwind cannot express cleanly.
 6. Prefer `const { prop = defaultValue } = defineProps<Type>()` for defaults and avoid `withDefaults()` unless the local file pattern already depends on it.
 7. Keep user-facing literals translated through i18n keys (`useI18nLib`, `t`, `$t`), including `aria-label`, `title`, placeholders, validation copy, and button labels.
-8. When a change creates or exposes new public surface, update the nearest `index.ts` and shared entrypoints such as `vue/src/lib.ts` or `vue/src/containers/index.ts` as needed.
-9. Regenerate or reuse generated OpenAPI client artifacts through the existing script instead of hand-editing generated files.
+8. New public components or containers should usually ship with source, stories, MDX docs, and unit tests, unless the adjacent feature pattern in this repo clearly differs.
+9. When a change creates or exposes new public surface, update the nearest `index.ts` and shared entrypoints such as `vue/src/lib.ts` or `vue/src/containers/index.ts` as needed.
+10. Regenerate or reuse generated OpenAPI client artifacts through the existing script instead of hand-editing generated files.
 
 ## Delivery Workflow
 1. Inspect existing implementation first:

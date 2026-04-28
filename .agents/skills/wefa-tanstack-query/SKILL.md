@@ -68,4 +68,4 @@ Apply TanStack Query Vue v5 with official v5 patterns while preserving WeFa's pr
 1. For wrapper tests in `vue/src/network/__tests__`, mock `@tanstack/vue-query` directly and assert the wrapper configuration.
 2. For feature or component tests, mock `@/network` instead of TanStack internals unless the feature truly owns the hook configuration.
 3. Use `vue/CONTRIBUTE.md` as the source of truth for the current Vue quality gates and validation commands.
-4. If the task also changes frontend behavior outside the network layer, follow the matching validation expectations from `skills/wefa-vue-frontend/SKILL.md` instead of redefining them here.
+4. If the task also changes frontend behavior outside the network layer, follow the matching validation expectations from `.agents/skills/wefa-vue-frontend/SKILL.md` instead of redefining them here.
