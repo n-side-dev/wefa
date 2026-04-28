@@ -1,6 +1,11 @@
 <template>
   <section
-    class="relative isolate min-h-svh w-full lg:flex lg:gap-4 lg:p-4"
+    class="
+      relative isolate
+      h-svh w-full
+      flex
+      lg:gap-4 lg:p-4
+    "
     :data-router-view-depth="routerViewDepth"
   >
     <div class="pointer-events-none absolute inset-0 overflow-hidden">
@@ -23,7 +28,16 @@
         <slot name="navigation-bottom" />
       </template>
     </SideNavigationComponent>
-    <main class="relative z-[1] min-w-0 flex-1 px-3 pb-3 pt-0 lg:px-0 lg:py-0">
+    <main
+      class="
+        flex-1
+        relative z-[1]
+        min-h-0 min-w-0
+        px-3 pb-3 pt-0
+        lg:px-0 lg:py-0
+        flex flex-col
+      "
+    >
       <MobileNavigationComponent
         :project-title="projectTitle"
         :project-logo="projectLogo"
@@ -34,10 +48,26 @@
         </template>
       </MobileNavigationComponent>
       <section
-        class="min-h-[calc(100svh-0.75rem)] rounded-(--p-radius-lg) border border-(--p-border-contrast) bg-[linear-gradient(180deg,var(--p-surface-glass),var(--p-surface-glass-strong)),var(--p-surface-0)] p-(--p-spacing-page) shadow-(--p-shadow-lg) backdrop-blur-[14px] lg:min-h-[calc(100svh-2rem)]"
+        class="
+          grow
+          size-full
+          min-h-0
+          rounded-(--p-radius-lg)
+          border border-(--p-border-contrast)
+          bg-[linear-gradient(180deg,var(--p-surface-glass),var(--p-surface-glass-strong)),var(--p-surface-0)]
+          p-(--p-spacing-page)
+          shadow-(--p-shadow-lg)
+          backdrop-blur-[14px]
+          flex flex-col
+        "
       >
-        <AutoroutedBreadcrumb v-if="showBreadcrumb" :home-route="breadcrumbHomeRouteComputed" />
-        <router-view />
+        <div class="shrink-0">
+          <AutoroutedBreadcrumb v-if="showBreadcrumb" :home-route="breadcrumbHomeRouteComputed" />
+        </div>
+
+        <div class="min-h-0 grow-1 overflow-auto">
+          <router-view />
+        </div>
       </section>
     </main>
 
