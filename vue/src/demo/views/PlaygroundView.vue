@@ -1,5 +1,5 @@
 <template>
-  <div class="h-[calc(100svh-12rem)] min-h-[400px]">
+  <div class="size-full">
     <GanttChartComponent
       :start-date="startDate"
       :end-date="endDate"
