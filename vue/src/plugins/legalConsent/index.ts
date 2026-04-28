@@ -40,6 +40,7 @@ export const defaultTermsOfUseRoute: RouteRecordRaw = {
   name: 'terms-of-use',
   component: () => import('@/plugins/legalConsent/views/LegalDocument.vue'),
   props: { documentEndpoint: 'terms-of-use' },
+  meta: { wefa: { title: 'Terms of Use', fullscreen: true } },
 }
 
 /** Default route configuration for privacy notice page */
@@ -48,6 +49,7 @@ export const defaultPrivacyNoticeRoute: RouteRecordRaw = {
   name: 'privacy-notice',
   component: () => import('@/plugins/legalConsent/views/LegalDocument.vue'),
   props: { documentEndpoint: 'privacy-notice' },
+  meta: { wefa: { title: 'Privacy Notice', fullscreen: true } },
 }
 
 /** Default route configuration for legal consent page */
@@ -55,6 +57,7 @@ export const defaultLegalConsentRoute: RouteRecordRaw = {
   path: '/legal-consent',
   name: 'legal-consent',
   component: () => import('@/plugins/legalConsent/views/LegalConsent.vue'),
+  meta: { wefa: { title: 'Legal Consent', fullscreen: true } },
 }
 
 /**

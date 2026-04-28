@@ -677,25 +677,63 @@ export const nsidePreset = definePreset(Aura, {
         fontSize: '0.9rem',
         fontWeight: '500',
       },
-      success: createToastTone(
-        'rgba(5,181,200,0.12)',
-        'rgba(5,181,200,0.24)',
-        'var(--p-text-color)',
-        'var(--p-text-muted-color)'
-      ),
-      error: createToastTone('var(--p-error-bg)', 'var(--p-error-border)', 'var(--p-error-text)'),
-      warn: createToastTone(
-        'rgba(188,153,78,0.12)',
-        'rgba(188,153,78,0.26)',
-        'var(--p-text-color)',
-        'var(--p-text-muted-color)'
-      ),
-      info: createToastTone(
-        'rgba(5,181,200,0.1)',
-        'rgba(5,181,200,0.22)',
-        'var(--p-text-color)',
-        'var(--p-text-muted-color)'
-      ),
+      // Aura nests severity tones under `colorScheme.{light,dark}` and applies
+      // them after the top-level keys, so we have to override at the same path
+      // (otherwise Aura's defaults — e.g. green for success, `{surface.0}` for
+      // detail text which our inverted surface scale resolves to dark navy in
+      // dark mode — leak through and the detail text becomes unreadable).
+      colorScheme: {
+        light: {
+          success: createToastTone(
+            'rgba(5,181,200,0.12)',
+            'rgba(5,181,200,0.24)',
+            'var(--p-text-color)',
+            'var(--p-text-muted-color)'
+          ),
+          error: createToastTone(
+            'var(--p-error-bg)',
+            'var(--p-error-border)',
+            'var(--p-error-text)'
+          ),
+          warn: createToastTone(
+            'rgba(188,153,78,0.12)',
+            'rgba(188,153,78,0.26)',
+            'var(--p-text-color)',
+            'var(--p-text-muted-color)'
+          ),
+          info: createToastTone(
+            'rgba(5,181,200,0.1)',
+            'rgba(5,181,200,0.22)',
+            'var(--p-text-color)',
+            'var(--p-text-muted-color)'
+          ),
+        },
+        dark: {
+          success: createToastTone(
+            'rgba(5,181,200,0.18)',
+            'rgba(5,181,200,0.36)',
+            'var(--p-text-color)',
+            'var(--p-text-muted-color)'
+          ),
+          error: createToastTone(
+            'var(--p-error-bg)',
+            'var(--p-error-border)',
+            'var(--p-error-text)'
+          ),
+          warn: createToastTone(
+            'rgba(188,153,78,0.2)',
+            'rgba(188,153,78,0.36)',
+            'var(--p-text-color)',
+            'var(--p-text-muted-color)'
+          ),
+          info: createToastTone(
+            'rgba(5,181,200,0.16)',
+            'rgba(5,181,200,0.32)',
+            'var(--p-text-color)',
+            'var(--p-text-muted-color)'
+          ),
+        },
+      },
     },
     menu: {
       root: {

@@ -1,0 +1,13 @@
+{
+  "title": "Préférences en matière de cookies",
+  "bar_message": "Nous utilisons des cookies pour améliorer votre expérience. Veuillez vérifier vos préférences en matière de cookies.",
+  "dialog_message": "Choisissez les cookies que vous autorisez. Les cookies essentiels sont nécessaires au fonctionnement du site et ne peuvent pas être désactivés.",
+  "manage_preferences": "Gérer les préférences",
+  "save_preferences": "Enregistrer les préférences",
+  "accept_all": "Tout accepter",
+  "reject_all": "Tout refuser",
+  "column_name": "Nom",
+  "column_description": "Description",
+  "column_type": "Type",
+  "column_consent": "Consentement"
+}

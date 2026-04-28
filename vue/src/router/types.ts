@@ -9,6 +9,12 @@ export interface WeFaRouteMeta {
   showInNavigation?: boolean
   section?: string
   showBreadcrumb?: boolean
+  /**
+   * When true, the route renders standalone outside the app's main
+   * `LayoutContainer` (no side navigation, no breadcrumb). Used for forced
+   * acceptance flows like the legal-consent gate.
+   */
+  fullscreen?: boolean
 }
 
 export type WeFaRouteRecordRaw = RouteRecordRaw & {

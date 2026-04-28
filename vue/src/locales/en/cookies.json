@@ -1,0 +1,13 @@
+{
+  "title": "Cookie Preferences",
+  "bar_message": "We use cookies to enhance your experience. Please review your cookie preferences.",
+  "dialog_message": "Choose which cookies you allow. Essential cookies are required for the site to work and cannot be disabled.",
+  "manage_preferences": "Manage Preferences",
+  "save_preferences": "Save Preferences",
+  "accept_all": "Accept All",
+  "reject_all": "Reject All",
+  "column_name": "Name",
+  "column_description": "Description",
+  "column_type": "Type",
+  "column_consent": "Consent"
+}

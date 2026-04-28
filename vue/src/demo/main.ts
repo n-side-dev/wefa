@@ -83,15 +83,24 @@ app.use(legalConsentPlugin, {
   // rendering, so they stay in English here.
   termsOfUseRoute: {
     ...defaultTermsOfUseRoute,
-    meta: { ...defaultTermsOfUseRoute.meta, wefa: { title: 'Terms of Use' } },
+    meta: {
+      ...defaultTermsOfUseRoute.meta,
+      wefa: { ...defaultTermsOfUseRoute.meta?.wefa, title: 'Terms of Use' },
+    },
   },
   privacyNoticeRoute: {
     ...defaultPrivacyNoticeRoute,
-    meta: { ...defaultPrivacyNoticeRoute.meta, wefa: { title: 'Privacy Notice' } },
+    meta: {
+      ...defaultPrivacyNoticeRoute.meta,
+      wefa: { ...defaultPrivacyNoticeRoute.meta?.wefa, title: 'Privacy Notice' },
+    },
   },
   legalConsentRoute: {
     ...defaultLegalConsentRoute,
-    meta: { ...defaultLegalConsentRoute.meta, wefa: { title: 'Legal Consent' } },
+    meta: {
+      ...defaultLegalConsentRoute.meta,
+      wefa: { ...defaultLegalConsentRoute.meta?.wefa, title: 'Legal Consent' },
+    },
   },
 })
 app.use(localeSelectorPlugin, { backendStore: backendStore, i18n: i18n, endpoint: 'locale' })

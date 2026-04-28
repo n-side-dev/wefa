@@ -13,7 +13,7 @@ const DialogStub = {
     closeOnEscape: Boolean,
   },
   emits: ['update:visible'],
-  template: '<div class="dialog"><slot /></div>',
+  template: '<div class="dialog"><slot /><slot name="footer" /></div>',
 }
 
 const DataTableStub = {
@@ -100,6 +100,11 @@ vi.mock('../../index', () => ({
   useCookiesStore: () => mockStore,
 }))
 
+// Mock i18n util to return the key itself for easier assertions
+vi.mock('@/locales', () => ({
+  useI18nLib: () => ({ t: (key: string) => key }),
+}))
+
 // Import the component AFTER mocking the store
 import CookiesConsent from '../CookiesConsent.vue'
 
@@ -135,9 +140,9 @@ describe('CookiesConsent.vue', () => {
     expect(wrapper.find('.dialog').exists()).toBe(true)
     const btns = wrapper.findAll('button.btn')
     expect(btns).toHaveLength(3)
-    expect(btns[0]!.text()).toContain('Accept All')
-    expect(btns[1]!.text()).toContain('Reject All')
-    expect(btns[2]!.text()).toContain('Save Preferences')
+    expect(btns[0]!.text()).toContain('cookies.reject_all')
+    expect(btns[1]!.text()).toContain('cookies.save_preferences')
+    expect(btns[2]!.text()).toContain('cookies.accept_all')
   })
 
   it('calls store accept/reject on corresponding button clicks', async () => {
@@ -145,10 +150,10 @@ describe('CookiesConsent.vue', () => {
     const btns = wrapper.findAll('button.btn')
 
     await btns[0]!.trigger('click')
-    expect(mockStore.acceptAllCookies).toHaveBeenCalledTimes(1)
-
-    await btns[1]!.trigger('click')
     expect(mockStore.rejectAllCookies).toHaveBeenCalledTimes(1)
+
+    await btns[2]!.trigger('click')
+    expect(mockStore.acceptAllCookies).toHaveBeenCalledTimes(1)
   })
 
   it('onConsentChange does not modify Essential and saves updated preferences for others', async () => {
