@@ -30,9 +30,11 @@ dependencies = [
     "django>=6.0.4",
     "django-auditlog>=3.4.1",
     "django-cors-headers>=4.9.0",
+    "django-storages>=1.14",
     "djangorestframework>=3.14.0",
     "djangorestframework-simplejwt>=5.5.1",
     "drf-spectacular>=0.28.0",
+    "python-magic>=0.4.27",
 ]
 
 [project.urls]
