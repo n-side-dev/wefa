@@ -258,18 +258,18 @@ export const nsidePreset = definePreset(Aura, {
       },
       dark: {
         surface: {
-          0: '#0f1b31',
-          50: '#15233d',
-          100: '#1a2a48',
-          200: '#203156',
-          300: '#2a3d67',
-          400: '#3d557f',
-          500: '#5f779d',
-          600: '#89a4c7',
-          700: '#a5bedb',
-          800: '#c9d8eb',
-          900: '#e7ebf5',
-          950: '#f7f9fc',
+          0: '#f7f9fc',
+          50: '#e7ebf5',
+          100: '#c9d8eb',
+          200: '#a5bedb',
+          300: '#89a4c7',
+          400: '#5f779d',
+          500: '#3d557f',
+          600: '#2a3d67',
+          700: '#203156',
+          800: '#1a2a48',
+          900: '#15233d',
+          950: '#0f1b31',
           canvas: '#07101f',
           canvasStrong: '#040b16',
           strong: '#15233d',
@@ -387,7 +387,6 @@ export const nsidePreset = definePreset(Aura, {
     },
     dialog: {
       root: {
-        background: 'var(--p-surface-0)',
         borderColor: SURFACE_BORDER,
         color: 'var(--p-text-color)',
         borderRadius: '1.5rem',
@@ -407,11 +406,9 @@ export const nsidePreset = definePreset(Aura, {
     },
     inputtext: {
       root: {
-        background: 'var(--p-surface-0)',
         disabledBackground: 'var(--p-surface-strong)',
         filledBackground: 'var(--p-surface-strong)',
         filledHoverBackground: 'var(--p-surface-strong)',
-        filledFocusBackground: 'var(--p-surface-0)',
         borderColor: SURFACE_BORDER,
         hoverBorderColor: 'var(--p-border-color)',
         focusBorderColor: 'var(--p-link-color)',
@@ -535,24 +532,11 @@ export const nsidePreset = definePreset(Aura, {
         padding: '1rem',
       },
       row: {
-        background: 'var(--p-surface-0)',
         hoverBackground: 'var(--p-surface-hover)',
         selectedBackground: 'var(--p-surface-accent-strong)',
         color: 'var(--p-text-color)',
         hoverColor: 'var(--p-text-color)',
         selectedColor: 'var(--p-text-color)',
-      },
-      colorScheme: {
-        light: {
-          row: {
-            stripedBackground: '{surface.50}',
-          },
-        },
-        dark: {
-          row: {
-            stripedBackground: '{surface.50}',
-          },
-        },
       },
       bodyCell: {
         borderColor: SOFT_BORDER,
@@ -565,7 +549,6 @@ export const nsidePreset = definePreset(Aura, {
         color: 'var(--p-text-muted-color)',
       },
       footerCell: {
-        background: 'var(--p-surface-0)',
         borderColor: SOFT_BORDER,
         color: 'var(--p-text-muted-color)',
       },
@@ -609,7 +592,6 @@ export const nsidePreset = definePreset(Aura, {
     },
     panel: {
       root: {
-        background: 'var(--p-surface-0)',
         borderColor: SURFACE_BORDER,
         color: 'var(--p-text-color)',
         borderRadius: PANEL_RADIUS,
@@ -830,11 +812,9 @@ export const nsidePreset = definePreset(Aura, {
     },
     select: {
       root: {
-        background: 'var(--p-surface-0)',
         disabledBackground: 'var(--p-surface-strong)',
         filledBackground: 'var(--p-surface-strong)',
         filledHoverBackground: 'var(--p-surface-strong)',
-        filledFocusBackground: 'var(--p-surface-0)',
         borderColor: SURFACE_BORDER,
         hoverBorderColor: 'var(--p-border-color)',
         focusBorderColor: 'var(--p-link-color)',
