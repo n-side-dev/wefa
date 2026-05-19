@@ -122,7 +122,4 @@ def test_user_isolation(client, user, other_user, png_bytes, upload_file):
     bob = APIClient()
     bob.force_authenticate(user=other_user)
     assert bob.get("/images/").data == []
-    assert (
-        bob.get(f"/images/{pk}/").status_code
-        == status.HTTP_404_NOT_FOUND
-    )
+    assert bob.get(f"/images/{pk}/").status_code == status.HTTP_404_NOT_FOUND
