@@ -1,35 +1,45 @@
 <template>
   <div class="wefa-nav-bottom flex flex-col gap-3">
-    <div class="flex flex-col gap-1">
-      <span class="text-xs font-medium uppercase tracking-wider text-(--p-text-on-dark-muted)">
-        {{ $t('locale_selector.label') }}
-      </span>
-      <LocaleSelector />
-    </div>
+    <template v-if="!collapsed">
+      <div class="flex flex-col gap-1">
+        <span class="text-xs font-medium uppercase tracking-wider text-(--p-text-on-dark-muted)">
+          {{ $t('locale_selector.label') }}
+        </span>
+        <LocaleSelector />
+      </div>
 
-    <div class="flex flex-col gap-1">
-      <span class="text-xs font-medium uppercase tracking-wider text-(--p-text-on-dark-muted)">
-        {{ $t('demo.theme.label') }}
-      </span>
-      <ThemeSelector class="w-full" />
-    </div>
+      <div class="flex flex-col gap-1">
+        <span class="text-xs font-medium uppercase tracking-wider text-(--p-text-on-dark-muted)">
+          {{ $t('demo.theme.label') }}
+        </span>
+        <ThemeSelector class="w-full" />
+      </div>
 
-    <Divider class="!my-1" />
+      <Divider class="!my-1" />
+    </template>
 
-    <div class="flex flex-col gap-2 text-(--p-text-on-dark)">
-      <span class="truncate text-sm">
+    <div
+      :class="[
+        'flex text-(--p-text-on-dark)',
+        collapsed ? 'flex-col items-center gap-2' : 'flex-col gap-2',
+      ]"
+    >
+      <span v-if="!collapsed" class="truncate text-sm">
         {{ $t('demo.navigation.signed_in_as', { username }) }}
       </span>
       <Button
-        :label="$t('demo.navigation.logout')"
+        v-tooltip.right="collapsed ? $t('demo.navigation.logout') : undefined"
+        :label="collapsed ? undefined : $t('demo.navigation.logout')"
+        :aria-label="$t('demo.navigation.logout')"
         icon="pi pi-sign-out"
         size="small"
-        class="wefa-nav-logout w-full"
+        :class="['wefa-nav-logout', collapsed ? 'aspect-square !p-0' : 'w-full']"
         @click="handleLogout"
       />
     </div>
 
     <nav
+      v-if="!collapsed"
       class="flex flex-col gap-1 pt-2 text-xs text-(--p-text-on-dark-muted)"
       :aria-label="$t('demo.legal.terms_of_use') + ', ' + $t('demo.legal.privacy_notice')"
     >
@@ -48,9 +58,18 @@ import { computed } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import Button from 'primevue/button'
 import Divider from 'primevue/divider'
+import Tooltip from 'primevue/tooltip'
 import { LocaleSelector } from '@/plugins'
 import { backendStore } from '@/demo/backendStore'
 import ThemeSelector from '@/demo/components/ThemeSelector.vue'
+
+export interface NavigationBottomProps {
+  collapsed?: boolean
+}
+
+const { collapsed = false } = defineProps<NavigationBottomProps>()
+
+const vTooltip = Tooltip
 
 const router = useRouter()
 

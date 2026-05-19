@@ -36,9 +36,13 @@ import pinia from './pinia.ts'
 app.use(pinia)
 
 // Restore the user's theme preference from localStorage (no-op in SSR).
-import { useDarkModeStore } from '@/stores'
+import { useDarkModeStore, useSideNavStore } from '@/stores'
 const darkModeStore = useDarkModeStore()
 darkModeStore.setLocalStorageKey('dark-mode-wefa-demo')
+
+// Restore the user's side-nav collapsed preference from localStorage.
+const sideNavStore = useSideNavStore()
+sideNavStore.setLocalStorageKey('side-nav-collapsed-wefa-demo')
 
 // PrimeToasts
 import ToastService from 'primevue/toastservice'

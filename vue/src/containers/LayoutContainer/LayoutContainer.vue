@@ -19,8 +19,8 @@
       :project-logo="projectLogo"
       :project-logo-alt="projectLogoAlt"
     >
-      <template v-if="hasNavigationBottomSlot" #bottom>
-        <slot name="navigation-bottom" />
+      <template v-if="hasNavigationBottomSlot" #bottom="slotProps">
+        <slot name="navigation-bottom" v-bind="slotProps" />
       </template>
     </SideNavigationComponent>
     <main
@@ -32,7 +32,7 @@
         :project-logo-alt="projectLogoAlt"
       >
         <template v-if="hasNavigationBottomSlot" #bottom>
-          <slot name="navigation-bottom" />
+          <slot name="navigation-bottom" :collapsed="false" />
         </template>
       </MobileNavigationComponent>
       <section
@@ -71,6 +71,10 @@ export interface LayoutContainerProps {
   breadcrumbHomeRoute?: string
   breadcrumbShowHome?: boolean
 }
+
+defineSlots<{
+  'navigation-bottom'(props: { collapsed: boolean }): unknown
+}>()
 
 // Calling setupDepthTracker() is mandatory for all components with a <RouterView />
 const routerViewDepth = setupDepthTracker()

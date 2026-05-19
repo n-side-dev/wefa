@@ -6,8 +6,8 @@
   </template>
   <template v-else>
     <LayoutContainer project-title="WeFa">
-      <template #navigation-bottom>
-        <NavigationBottom />
+      <template #navigation-bottom="{ collapsed }">
+        <NavigationBottom :collapsed="collapsed" />
       </template>
     </LayoutContainer>
   </template>

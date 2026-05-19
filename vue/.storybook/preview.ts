@@ -5,7 +5,9 @@ import type { App } from 'vue'
 import PrimeVue from 'primevue/config'
 import { nsidePrimeVueTheme } from '../src/theme'
 import { VueQueryPlugin, QueryClient } from '@tanstack/vue-query'
+import { createPinia } from 'pinia'
 import { createLibI18n } from '../src/locales'
+import { useSideNavStore } from '../src/stores'
 import '../src/assets/main.css'
 import NotFoundView from '../src/views/NotFoundView.vue'
 import PlaceholderView from '@/containers/storybook/PlaceholderView.vue'
@@ -124,6 +126,7 @@ const i18n = createLibI18n()
 
 // Set up global dependencies for all stories
 setup((app: App) => {
+  app.use(createPinia())
   app.use(router)
   app.use(PrimeVue, {
     theme: nsidePrimeVueTheme,
@@ -136,6 +139,17 @@ setup((app: App) => {
 })
 
 const preview: Preview = {
+  decorators: [
+    // Reset wefa stores before each story so interaction tests or stories that
+    // mutate state (e.g. toggling the side nav collapsed) don't leak into the
+    // next story. The Pinia instance itself is shared across the session
+    // because Vue's app.use() installs it once at setup() time and can't be
+    // swapped per-story; resetting individual stores is the per-story isolation.
+    (story) => {
+      useSideNavStore().setCollapsed(false)
+      return story()
+    },
+  ],
   parameters: {
     controls: {
       matchers: {
