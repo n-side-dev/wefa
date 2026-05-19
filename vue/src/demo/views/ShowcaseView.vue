@@ -10,9 +10,9 @@
 
         <span>{{ t('demo.showcase.edit_intro') }}</span>
 
-        <span class="rounded bg-(--p-surface-100) px-2 py-0.5 text-center font-mono"
-          >vue/src/demo/ShowcaseView.vue</span
-        >
+        <Message severity="contrast" class="font-mono">
+          vue/src/demo/ShowcaseView.vue
+        </Message>
 
         <span>{{ t('demo.showcase.try_wefa') }}</span>
 
@@ -37,6 +37,8 @@
 <script setup lang="ts">
 import Divider from 'primevue/divider'
 import Button from 'primevue/button'
+import Message from 'primevue/message'
+
 import { useI18nLib } from '@/locales'
 
 const { t } = useI18nLib()
