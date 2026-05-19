@@ -3,17 +3,6 @@
     class="relative isolate h-svh w-full flex lg:gap-4 lg:p-4"
     :data-router-view-depth="routerViewDepth"
   >
-    <div class="pointer-events-none absolute inset-0 overflow-hidden">
-      <div
-        class="absolute top-0 left-[-4rem] h-[22rem] w-[22rem] rounded-full bg-(--p-orb-teal) opacity-55 blur-[80px]"
-      />
-      <div
-        class="absolute top-48 right-[-8rem] h-[20rem] w-[20rem] rounded-full bg-(--p-orb-magenta) opacity-55 blur-[80px]"
-      />
-      <div
-        class="absolute bottom-8 left-[30%] h-[16rem] w-[16rem] rounded-full bg-(--p-orb-gold) opacity-55 blur-[80px]"
-      />
-    </div>
     <SideNavigationComponent
       :project-title="projectTitle"
       :project-logo="projectLogo"
@@ -36,7 +25,7 @@
         </template>
       </MobileNavigationComponent>
       <section
-        class="grow size-full min-h-0 rounded-(--p-radius-lg) border border-(--p-border-contrast) bg-[linear-gradient(180deg,var(--p-surface-glass),var(--p-surface-glass-strong)),var(--p-surface-0)] p-(--p-spacing-page) shadow-(--p-shadow-lg) backdrop-blur-[14px] flex flex-col"
+        class="grow size-full min-h-0 rounded-(--p-radius-lg) border border-(--p-border-contrast) bg-(--p-surface-glass)/30 p-4 shadow-(--p-shadow-lg) flex flex-col"
       >
         <div class="shrink-0">
           <AutoroutedBreadcrumb v-if="showBreadcrumb" :home-route="breadcrumbHomeRouteComputed" />

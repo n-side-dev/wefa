@@ -1,10 +1,5 @@
 <template>
   <div class="flex grow flex-col px-3 py-3 lg:px-4 lg:py-5">
-    <p
-      class="px-3 text-[0.7rem] font-medium uppercase tracking-[0.28em] text-(--p-text-on-dark-soft)"
-    >
-      Navigate
-    </p>
     <section v-if="topLevelEntries.length > 0" class="mt-3 flex flex-col gap-1.5">
       <NavigationLinkComponent
         v-for="entry in topLevelEntries"
