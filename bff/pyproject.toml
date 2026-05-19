@@ -4,7 +4,7 @@ version = "0.6.0"
 description = "Flask backend-for-frontend"
 requires-python = ">=3.12,<3.13"
 dependencies = [
-    "authlib>=1.6.11",
+    "authlib>=1.7.2",
     "cryptography",
     "flask~=3.1.2",
     "flask-cors",
@@ -13,6 +13,7 @@ dependencies = [
     "pyyaml~=6.0",
     "python-dotenv~=1.2.1",
     "requests>=2.33.0",
+    "urllib3>=2.7.0",
 ]
 
 [dependency-groups]
