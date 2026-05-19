@@ -10,9 +10,7 @@
 
         <span>{{ t('demo.showcase.edit_intro') }}</span>
 
-        <Message severity="contrast" class="font-mono">
-          vue/src/demo/ShowcaseView.vue
-        </Message>
+        <Message severity="contrast" class="font-mono"> vue/src/demo/ShowcaseView.vue </Message>
 
         <span>{{ t('demo.showcase.try_wefa') }}</span>
 

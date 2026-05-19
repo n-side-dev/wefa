@@ -28,7 +28,7 @@
         class="grow size-full min-h-0 rounded-(--p-radius-lg) border border-(--p-border-contrast) bg-(--p-surface-glass)/30 p-4 shadow-(--p-shadow-lg) flex flex-col"
       >
         <div class="shrink-0">
-          <AutoroutedBreadcrumb v-if="showBreadcrumb" :home-route="breadcrumbHomeRouteComputed"/>
+          <AutoroutedBreadcrumb v-if="showBreadcrumb" :home-route="breadcrumbHomeRouteComputed" />
         </div>
 
         <div class="min-h-0 grow-1 overflow-auto">

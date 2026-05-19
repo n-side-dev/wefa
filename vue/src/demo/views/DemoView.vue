@@ -9,7 +9,8 @@
 
       <span class="text-center">
         {{ t('demo.home.storybook_intro') }}
-        <code class="rounded bg-(--p-button-contrast-background) px-2 py-0.5 font-mono text-(--p-button-contrast-color)"
+        <code
+          class="rounded bg-(--p-button-contrast-background) px-2 py-0.5 font-mono text-(--p-button-contrast-color)"
           >npm run storybook</code
         >
         {{ t('demo.home.storybook_instead') }}
