@@ -5,4 +5,13 @@ version = 1
 fail_on = "medium"
 
 [ignore]
-while_no_fix = ["GHSA-5239-wwwm-4pmq"]
+# Advisories ignored while no patched release is available upstream.
+# TODO: revisit periodically — remove each id once a fixed version is published
+# AND reachable through our direct deps' version constraints.
+while_no_fix = [
+    "GHSA-5239-wwwm-4pmq",
+    # PYSEC-2025-183 — pyjwt v2.12.1 (transitive via djangorestframework-simplejwt).
+    # No patched pyjwt release available at time of writing (2026-05).
+    # TODO: drop once a fixed pyjwt is on PyPI and simplejwt's constraint allows it.
+    "PYSEC-2025-183",
+]
