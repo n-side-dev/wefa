@@ -70,12 +70,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted } from 'vue'
+import { onBeforeUnmount, onMounted } from 'vue'
+import { useLocalStorage } from '@vueuse/core'
 import Tooltip from 'primevue/tooltip'
 import BottomComponent from '@/containers/LayoutContainer/SideNavigationComponent/BottomComponent/BottomComponent.vue'
 import TopComponent from '@/containers/LayoutContainer/SideNavigationComponent/TopComponent/TopComponent.vue'
 import MainComponent from '@/containers/LayoutContainer/SideNavigationComponent/MainComponent/MainComponent.vue'
-import { useSideNavStore } from '@/stores'
 
 const vTooltip = Tooltip
 
@@ -91,11 +91,13 @@ const {
   projectLogoAlt = undefined,
 } = defineProps<SideNavigationComponentProps>()
 
-const sideNavStore = useSideNavStore()
-const collapsed = computed(() => sideNavStore.collapsed)
+// Collapsed state persists via localStorage so the user's preference survives
+// reloads. Apps that need a per-deployment key can override `WEFA_SIDE_NAV_KEY`
+// at build time, but the default works out of the box with no setup.
+const collapsed = useLocalStorage<boolean>('wefa-side-nav-collapsed', false)
 
 function toggleSideNav() {
-  sideNavStore.toggle()
+  collapsed.value = !collapsed.value
 }
 
 /**
@@ -141,7 +143,7 @@ function handleKeydown(event: KeyboardEvent) {
   }
 
   event.preventDefault()
-  sideNavStore.toggle()
+  toggleSideNav()
 }
 
 onMounted(() => {

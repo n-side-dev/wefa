@@ -10,5 +10,3 @@ export {
 } from './backend.ts'
 
 export { useDarkModeStore } from './darkMode.ts'
-
-export { useSideNavStore } from './sideNav.ts'
