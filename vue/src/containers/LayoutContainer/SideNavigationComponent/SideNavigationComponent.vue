@@ -32,6 +32,7 @@
         </slot>
       </div>
       <div
+        v-if="collapsible"
         :class="[
           'border-t border-(--p-border-contrast-soft)',
           collapsed ? 'p-2 lg:p-2' : 'p-3 lg:p-3',
@@ -70,7 +71,7 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted } from 'vue'
+import { computed, onBeforeUnmount, onMounted } from 'vue'
 import { useLocalStorage } from '@vueuse/core'
 import Tooltip from 'primevue/tooltip'
 import BottomComponent from '@/containers/LayoutContainer/SideNavigationComponent/BottomComponent/BottomComponent.vue'
@@ -83,21 +84,35 @@ export interface SideNavigationComponentProps {
   projectTitle: string
   projectLogo?: string
   projectLogoAlt?: string
+  /**
+   * When true the rail shows a Collapse/Expand toggle button at the bottom,
+   * persists the user's choice to localStorage, and listens for Cmd/Ctrl+B
+   * globally. When false (the default) the rail is fixed at its expanded
+   * width and no toggle UI or keyboard shortcut is exposed.
+   */
+  collapsible?: boolean
 }
 
 const {
   projectTitle,
   projectLogo = undefined,
   projectLogoAlt = undefined,
+  collapsible = false,
 } = defineProps<SideNavigationComponentProps>()
 
-// Collapsed state persists via localStorage so the user's preference survives
-// reloads. Apps that need a per-deployment key can override `WEFA_SIDE_NAV_KEY`
-// at build time, but the default works out of the box with no setup.
-const collapsed = useLocalStorage<boolean>('wefa-side-nav-collapsed', false)
+// Persisted state is only meaningful when the rail can actually collapse.
+// Skip the localStorage subscription entirely otherwise.
+const persistedCollapsed = collapsible
+  ? useLocalStorage<boolean>('wefa-side-nav-collapsed', false)
+  : null
+
+const collapsed = computed(() => persistedCollapsed?.value ?? false)
 
 function toggleSideNav() {
-  collapsed.value = !collapsed.value
+  if (!persistedCollapsed) {
+    return
+  }
+  persistedCollapsed.value = !persistedCollapsed.value
 }
 
 /**
@@ -146,11 +161,17 @@ function handleKeydown(event: KeyboardEvent) {
   toggleSideNav()
 }
 
+// Only attach the global shortcut when the rail can actually collapse —
+// otherwise we'd be silently swallowing Cmd/Ctrl+B for no observable effect.
 onMounted(() => {
-  window.addEventListener('keydown', handleKeydown)
+  if (collapsible) {
+    window.addEventListener('keydown', handleKeydown)
+  }
 })
 
 onBeforeUnmount(() => {
-  window.removeEventListener('keydown', handleKeydown)
+  if (collapsible) {
+    window.removeEventListener('keydown', handleKeydown)
+  }
 })
 </script>

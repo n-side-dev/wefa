@@ -56,10 +56,14 @@ const globalConfig = {
 }
 
 function mountSideNav(
-  props: { projectTitle: string; projectLogo?: string } = { projectTitle: 'WeFa' }
+  props: {
+    projectTitle?: string
+    projectLogo?: string
+    collapsible?: boolean
+  } = {}
 ) {
   return mount(SideNavigationComponent, {
-    props,
+    props: { projectTitle: 'WeFa', collapsible: true, ...props },
     attachTo: document.body,
     global: globalConfig,
   })
@@ -201,5 +205,55 @@ describe('SideNavigationComponent', () => {
     const keydownCalls = removeSpy.mock.calls.filter(([type]) => type === 'keydown')
     expect(keydownCalls.length).toBeGreaterThan(0)
     removeSpy.mockRestore()
+  })
+
+  describe('when collapsible is false (default)', () => {
+    it('does not render the toggle button', () => {
+      const wrapper = mountSideNav({ collapsible: false })
+      expect(wrapper.find('button[data-test="side-nav-toggle"]').exists()).toBe(false)
+    })
+
+    it('stays at expanded width regardless of any saved preference', () => {
+      localStorage.setItem(STORAGE_KEY, 'true')
+      const wrapper = mountSideNav({ collapsible: false })
+      const aside = wrapper.find('aside')
+      expect(aside.classes()).toContain('lg:w-[19rem]')
+      expect(aside.classes()).not.toContain('lg:w-[4.5rem]')
+    })
+
+    it('forwards collapsed=false to children regardless of saved preference', () => {
+      localStorage.setItem(STORAGE_KEY, 'true')
+      const wrapper = mountSideNav({ collapsible: false })
+      expect(wrapper.get('[data-test="top"]').attributes('data-collapsed')).toBe('false')
+      expect(wrapper.get('[data-test="main"]').attributes('data-collapsed')).toBe('false')
+      expect(wrapper.get('[data-test="bottom"]').attributes('data-collapsed')).toBe('false')
+    })
+
+    it('does not respond to Cmd+B', async () => {
+      const wrapper = mountSideNav({ collapsible: false })
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'b', metaKey: true }))
+      await nextTick()
+      const aside = wrapper.find('aside')
+      expect(aside.classes()).toContain('lg:w-[19rem]')
+    })
+
+    it('does not register a global keydown listener', () => {
+      const addSpy = vi.spyOn(window, 'addEventListener')
+      mountSideNav({ collapsible: false })
+      const keydownCalls = addSpy.mock.calls.filter(([type]) => type === 'keydown')
+      expect(keydownCalls.length).toBe(0)
+      addSpy.mockRestore()
+    })
+
+    it('exposes collapsed=false via the scoped bottom slot', () => {
+      const wrapper = mount(SideNavigationComponent, {
+        props: { projectTitle: 'WeFa', collapsible: false },
+        slots: {
+          bottom: `<template #default="{ collapsed }"><div data-test="slot-collapsed">{{ collapsed }}</div></template>`,
+        },
+        global: globalConfig,
+      })
+      expect(wrapper.get('[data-test="slot-collapsed"]').text()).toBe('false')
+    })
   })
 })
