@@ -55,7 +55,9 @@ const globalConfig = {
   },
 }
 
-function mountSideNav(props: { projectTitle: string; projectLogo?: string } = { projectTitle: 'WeFa' }) {
+function mountSideNav(
+  props: { projectTitle: string; projectLogo?: string } = { projectTitle: 'WeFa' }
+) {
   return mount(SideNavigationComponent, {
     props,
     attachTo: document.body,
@@ -184,9 +186,7 @@ describe('SideNavigationComponent', () => {
     document.body.appendChild(el)
     el.focus()
 
-    el.dispatchEvent(
-      new KeyboardEvent('keydown', { key: 'b', metaKey: true, bubbles: true })
-    )
+    el.dispatchEvent(new KeyboardEvent('keydown', { key: 'b', metaKey: true, bubbles: true }))
     await nextTick()
     expect(isCollapsed(wrapper)).toBe(false)
 

@@ -35,10 +35,7 @@
     <section
       v-for="section in sectionEntries"
       :key="section.label"
-      :class="[
-        'flex flex-col',
-        collapsed ? 'mt-4 gap-1.5 first:mt-3' : 'mt-5 gap-2 first:mt-4',
-      ]"
+      :class="['flex flex-col', collapsed ? 'mt-4 gap-1.5 first:mt-3' : 'mt-5 gap-2 first:mt-4']"
     >
       <template v-if="collapsed">
         <span

@@ -1,9 +1,6 @@
 <template>
   <div
-    :class="[
-      'border-b border-(--p-border-contrast-soft)',
-      collapsed ? 'p-3 lg:p-3' : 'p-4 lg:p-6',
-    ]"
+    :class="['border-b border-(--p-border-contrast-soft)', collapsed ? 'p-3 lg:p-3' : 'p-4 lg:p-6']"
   >
     <div
       :class="[

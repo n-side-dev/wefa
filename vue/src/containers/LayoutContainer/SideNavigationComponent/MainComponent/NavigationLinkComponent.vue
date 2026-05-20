@@ -28,9 +28,7 @@
           isActive || isExactActive
             ? 'bg-(--p-nav-active-bg) text-(--p-nav-active-text) shadow-(--p-nav-active-shadow)'
             : 'text-(--p-nav-text) hover:bg-(--p-nav-hover-bg) hover:text-(--p-text-on-dark)',
-          collapsed
-            ? 'justify-center px-0 py-3'
-            : 'gap-3 px-4 py-3',
+          collapsed ? 'justify-center px-0 py-3' : 'gap-3 px-4 py-3',
         ]"
         class="flex w-full cursor-pointer items-center rounded-[1.1rem] text-sm font-medium transition"
         @click="emitNavigationClick"
