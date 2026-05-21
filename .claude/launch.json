@@ -1,0 +1,39 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "vue-demo",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "vue", "run", "dev"],
+      "port": 5173
+    },
+    {
+      "name": "vue-storybook",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "vue", "run", "storybook"],
+      "port": 6006
+    },
+    {
+      "name": "django-demo",
+      "runtimeExecutable": "django/.venv/bin/python",
+      "runtimeArgs": ["django/manage.py", "runserver"],
+      "port": 8000
+    },
+    {
+      "name": "bff-flask",
+      "runtimeExecutable": "uv",
+      "runtimeArgs": [
+        "run",
+        "--project",
+        "bff",
+        "flask",
+        "--app",
+        "bff/bff.py",
+        "run",
+        "--port",
+        "5022"
+      ],
+      "port": 5022
+    }
+  ]
+}
