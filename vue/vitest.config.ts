@@ -128,11 +128,35 @@ const vitestConfig: UserConfig = {
               configDir: path.join(dirname, '.storybook'),
             }),
           ],
+          optimizeDeps: {
+            include: [
+              'axios',
+              'pinia',
+              'primevue/confirmationservice',
+              'primevue/dialog',
+              'primevue/toastservice',
+            ],
+            exclude: ['vue-i18n'],
+          },
           test: {
             name: 'storybook',
             // Browser tests are significantly slower and more resource-intensive
             testTimeout: 120000, // 2 minutes for storybook browser tests
             hookTimeout: 30000, // 30 seconds for browser setup/teardown
+            deps: {
+              optimizer: {
+                client: {
+                  include: [
+                    'axios',
+                    'pinia',
+                    'primevue/confirmationservice',
+                    'primevue/dialog',
+                    'primevue/toastservice',
+                  ],
+                  exclude: ['vue-i18n'],
+                },
+              },
+            },
             browser: {
               enabled: true,
               headless: true,
@@ -152,7 +176,6 @@ const vitestConfig: UserConfig = {
                 },
               ],
             },
-            setupFiles: ['./.storybook/vitest.setup.ts'],
           },
         },
       ],

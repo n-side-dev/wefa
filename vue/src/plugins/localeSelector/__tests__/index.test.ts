@@ -7,6 +7,8 @@ import type { BackendStore } from '@/stores'
 import { axiosInstance } from '@/network'
 import { localeSelectorPlugin, useLocaleStore, type LocaleSelectorOptions } from '../index'
 
+const testLocalStorage = globalThis.localStorage
+
 interface TestI18n {
   global: { locale: Ref<string> }
 }
@@ -92,6 +94,7 @@ describe('localeSelectorPlugin', () => {
     mockAdapter.restore()
     vi.restoreAllMocks()
     vi.unstubAllGlobals()
+    vi.stubGlobal('localStorage', testLocalStorage)
   })
 
   describe('installation', () => {

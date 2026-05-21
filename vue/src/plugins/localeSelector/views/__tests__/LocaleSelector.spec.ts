@@ -5,6 +5,8 @@ import { setActivePinia, createPinia } from 'pinia'
 import LocaleSelector from '../LocaleSelector.vue'
 import { useLocaleStore } from '../../index'
 
+const testLocalStorage = globalThis.localStorage
+
 const LocaleSelectStub = defineComponent({
   name: 'LocaleSelectStub',
   props: {
@@ -54,6 +56,7 @@ describe('LocaleSelector.vue', () => {
   afterEach(() => {
     vi.restoreAllMocks()
     vi.unstubAllGlobals()
+    vi.stubGlobal('localStorage', testLocalStorage)
   })
 
   it('renders one option per available locale with capitalized display names', () => {
