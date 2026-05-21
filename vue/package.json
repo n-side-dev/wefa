@@ -20,13 +20,9 @@
   "publishConfig": {
     "access": "public"
   },
-  "bin": {
-    "wefa-install": "./scripts/install.js"
-  },
   "files": [
     "dist",
-    "src",
-    "scripts"
+    "src"
   ],
   "exports": {
     ".": {

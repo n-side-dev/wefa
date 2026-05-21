@@ -1,56 +1,62 @@
-# N-SIDE WeFa – Agent Guide
+# N-SIDE WeFa - Agent Guide
 
-## Project Snapshot
-- WeFa (Web Factory) ships two publishable packages: `django/` contains the `nside-wefa` Django toolkit, `vue/` contains the `@nside/wefa` Vue 3 component library.
-- Goal: provide production-ready auth, legal-consent, other backend packages, and UI building blocks so product teams can assemble full-stack experiences quickly.
-- Primary technologies: Python 3.12+, Django 5.2 + Django REST Framework, Vitest + Playwright, Vue 3 + PrimeVue + Tailwind 4.
+## Purpose
 
-## Repository Layout & Key Docs
-- `README.md` – top-level overview; defer to `django/README.md` and `vue/README.md` for workspace specifics.
-- `django/` – reusable apps (`nside_wefa.common`, `.authentication`, `.legal_consent`, etc) plus `demo/` project and pytest setup.
-- `vue/` – component library, demo playground, Storybook, scripts (e.g. `wefa-install`), and AI guidance (`scripts/files/copilot-instructions.md`).
-- Contribution guides: `django/CONTRIBUTE.md` & `vue/CONTRIBUTE.md` define environment setup, quality gates, and release discipline.
+This file gives Codex durable repository context. Keep it concise: put shared rules here, put workspace-specific rules in nested `AGENTS.md` files, and move repeatable task workflows into skills.
+
+Codex loads AGENTS instructions from the repository root down to the current working directory. Later files are more specific, so prefer plain nested `AGENTS.md` files for additive guidance. Use `AGENTS.override.md` only when intentionally replacing broader guidance.
+
+## Repository Map
+
+- `django/` publishes the `nside-wefa` Django toolkit with reusable apps under `nside_wefa/` and the `demo/` validation project.
+- `vue/` publishes the `@nside/wefa` Vue 3 library, demo app, Storybook docs, CLI helpers, and generated OpenAPI demo clients.
+- `bff/` provides the Flask backend-for-frontend for OAuth login/logout/session checks and proxying backend REST calls.
+- `scripts/` contains repository automation, especially the version orchestrator used to keep package versions aligned.
+- `.github/workflows/` is the source of truth for CI-equivalent validation commands.
+
+## Technology Baseline
+
+- Python workspaces target Python 3.12+ and use `uv`, pytest, Ruff, mypy, and security checks.
+- `django/` targets modern Django, Django REST Framework, Simple JWT, drf-spectacular, and Hatchling packaging.
+- `bff/` uses Flask, Authlib, encrypted token cookies, Docker, and generated OpenAPI documentation.
+- `vue/` uses Vue 3, Vite, TypeScript, PrimeVue, Tailwind 4, Pinia, Vue I18n, TanStack Query, Vitest, Storybook, and Playwright.
 
 ## Instruction Routing
-- For frontend work inside `vue/` (components, containers, stories/docs, translations, tests), use the `$wefa-vue-frontend` skill defined at `skills/wefa-vue-frontend/SKILL.md`.
-- For work inside `django/`, use the backend guidance in this file until a dedicated `django/AGENTS.md` is introduced.
-- For cross-cutting work (API + UI), follow this file for shared expectations and apply the `wefa-vue-frontend` skill for the frontend part.
 
-## Core Engineering Principles
-- **Convention over configuration**: align with provided settings helpers (`NSIDE_WEFA` for Django and documented Vue defaults) before introducing bespoke wiring.
-- **Type safety & documentation**: keep Python and TypeScript hints accurate; add comments only for non-obvious logic; update relevant docs whenever behaviour changes.
-- **Tests as gatekeepers**: extend existing suites when behaviour changes; no feature lands without matching tests unless explicitly justified.
+- For `django/` work, read `django/AGENTS.md`, `django/README.md`, and `django/CONTRIBUTE.md`.
+- For `vue/` work, read `vue/AGENTS.md`, `vue/README.md`, and `vue/CONTRIBUTE.md`; use `$wefa-vue-frontend` for component, container, Storybook, i18n, demo, and frontend test work.
+- For TanStack Query work in `vue/`, also use `$wefa-tanstack-query`.
+- For `bff/` work, read `bff/AGENTS.md` and `bff/README.md`.
+- For `scripts/` work, read `scripts/AGENTS.md`.
+- For cross-cutting changes, coordinate backend/API shape first, then update consumers and documentation in the affected workspaces.
 
-## Backend Playbook (`django/`)
-- **App structure**: extend existing apps (`nside_wefa.authentication`, `.legal_consent`, `.common`, etc) unless a new domain warrants a standalone package. Mirror current layout: `apps.py`, `checks.py`, `models/`, `serializers.py`, `urls.py`, `views/`, `tests/`, `README.md`.
-- **Settings contract**: all configuration flows through the `NSIDE_WEFA` dict. When adding options, document in `django/README.md`, add system checks in `checks.py`, and ensure defaults keep migrations optional.
-- **APIs & serializers**: follow DRF patterns already present; keep authentication utilities DRY by placing shared logic under `utils/`. Expose URLs through `include('nside_wefa.<app>.urls')` and cover them in tests.
-- **Testing & quality**: use pytest with Django (`pytest` or `python manage.py test`) plus coverage when needed. Run `ruff format .`, `ruff check .`, and `mypy nside_wefa/` before submission. Demo project (`django/demo`) is available for manual validation.
+The current repository skills live under `skills/`. A later cleanup should migrate shared Codex skills to official repository discovery under `.agents/skills`, but do not do that as part of AGENTS-only edits unless explicitly requested.
 
-## Shared Workflow Expectations
-- Stay within the workspace toolchain: `uv`/pip + Hatchling builds for Django, npm scripts + Vite for Vue.
-- Keep lockfiles consistent with the package manager in use (`uv.lock`, `package-lock.json`).
-- Maintain documentation parity: adjust relevant READMEs, MDX docs, or changelog entries (once introduced) whenever behaviour changes.
-- For cross-cutting features, coordinate backend API shape first, then wire the frontend through the generated clients/composables.
+## Shared Engineering Rules
 
-## Decision Checklists
-- **Before shipping backend change**:
-  - [ ] Update/extend system checks and settings docs.
-  - [ ] Provide migrations only when required and reversible.
-  - [ ] Add pytest coverage for new branches/edge cases.
-- **Before opening a PR**:
-  - [ ] Run required backend lint/format/test commands.
-  - [ ] Update backend docs/demo snippets as needed.
-  - [ ] Document breaking changes and version impacts.
+- Explore first: inspect existing implementations, neighboring files, docs, and CI before designing changes.
+- Prefer existing conventions and helpers over new bespoke wiring.
+- Preserve public APIs unless the task explicitly asks for a breaking change; document behavior changes where consumers will notice them.
+- Keep Python and TypeScript types accurate. Avoid broad casts, silent fallbacks, and broad exception handling.
+- Keep user-facing copy localized in frontend code and documented in the relevant README, MDX, or package docs.
+- Add or update tests when behavior changes. If validation is skipped, state exactly why.
+- Do not hand-edit generated artifacts unless the workspace guide explicitly allows it.
+- Do not commit secrets. Treat `.env` files, OAuth credentials, tokens, and generated local IDE/cache files as local-only.
 
-## Quick Command Reference
-- Backend install: `cd django && pip install -e .[dev]` (or `uv sync --all-extras`)
-- Backend tests: `cd django && pytest`
-- Backend lint/type: `cd django && ruff check . && ruff format --check && mypy nside_wefa/`
+## Versioning And Releases
 
-## When in Doubt
-- Re-read the relevant `README.md` and `CONTRIBUTE.md` before altering flows.
-- Trace existing backend implementations (e.g., `nside_wefa/legal_consent`) to mirror patterns.
-- Surface open questions early (e.g., new authentication modes) so design/system owners can confirm direction.
+- The monorepo uses one shared version across `django/`, `vue/`, and `bff/`.
+- Use `python3 scripts/wefa_version.py` from the repository root for version changes.
+- Prefer `--dry-run` before version changes; do not manually edit per-package version fields unless repairing the orchestrator itself.
+- Keep lockfiles consistent with the package manager used in the branch: `uv.lock` for Python workspaces and `package-lock.json` for npm.
 
-Following this guide keeps contributions aligned with the existing architecture, ensures compliance with the WeFa component hierarchy, and preserves release quality across both Django and Vue packages.
+## Validation Expectations
+
+- Run the smallest relevant checks while iterating, then run the workspace's CI-equivalent commands before handoff when feasible.
+- Documentation-only AGENTS changes do not require product test suites, but they should pass basic markdown/content sanity checks.
+- For reviews, prioritize bugs, behavior regressions, missing tests, security risks, and docs drift before style suggestions.
+
+## Compatibility Notes
+
+- Codex guidance should come from `AGENTS.md` files and skills, not generated assistant instruction artifacts.
+- Keep AGENTS files compact. Link to workspace docs rather than copying full manuals so the combined instruction chain stays below Codex's default 32 KiB project-doc size limit.

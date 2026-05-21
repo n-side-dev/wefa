@@ -7,3 +7,4 @@
 django/docs/source/api/*
 django/docs/output/**/*
 .env
+*/__pycache__
