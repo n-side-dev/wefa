@@ -111,8 +111,11 @@ describe('legalConsent Plugin', () => {
     mockBackendStore = {
       authenticated: ref(false),
       axiosInstance: axiosInstance,
+      permissions: ref<readonly string[]>([]),
       login: vi.fn().mockResolvedValue({}),
       logout: vi.fn(),
+      setPermissions: vi.fn(),
+      clearPermissions: vi.fn(),
       setPostLogin: vi.fn(),
       setPostLogout: vi.fn(),
       setupAuthRouteGuard: vi.fn(),

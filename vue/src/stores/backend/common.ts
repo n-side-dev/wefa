@@ -1,4 +1,4 @@
-import { watch, type Ref, type WatchHandle } from 'vue'
+import { ref, watch, type Ref, type WatchHandle } from 'vue'
 import type { Router } from 'vue-router'
 
 export interface CommonAuthFunctions {
@@ -86,4 +86,40 @@ export function createCommonAuthFunctions(
     unsetAuthRouteGuard,
     authRouteGuardWatcher,
   }
+}
+
+export interface PermissionState {
+  permissions: Ref<readonly string[]>
+  setPermissions: (perms: readonly string[]) => void
+  clearPermissions: () => void
+}
+
+/**
+ * Creates the reactive permission slice attached to every backend store.
+ *
+ * The list is frozen on assignment so consumers cannot mutate the internal array
+ * after calling `setPermissions`. Schemes must call `clearPermissions()` from their
+ * `logout()` so the slate is wiped automatically when a session ends.
+ * @returns Reactive permission state plus its setter and clear helper.
+ */
+export function createPermissionState(): PermissionState {
+  const permissions = ref<readonly string[]>(Object.freeze([])) as Ref<readonly string[]>
+
+  /**
+   * Replace the active permission set with a frozen copy of `perms`.
+   * @param perms Permissions to store. Will be defensively copied and frozen.
+   */
+  function setPermissions(perms: readonly string[]): void {
+    permissions.value = Object.freeze([...perms])
+  }
+
+  /**
+   * Reset the permission set to an empty frozen array. Called automatically
+   * by each authentication scheme during logout.
+   */
+  function clearPermissions(): void {
+    permissions.value = Object.freeze([])
+  }
+
+  return { permissions, setPermissions, clearPermissions }
 }

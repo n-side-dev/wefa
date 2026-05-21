@@ -50,6 +50,13 @@ export default defineConfigWithVueTs(
           order: ['template', 'script', 'style'], // Enforce this precise order in component definition!
         },
       ],
+      'vue/multi-word-component-names': [
+        'error',
+        {
+          // `Can` mirrors the well-known CASL `<Can>` permission gate.
+          ignores: ['Can'],
+        },
+      ],
       'vitest/prefer-called-exactly-once-with': 'off', // Exactly once is not always possible
       'sonarjs/todo-tag': 'warn', // TODOs can refer to issues that are not yet fixed
       'security/detect-object-injection': 'off', // False positives are common with this rule in TS projects

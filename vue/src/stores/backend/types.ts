@@ -78,8 +78,23 @@ export interface AuthenticationEndpoints {
 export interface BackendStore {
   authenticated: Ref<boolean>
   axiosInstance: AxiosInstance
+  /**
+   * Permission strings held by the currently authenticated user. Empty by default.
+   * Consumers populate this in their `setPostLogin` callback after login resolves.
+   * Cleared automatically on `logout()`.
+   */
+  permissions: Ref<readonly string[]>
   login: (credentials: Credentials) => Promise<AxiosResponse>
   logout: () => void
+  /**
+   * Replace the current permission set. Pass an empty array to clear.
+   * Stored frozen so consumers cannot mutate the internal array.
+   */
+  setPermissions: (perms: readonly string[]) => void
+  /**
+   * Clear permissions without logging out. Called automatically on logout.
+   */
+  clearPermissions: () => void
   setPostLogin: (fn: () => void) => void
   setPostLogout: (fn: () => void) => void
   setupAuthRouteGuard: (router: Router) => void

@@ -2,14 +2,15 @@
 // `isUnauthenticated = true` (tracked as SOFA-292). These tests lock in the
 // current "never-redirect" behaviour; they need to be updated when the auth
 // wiring lands.
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { setActivePinia, createPinia } from 'pinia'
 import type {
   RouteLocationNormalized,
   RouteLocationNormalizedLoaded,
   NavigationGuardNext,
 } from 'vue-router'
-import type { BackendStore } from '@/stores'
-import { requiresAuth, requiresUnauth, defaultRouteGuards } from '../guards'
+import { useBackendStore, type AuthenticationType, type BackendStore } from '@/stores'
+import { requiresAuth, requiresUnauth, requiresPermissions, defaultRouteGuards } from '../guards'
 import { createLibRouteRecords, libRouteRecords } from '../libRoutes'
 
 /**
@@ -55,6 +56,17 @@ describe('router/guards', () => {
   })
 
   describe('defaultRouteGuards', () => {
+    beforeEach(() => {
+      // `defaultRouteGuards` invokes `requiresPermissions`, which resolves the
+      // backend store from the active Pinia. Without a store the guard throws,
+      // but only if the target route declares `requiresPermissions` — which
+      // these existing cases do not. We still register a fresh Pinia + store
+      // so the guard short-circuits cleanly without touching scheme side
+      // effects from earlier specs.
+      setActivePinia(createPinia())
+      useBackendStore({ authenticationType: 'TOKEN' as AuthenticationType })
+    })
+
     it('runs both auth and unauth guards without throwing', () => {
       const next = vi.fn() as unknown as NavigationGuardNext
       expect(() =>
@@ -65,6 +77,83 @@ describe('router/guards', () => {
         )
       ).not.toThrow()
       expect(next).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('requiresPermissions', () => {
+    /**
+     * Build a route whose `matched` chain and merged `meta` both carry the
+     * supplied wefa meta. Mimics vue-router's merge so `to.meta.wefa` and the
+     * leaf `matched` record agree, which the guard relies on for the
+     * `permissionsMatch` lookup.
+     * @param wefa Wefa meta to attach to the synthetic leaf route.
+     */
+    function routeWithWefaMeta(wefa: Record<string, unknown>): RouteLocationNormalized {
+      const meta = { wefa }
+      return {
+        matched: [{ meta } as unknown as RouteLocationNormalized['matched'][number]],
+        meta,
+      } as unknown as RouteLocationNormalized
+    }
+
+    let store: ReturnType<typeof useBackendStore>
+
+    beforeEach(() => {
+      setActivePinia(createPinia())
+      store = useBackendStore({ authenticationType: 'TOKEN' as AuthenticationType })
+    })
+
+    it('passes through routes that declare no permission requirement', () => {
+      const next = vi.fn() as unknown as NavigationGuardNext
+      requiresPermissions(routeWithWefaMeta({}), fromRoute, next)
+      expect(next).not.toHaveBeenCalled()
+    })
+
+    it('allows entry when every required permission is held', () => {
+      store.setPermissions(['orders.read', 'orders.delete'])
+      const next = vi.fn() as unknown as NavigationGuardNext
+      requiresPermissions(
+        routeWithWefaMeta({ requiresPermissions: ['orders.read', 'orders.delete'] }),
+        fromRoute,
+        next
+      )
+      expect(next).not.toHaveBeenCalled()
+    })
+
+    it('redirects when a required permission is missing', () => {
+      store.setPermissions(['orders.read'])
+      const next = vi.fn() as unknown as NavigationGuardNext
+      requiresPermissions(
+        routeWithWefaMeta({ requiresPermissions: ['orders.read', 'orders.delete'] }),
+        fromRoute,
+        next
+      )
+      expect(next).toHaveBeenCalledWith({ path: '/' })
+    })
+
+    it("supports 'any' mode where a single match is enough", () => {
+      store.setPermissions(['orders.read'])
+      const next = vi.fn() as unknown as NavigationGuardNext
+      requiresPermissions(
+        routeWithWefaMeta({
+          requiresPermissions: ['orders.read', 'orders.delete'],
+          permissionsMatch: 'any',
+        }),
+        fromRoute,
+        next
+      )
+      expect(next).not.toHaveBeenCalled()
+    })
+
+    it('honours an explicit redirect target on denial', () => {
+      const next = vi.fn() as unknown as NavigationGuardNext
+      requiresPermissions(
+        routeWithWefaMeta({ requiresPermissions: ['orders.delete'] }),
+        fromRoute,
+        next,
+        { name: 'denied' }
+      )
+      expect(next).toHaveBeenCalledWith({ name: 'denied' })
     })
   })
 })

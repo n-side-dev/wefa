@@ -8,6 +8,7 @@ export { PrimeVue as PrimeVueLibConfig }
 
 // Export your library components, functions and props in this file
 export * from './components/AutoroutedBreadcrumb/index'
+export * from './components/Can/index'
 export * from './components/ControlBarComponent/index'
 export * from './components/GanttChartComponent/index'
 export * from './components/DashboardComponent/index'
@@ -20,6 +21,9 @@ export * from './theme/index'
 
 // Export stores
 export * from './stores/index'
+
+// Export composables
+export * from './composables/index'
 
 // Export plugins
 export * from './plugins/index'

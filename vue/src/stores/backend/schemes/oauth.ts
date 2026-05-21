@@ -1,7 +1,7 @@
 import { ref, type Ref } from 'vue'
 import type { AxiosResponse } from 'axios'
 import axiosInstance from '@/network/axios.ts'
-import { createCommonAuthFunctions } from '../common.ts'
+import { createCommonAuthFunctions, createPermissionState } from '../common.ts'
 import { oauthLoginEndpoint, oauthLogoutEndpoint, oauthSessionEndpoint } from '../constants.ts'
 import type { BackendStore, BackendStoreOptions } from '../types.ts'
 
@@ -39,6 +39,7 @@ export function oauthAuthenticationBackendStoreSetup(
   const _postLogin: Ref<() => void> = ref(() => {})
 
   const commonAuth = createCommonAuthFunctions(authenticated, _postLogin, _postLogout)
+  const perms = createPermissionState()
 
   const oauthOverrides = backendStoreOptions.endpoints?.oauth
   const oauthEndpoints = {
@@ -123,6 +124,7 @@ export function oauthAuthenticationBackendStoreSetup(
    */
   function logout(): void {
     authenticated.value = false
+    perms.clearPermissions()
     axiosInstance
       .get(oauthEndpoints.logout, { withCredentials: true })
       .catch((error) => console.debug(error))
@@ -132,8 +134,11 @@ export function oauthAuthenticationBackendStoreSetup(
   return {
     axiosInstance,
     authenticated,
+    permissions: perms.permissions,
     login,
     logout,
+    setPermissions: perms.setPermissions,
+    clearPermissions: perms.clearPermissions,
     setPostLogin: commonAuth.setPostLogin,
     setPostLogout: commonAuth.setPostLogout,
     setupAuthRouteGuard: commonAuth.setupAuthRouteGuard,

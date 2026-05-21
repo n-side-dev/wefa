@@ -6,6 +6,18 @@ export interface WeFaRouteMeta {
   icon?: string
   requiresAuth?: boolean
   requiresUnauth?: boolean
+  /**
+   * Permissions required to enter the route. When set on a route (or any of its
+   * matched parents), the `requiresPermissions` guard checks them against the
+   * permissions held by the active backend store. By default every listed
+   * permission must be present; set `permissionsMatch: 'any'` to allow entry
+   * when at least one is held.
+   */
+  requiresPermissions?: readonly string[]
+  /**
+   * Match mode for `requiresPermissions`. Defaults to `'all'`.
+   */
+  permissionsMatch?: 'all' | 'any'
   showInNavigation?: boolean
   section?: string
   showBreadcrumb?: boolean

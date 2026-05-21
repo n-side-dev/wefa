@@ -1,7 +1,7 @@
 import { ref, watch, type Ref } from 'vue'
 import type { AxiosError, AxiosResponse } from 'axios'
 import axiosInstance from '@/network/axios.ts'
-import { createCommonAuthFunctions } from '../common.ts'
+import { createCommonAuthFunctions, createPermissionState } from '../common.ts'
 import { localStorageKey, tokenLoginEndpoint } from '../constants.ts'
 import type { BackendStore, BackendStoreOptions, Credentials } from '../types.ts'
 
@@ -42,6 +42,7 @@ export function tokenAuthenticationBackendStoreSetup(
 
   // Create common authentication functions
   const commonAuth = createCommonAuthFunctions(authenticated, _postLogin, _postLogout)
+  const perms = createPermissionState()
 
   if (_fromLocalStorage) {
     _token.value = _fromLocalStorage
@@ -105,14 +106,18 @@ export function tokenAuthenticationBackendStoreSetup(
     localStorage.removeItem(localStorageKey)
     authenticated.value = false
     _token.value = null
+    perms.clearPermissions()
     _postLogout.value()
   }
 
   return {
     axiosInstance,
     authenticated,
+    permissions: perms.permissions,
     login,
     logout,
+    setPermissions: perms.setPermissions,
+    clearPermissions: perms.clearPermissions,
     setPostLogin: commonAuth.setPostLogin,
     setPostLogout: commonAuth.setPostLogout,
     setupAuthRouteGuard: commonAuth.setupAuthRouteGuard,

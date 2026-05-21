@@ -1,0 +1,119 @@
+import { Meta, Story, Canvas, Controls, ArgTypes } from '@storybook/addon-docs/blocks'
+import * as CanStories from './Can.stories'
+
+<Meta of={CanStories} />
+
+# Can
+
+Renderless component that conditionally renders its default slot based on the permissions held by the active backend store. Pairs with the [`usePermission`](?path=/docs/composables-usepermission--docs) composable.
+
+## Overview
+
+`Can` is the declarative counterpart of `usePermission`. It reads the current permission set from the backend store (registered under id `'backend'`) and renders the default slot only when the requirement is satisfied. When denied, an optional `#fallback` slot is rendered instead — otherwise nothing is rendered.
+
+The component is purely structural: hiding UI is **not** a security boundary. Backend authorization must still enforce permissions on every protected action.
+
+### Key features
+
+- **Renderless by default.** Outputs only slot content; no wrapper element.
+- **Reactive.** Reacts to store changes (`setPermissions`, `logout`) and prop changes.
+- **Scoped slot.** Both `default` and `fallback` expose `{ allowed }` so consumers can render contextual UI.
+- **Array + mode.** Pass an array of permissions and pick `mode: 'all'` (default) or `'any'`.
+
+## Basic usage
+
+<Canvas of={CanStories.Allowed} />
+
+```vue
+<template>
+  <Can permission="order.delete">
+    <Button label="Delete" severity="danger" />
+  </Can>
+</template>
+```
+
+## Denied path with fallback
+
+<Canvas of={CanStories.Denied} />
+
+```vue
+<Can permission="admin.users.edit">
+  <Button label="Edit user" />
+  <template #fallback>
+    <span class="text-(--p-text-muted-color)">Read-only — admin permission required.</span>
+  </template>
+</Can>
+```
+
+## Multiple permissions, `any` mode
+
+<Canvas of={CanStories.AnyMode} />
+
+```vue
+<Can :permission="['articles.write', 'articles.publish']" mode="any">
+  <Button label="Draft article" />
+</Can>
+```
+
+## Scoped slot
+
+<Canvas of={CanStories.ScopedSlot} />
+
+```vue
+<Can permission="admin.access">
+  <template #default="{ allowed }">
+    <Button :disabled="!allowed" label="Promote" />
+  </template>
+</Can>
+```
+
+## Seeding permissions
+
+The component reads permissions from `useBackendStore().permissions`. Consumers populate this list in their `setPostLogin` callback after the user logs in:
+
+```ts
+const backendStore = useBackendStore({ authenticationType: 'JWT' })
+
+backendStore.setPostLogin(async () => {
+  const me = await apiClient.get('/me')
+  backendStore.setPermissions(me.data.permissions)
+})
+```
+
+The library does not fetch users or decode tokens — surfacing permissions is a consumer responsibility. Permissions are cleared automatically on `logout()`.
+
+## API reference
+
+### Props
+
+<ArgTypes of={CanStories} />
+
+```ts
+export interface CanProps {
+  /** Permission string, or array of strings, required to render the default slot. */
+  permission: string | readonly string[]
+  /** `'all'` (default) requires every listed permission; `'any'` requires one. */
+  mode?: 'all' | 'any'
+}
+```
+
+### Slots
+
+| Name       | Scope                | When it renders                           |
+| ---------- | -------------------- | ----------------------------------------- |
+| `default`  | `{ allowed: true }`  | When the requirement is satisfied         |
+| `fallback` | `{ allowed: false }` | When the requirement is **not** satisfied |
+
+When the requirement is not satisfied and no `fallback` slot is supplied, the component renders nothing.
+
+## Accessibility
+
+- The component is invisible to assistive technology when it renders nothing — keep the surrounding layout sensible (don't rely on `<Can>` to provide spacing).
+- When you hide an action, consider whether the user should _know_ the action exists. A `#fallback` slot with explanatory copy is often kinder than silent omission.
+- **Permissions in UI are advisory, not security.** Always enforce on the server.
+
+## Related
+
+- [`usePermission`](?path=/docs/composables-usepermission--docs) — the underlying reactive composable.
+- `requiresPermissions` route guard — gates entire routes via `meta.wefa.requiresPermissions`.
+- `BackendStore.setPermissions` — populate the permission set after login.

@@ -184,6 +184,26 @@ The following `WefaRouteMeta` fields are used by WeFa:
       </td>
     </tr>
     <tr>
+      <td class='font-mono'>wefa.requiresPermissions</td>
+      <td>Optional</td>
+      <td>
+        Array of permission strings that must be present in the active backend store for entry.
+        Checked across all matched records (parents + leaf). Enforced by the
+        <code>requiresPermissions</code> default guard. Call{' '}
+        <code>backendStore.setPermissions(...)</code> in your <code>setPostLogin</code> callback to
+        populate the set after login.
+      </td>
+    </tr>
+    <tr>
+      <td class='font-mono'>wefa.permissionsMatch</td>
+      <td>Optional</td>
+      <td>
+        Match mode for <code>requiresPermissions</code>. Defaults to <code>'all'</code> (every
+        listed permission must be held); set to <code>'any'</code> to allow entry when at least one
+        is held. Read from the leaf route only.
+      </td>
+    </tr>
+    <tr>
       <td class='font-mono'>wefa.showInNavigation</td>
       <td>Optional</td>
       <td>Indicates whether the route should be shown in navigation containers.</td>

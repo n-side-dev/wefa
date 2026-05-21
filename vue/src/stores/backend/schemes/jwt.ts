@@ -1,7 +1,7 @@
 import { ref, watch, type Ref } from 'vue'
 import type { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import axiosInstance from '@/network/axios.ts'
-import { createCommonAuthFunctions } from '../common.ts'
+import { createCommonAuthFunctions, createPermissionState } from '../common.ts'
 import {
   jwtAccessTokenKey,
   jwtLoginEndpoint,
@@ -52,6 +52,7 @@ export function jwtAuthenticationBackendStoreSetup(
 
   // Create common authentication functions
   const commonAuth = createCommonAuthFunctions(authenticated, _postLogin, _postLogout)
+  const perms = createPermissionState()
 
   if (_accessTokenFromLocalStorage && _refreshTokenFromLocalStorage) {
     _accessToken.value = _accessTokenFromLocalStorage
@@ -192,14 +193,18 @@ export function jwtAuthenticationBackendStoreSetup(
     authenticated.value = false
     _accessToken.value = null
     _refreshToken.value = null
+    perms.clearPermissions()
     _postLogout.value()
   }
 
   return {
     axiosInstance,
     authenticated,
+    permissions: perms.permissions,
     login,
     logout,
+    setPermissions: perms.setPermissions,
+    clearPermissions: perms.clearPermissions,
     setPostLogin: commonAuth.setPostLogin,
     setPostLogout: commonAuth.setPostLogout,
     setupAuthRouteGuard: commonAuth.setupAuthRouteGuard,
