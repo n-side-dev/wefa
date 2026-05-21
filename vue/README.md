@@ -37,7 +37,6 @@ A demo playground lives alongside the library so you can experiment locally whil
 
 - Rich component catalogue following the WeFa design language
 - Reusable containers, router helpers, and data-client utilities for product scaffolding
-- CLI (`wefa-install`) that bootstraps recommended project configuration
 - Opinionated linting, formatting, and testing presets aligned with modern Vue best practices
 
 ## Installation
@@ -77,14 +76,6 @@ npm install --force /absolute/path/to/wefa-1.0.0.tgz
 ```
 
 Repeat the build-and-pack step whenever you change the library.
-
-### Post-install tooling
-
-Run the bundled installer to copy optional helpers (AI prompts, configuration snippets, etc.) into your project:
-
-```bash
-npx wefa-install
-```
 
 ## Using the library
 
