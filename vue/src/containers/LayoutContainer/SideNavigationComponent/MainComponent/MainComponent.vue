@@ -1,5 +1,25 @@
 <template>
-  <div class="flex grow flex-col px-3 py-3 lg:px-4 lg:py-5">
+  <div
+    :class="[
+      'flex min-h-0 grow flex-col overflow-y-auto py-3 lg:py-5',
+      collapsed ? 'px-2 lg:px-2' : 'px-3 lg:px-4',
+    ]"
+  >
+    <Transition
+      enter-active-class="transition duration-200 ease-out"
+      enter-from-class="opacity-0"
+      enter-to-class="opacity-100"
+      leave-active-class="transition duration-150 ease-in"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0"
+    >
+      <p
+        v-if="!collapsed"
+        class="px-3 text-[0.7rem] font-medium uppercase tracking-[0.28em] text-(--p-text-on-dark-soft)"
+      >
+        Navigate
+      </p>
+    </Transition>
     <section v-if="topLevelEntries.length > 0" class="mt-3 flex flex-col gap-1.5">
       <NavigationLinkComponent
         v-for="entry in topLevelEntries"
@@ -7,6 +27,7 @@
         :route="entry.path"
         :icon="entry.icon"
         :label="entry.label"
+        :collapsed="collapsed"
         @navigation-item-click="emitNavigationItemClick"
       />
     </section>
@@ -14,13 +35,22 @@
     <section
       v-for="section in sectionEntries"
       :key="section.label"
-      class="mt-5 flex flex-col gap-2 first:mt-4"
+      :class="['flex flex-col', collapsed ? 'mt-4 gap-1.5 first:mt-3' : 'mt-5 gap-2 first:mt-4']"
     >
-      <h3
-        class="px-3 text-[0.7rem] font-medium uppercase tracking-[0.28em] text-(--p-text-on-dark-soft)"
-      >
-        {{ section.label }}
-      </h3>
+      <template v-if="collapsed">
+        <span
+          class="mx-3 h-px bg-(--p-border-contrast-soft)"
+          :aria-label="section.label"
+          role="separator"
+        />
+      </template>
+      <template v-else>
+        <h3
+          class="px-3 text-[0.7rem] font-medium uppercase tracking-[0.28em] text-(--p-text-on-dark-soft)"
+        >
+          {{ section.label }}
+        </h3>
+      </template>
       <div class="flex flex-col gap-1.5">
         <NavigationLinkComponent
           v-for="entry in section.entries"
@@ -28,6 +58,7 @@
           :route="entry.path"
           :icon="entry.icon"
           :label="entry.label"
+          :collapsed="collapsed"
           @navigation-item-click="emitNavigationItemClick"
         />
       </div>
@@ -52,6 +83,12 @@ interface SectionNavigationEntries {
   label: string
   entries: NavigationEntry[]
 }
+
+export interface MainComponentProps {
+  collapsed?: boolean
+}
+
+const { collapsed = false } = defineProps<MainComponentProps>()
 
 const router = useRouter()
 const emit = defineEmits<{

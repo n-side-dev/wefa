@@ -5,9 +5,9 @@
     <ConfirmDialog />
   </template>
   <template v-else>
-    <LayoutContainer project-title="WeFa">
-      <template #navigation-bottom>
-        <NavigationBottom />
+    <LayoutContainer project-title="WeFa" :collapsible-side-navigation="true">
+      <template #navigation-bottom="{ collapsed }">
+        <NavigationBottom :collapsed="collapsed" />
       </template>
     </LayoutContainer>
   </template>

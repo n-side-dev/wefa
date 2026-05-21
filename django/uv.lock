@@ -2,6 +2,9 @@ version = 1
 revision = 3
 requires-python = ">=3.12"
 
+[manifest]
+constraints = [{ name = "idna", specifier = ">=3.15" }]
+
 [[package]]
 name = "alabaster"
 version = "1.0.0"

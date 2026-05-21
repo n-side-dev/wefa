@@ -7,9 +7,10 @@
       :project-title="projectTitle"
       :project-logo="projectLogo"
       :project-logo-alt="projectLogoAlt"
+      :collapsible="collapsibleSideNavigation"
     >
-      <template v-if="hasNavigationBottomSlot" #bottom>
-        <slot name="navigation-bottom" />
+      <template v-if="hasNavigationBottomSlot" #bottom="slotProps">
+        <slot name="navigation-bottom" v-bind="slotProps" />
       </template>
     </SideNavigationComponent>
     <main
@@ -21,7 +22,7 @@
         :project-logo-alt="projectLogoAlt"
       >
         <template v-if="hasNavigationBottomSlot" #bottom>
-          <slot name="navigation-bottom" />
+          <slot name="navigation-bottom" :collapsed="false" />
         </template>
       </MobileNavigationComponent>
       <section
@@ -59,7 +60,20 @@ export interface LayoutContainerProps {
   projectLogoAlt?: string
   breadcrumbHomeRoute?: string
   breadcrumbShowHome?: boolean
+  /**
+   * Opt in to a collapsible side navigation. When enabled, the rail shows a
+   * Collapse/Expand toggle at the bottom, persists the preference to
+   * localStorage, and listens for Cmd/Ctrl+B globally.
+   *
+   * Defaults to `false` — the rail stays expanded and no toggle UI or
+   * keyboard shortcut is exposed.
+   */
+  collapsibleSideNavigation?: boolean
 }
+
+defineSlots<{
+  'navigation-bottom'(props: { collapsed: boolean }): unknown
+}>()
 
 // Calling setupDepthTracker() is mandatory for all components with a <RouterView />
 const routerViewDepth = setupDepthTracker()
@@ -72,6 +86,7 @@ const {
   projectLogoAlt = undefined,
   breadcrumbHomeRoute = '/home',
   breadcrumbShowHome = true,
+  collapsibleSideNavigation = false,
 } = defineProps<LayoutContainerProps>()
 
 const hasNavigationBottomSlot = computed<boolean>(() => {
