@@ -5,4 +5,8 @@ version = 1
 fail_on = "medium"
 
 [ignore]
-while_no_fix = ["GHSA-5239-wwwm-4pmq"]
+# pyjwt weak-encryption advisory (CVE-2025-45768).
+# Disputed by upstream: key length is chosen by the calling application, not pyjwt.
+# Latest published pyjwt (2.12.1) has no fix; pulled in transitively via
+# djangorestframework-simplejwt.
+while_no_fix = ["GHSA-5239-wwwm-4pmq", "PYSEC-2025-183"]
