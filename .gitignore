@@ -8,3 +8,6 @@ django/docs/source/api/*
 django/docs/output/**/*
 .env
 */__pycache__
+# herve:gitignore
+.entire/
+# herve:gitignore:end
