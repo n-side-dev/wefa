@@ -1,0 +1,5 @@
+Analyze what is currently offered by the Vue project and find something cool / useful we could add to the library
+
+---
+
+Go for usePermission() + <Can>

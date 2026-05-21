@@ -1,0 +1,48 @@
+{
+  "cli_version": "0.6.2",
+  "checkpoint_id": "24f81a23e461",
+  "strategy": "manual-commit",
+  "branch": "poc/rv-test",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "vue/eslint.config.ts",
+    "vue/src/components/Can/Can.mdx",
+    "vue/src/components/Can/Can.spec.ts",
+    "vue/src/components/Can/Can.stories.ts",
+    "vue/src/components/Can/Can.vue",
+    "vue/src/components/Can/index.ts",
+    "vue/src/composables/__tests__/usePermission.spec.ts",
+    "vue/src/composables/index.ts",
+    "vue/src/composables/usePermission.ts",
+    "vue/src/demo/backendStore.ts",
+    "vue/src/lib.ts",
+    "vue/src/locales/en/permission.json",
+    "vue/src/locales/fr/permission.json",
+    "vue/src/plugins/legalConsent/__tests__/index.test.ts",
+    "vue/src/router/__tests__/guards.spec.ts",
+    "vue/src/router/guards.ts",
+    "vue/src/router/router.mdx",
+    "vue/src/router/types.ts",
+    "vue/src/stores/backend/common.ts",
+    "vue/src/stores/backend/resolve.ts",
+    "vue/src/stores/backend/schemes/jwt.ts",
+    "vue/src/stores/backend/schemes/oauth.ts",
+    "vue/src/stores/backend/schemes/token.ts",
+    "vue/src/stores/backend/types.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/24/f81a23e461/0/metadata.json",
+      "transcript": "/24/f81a23e461/0/full.jsonl",
+      "content_hash": "/24/f81a23e461/0/content_hash.txt",
+      "prompt": "/24/f81a23e461/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 212,
+    "cache_creation_tokens": 277452,
+    "cache_read_tokens": 20837828,
+    "output_tokens": 69243,
+    "api_call_count": 162
+  }
+}
