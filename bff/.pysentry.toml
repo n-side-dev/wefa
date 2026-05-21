@@ -5,4 +5,7 @@ version = 1
 fail_on = "medium"
 
 [ignore]
-while_no_fix = ["GHSA-5239-wwwm-4pmq"]
+# flask-cors debug-mode log injection (CRLF in request path).
+# Latest published flask-cors (6.0.2) is still affected; no upstream fix.
+# Only exploitable when log level is DEBUG.
+while_no_fix = ["GHSA-5239-wwwm-4pmq", "PYSEC-2024-271"]
