@@ -53,7 +53,7 @@ vue/
 │   └── README.mdx      # Storybook docs entry point (imports README.md)
 ├── demo/               # Playground application consuming the library
 ├── dist/               # Build artifacts (generated)
-├── scripts/            # CLI helpers (e.g. `wefa-install`)
+├── scripts/            # Local validation and maintenance helpers
 ├── README.md           # Frontend overview (kept in sync with Storybook)
 └── package.json        # Scripts, dependencies, build targets
 ```

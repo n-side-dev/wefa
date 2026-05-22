@@ -1,22 +1,43 @@
-# WeFa Vue – Agent Guide
+# WeFa Vue - Agent Guide
 
-Frontend slice of the N-SIDE WeFa monorepo. This file is the entry point for any agent that follows the AGENTS.md convention; the deep guidance lives in two repo-local skills that Codex can auto-discover and other agents can read directly.
+## Scope
 
-## Library identity
+This file applies to the `@nside/wefa` Vue 3 workspace in `vue/`: components, containers, composables, stores, router helpers, network helpers, locales, demo code, Storybook docs, tests, and packaging helpers.
 
-`@nside/wefa` is a **PrimeVue superset** — every public component either wraps, extends, or composes PrimeVue + PrimeIcons, styled exclusively through Tailwind 4 with `tailwindcss-primeui`. The reuse hierarchy is **WeFa → PrimeVue → native HTML**, never invent a new primitive when a PrimeVue equivalent exists. Pinia, Vue Router, Axios, and TanStack Query Vue v5 round out the runtime stack.
+Read [README.md](/Users/ala/N-SIDE/wefa/vue/README.md) and [CONTRIBUTE.md](/Users/ala/N-SIDE/wefa/vue/CONTRIBUTE.md) before changing public exports, package behavior, docs, or validation commands.
 
-## Where the conventions live
+## Skill Routing
 
-- **`../.agents/skills/wefa-vue-cookbook/SKILL.md`** — the shared WeFa Vue cookbook. It is the base skill for consuming projects that use `@nside/wefa`, and it is also the first skill to load for work inside this `vue/` workspace. It covers reuse hierarchy (WeFa → PrimeVue → native), layout and i18n rules, validation routing, and TanStack Query Vue v5 guidance including wrapper choice, query keys, invalidation, and v5 review checks.
-- **`../.agents/skills/wefa-vue-frontend/SKILL.md`** — the maintainer skill for this repository's Vue library. Read it after the cookbook when working inside this repo. It adds repo-specific rules for exports, Storybook and MDX docs, demo wiring, generated artifacts, frontend tests, and the Vue package quality gate.
-- **[`CONTRIBUTE.md`](CONTRIBUTE.md)** — human onboarding, project layout, full npm scripts table, release flow.
-- **[`README.md`](README.md)** — package capabilities, exports, install, demo flow.
-- **[`.github/copilot-instructions.md`](.github/copilot-instructions.md)** — compatibility entry point for tools that look for `copilot-instructions.md`; it points back to this file and the skills above and is not the source of truth.
+- Load `wefa-vue-cookbook` first for any Vue work here.
+- `wefa-vue-cookbook` is the shared base skill for the WeFa Vue ecosystem: it applies to consuming projects that use `@nside/wefa`, and it also applies inside this repository for the shared conventions that the library follows too.
+- After the cookbook, load `wefa-vue-frontend` for repo-specific maintainer guidance in this `vue/` workspace.
+- `wefa-vue-frontend` adds only repo-specific rules for exports, Storybook and MDX docs, demo wiring, generated artifacts, frontend tests, and the package quality gate.
+- For TanStack Query setup, query or mutation flows, invalidation, or wrapper-choice work, also use `wefa-tanstack-query`.
+- [`.github/copilot-instructions.md`](/Users/ala/N-SIDE/wefa/vue/.github/copilot-instructions.md) is a compatibility pointer only, not the source of truth.
 
-## Quality gate (paste-ready)
+## UI And Composition Rules
 
-Run from `vue/` before opening a PR:
+- Treat public WeFa components as an enhancement layer over PrimeVue.
+- Reuse hierarchy is strict: WeFa component or container first, then PrimeVue composition, then native HTML only when neither higher layer fits cleanly.
+- Reuse public-surface exports first. Start discovery at `src/lib.ts`, `src/containers/index.ts`, and nearby feature `index.ts` files.
+- Prefer Tailwind utility classes for routine styling. Do not add new CSS imports for routine work.
+- Use scoped styles only when an existing local pattern or unavoidable layout math makes Tailwind impractical.
+- Follow adjacent component patterns for props, emits, tests, stories, docs, and file naming.
+- Keep user-facing literals translated, including labels, placeholders, validation copy, `title`, and accessibility text.
+
+## Repo-Specific Rules
+
+- New or changed public components usually need source, stories, tests, and MDX docs when consumer guidance is non-trivial.
+- Update nearest `index.ts` files and shared entrypoints when public surface changes.
+- Treat `src/demo/` as a manual-validation surface, not as a home for reusable library logic.
+- Do not hand-edit generated demo OpenAPI client artifacts; regenerate them through the existing script.
+- Keep Storybook docs, demo flows, and README-facing examples aligned with implementation changes.
+- SFC block order is enforced: `<template>` then `<script>` then `<style>`.
+- Storybook stories should not add the `autodocs` tag unless the Storybook setup itself changes.
+
+## Validation Commands
+
+Run from `vue/` unless noted:
 
 ```bash
 npm install
@@ -25,43 +46,8 @@ npm run type-check
 npm run format-check
 npm run test:unit -- --reporter=dot --silent
 npm run build
-npm run test:e2e -- --reporter=dot       # only when routing, demo flows, or browser interactions changed
-npm run test:package-types               # only when exports or packaging changed
+npm run test:e2e -- --reporter=dot
+npm run test:package-types
 ```
 
-## Workspace map (cheat sheet)
-
-- Public surface starts at `src/lib.ts` and `src/containers/index.ts`.
-- Feature folders keep neighbours together: source, `index.ts`, stories, MDX docs, tests in the same folder.
-- Reference component: [`src/components/AutoroutedBreadcrumb/`](src/components/AutoroutedBreadcrumb/) — canonical four-deliverable shape (`.vue`, `.stories.ts`, `.spec.ts`, `.mdx`). Mirror this structure when adding a public component.
-- Library i18n: `src/locales/index.ts` + `src/locales/<locale>/*.json`.
-- Cross-cutting helpers: `src/network/`, `src/router/`, `src/plugins/`, `src/stores/` — check before duplicating.
-- Demo + generated OpenAPI client: `src/demo/` and `src/demo/openapi/`.
-
-## Test layout
-
-Vitest is configured with three projects plus a separate Playwright runner. Pick the right one:
-
-- **Component tests** — `src/components/**/*.{spec,test}.ts`, jsdom env, Vue Test Utils.
-- **Network tests** — `src/network/__tests__/**`, jsdom + axios-mock-adapter; mock `@tanstack/vue-query` directly when asserting wrapper config.
-- **Storybook visual tests** — auto-generated from `*.stories.ts`, run in browser mode (Chromium + WebKit).
-- **E2E** — `e2e/**/*.spec.ts` via Playwright; auto-starts the demo dev server. Run only when routing, demo flows, or browser interactions changed.
-
-Coverage is Istanbul, output in `./coverage` (`text` + `cobertura` + `lcov` reporters).
-
-## Cross-workspace coordination
-
-- Backend API shape comes from `django/` first. When the OpenAPI surface changes, regenerate the typed client through the existing script under `src/demo/openapi/` rather than hand-editing.
-- Cookie/session-based auth flows are mediated by `bff/`. When changing auth-aware UI, confirm cookie names and redirect targets match what `bff/AGENTS.md` and `bff/README.md` document.
-
-## Known gotchas
-
-- `copilot-instructions.md` is a compatibility pointer only. Keep the current rules in this file and the two skill files above.
-- `withDefaults()` is discouraged; use `const { prop = default } = defineProps<Type>()` (per the frontend SKILL).
-- Treat data returned from queries as immutable; copy before binding to `v-model` or local mutation (per the cookbook SKILL).
-- Test runs default to low-verbosity reporters (`--reporter=dot --silent`); rerun the failing scope with detail only when debugging.
-- Keep user-facing literals (including `aria-label`, `title`, placeholders) translated through i18n keys — never hard-code English copy.
-- **SFC block order is enforced**: `<template>` → `<script>` → `<style>` (eslint `vue/block-order`). Composition-API instinct is to write script first; ESLint will fail the build.
-- **Stories must not declare the `autodocs` tag** — the project relies on hand-authored `.mdx` docs as the canonical reference and `autodocs` causes duplicated/stale auto-generated pages.
-- **No new CSS files / `<style>` blocks for routine styling.** Stick to Tailwind utilities and `tailwindcss-primeui`. Scoped styles are an escape hatch only when an existing feature pattern already needs layout math, chart sizing, or other cases Tailwind cannot express cleanly (per the frontend SKILL).
-- **Bundle budget**: `./dist/**/*.js` is capped at 2 MB by [bundlesize](package.json) — if a change risks breaching it, flag the bundle delta in the PR.
+Use `npm run test:e2e` when routing, demo flows, browser behavior, or integration paths change. Use `npm run test:package-types` when exports, packaging, declaration generation, or subpaths change. If running a subset, state what remains unrun.

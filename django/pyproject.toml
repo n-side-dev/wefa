@@ -44,6 +44,17 @@ Issues = "https://github.com/n-side-dev/wefa/issues"
 [tool.hatch.build.targets.wheel]
 packages = ["nside_wefa"]
 
+[tool.uv]
+# Transitive-dependency security pins. Each constraint applies only when the
+# package is already pulled in by another dependency, so we don't add new
+# packages to the library's runtime closure.
+#
+# - idna: 3.10 had GHSA-65pc-fj4g-8rjx (incomplete fix for CVE-2024-3651);
+#   3.15 rejects oversized inputs early to avoid the DoS path.
+constraint-dependencies = [
+    "idna>=3.15",
+]
+
 [tool.bandit]
 exclude_dirs = ["tests"]
 

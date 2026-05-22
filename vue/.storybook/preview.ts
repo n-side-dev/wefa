@@ -5,6 +5,7 @@ import type { App } from 'vue'
 import PrimeVue from 'primevue/config'
 import { nsidePrimeVueTheme } from '../src/theme'
 import { VueQueryPlugin, QueryClient } from '@tanstack/vue-query'
+import { createPinia } from 'pinia'
 import { createLibI18n } from '../src/locales'
 import '../src/assets/main.css'
 import NotFoundView from '../src/views/NotFoundView.vue'
@@ -124,6 +125,7 @@ const i18n = createLibI18n()
 
 // Set up global dependencies for all stories
 setup((app: App) => {
+  app.use(createPinia())
   app.use(router)
   app.use(PrimeVue, {
     theme: nsidePrimeVueTheme,
@@ -136,6 +138,16 @@ setup((app: App) => {
 })
 
 const preview: Preview = {
+  decorators: [
+    // Reset side-nav collapsed preference (persisted in localStorage) so
+    // interaction tests in one story don't leak into the next.
+    (story) => {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.removeItem('wefa-side-nav-collapsed')
+      }
+      return story()
+    },
+  ],
   parameters: {
     controls: {
       matchers: {

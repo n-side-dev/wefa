@@ -1,7 +1,12 @@
 <template>
-  <div class="border-b border-(--p-border-contrast-soft) p-4 lg:p-6">
+  <div
+    :class="['border-b border-(--p-border-contrast-soft)', collapsed ? 'p-3 lg:p-3' : 'p-4 lg:p-6']"
+  >
     <div
-      class="flex items-start gap-4 rounded-[1.5rem] border border-(--p-nav-card-border) bg-(--p-nav-card-bg) px-4 py-4 text-(--p-text-on-dark) shadow-(--p-nav-card-shadow) backdrop-blur-sm"
+      :class="[
+        'flex items-center rounded-[1.5rem] border border-(--p-nav-card-border) bg-(--p-nav-card-bg) text-(--p-text-on-dark) shadow-(--p-nav-card-shadow) backdrop-blur-sm transition-[padding,gap] duration-300 ease-out',
+        collapsed ? 'justify-center gap-0 p-2' : 'items-start gap-4 px-4 py-4',
+      ]"
     >
       <template v-if="projectLogo">
         <span
@@ -22,16 +27,25 @@
           {{ projectAvatarLabel }}
         </span>
       </template>
-      <span class="min-w-0 grow">
-        <span
-          class="block text-[0.7rem] font-medium uppercase tracking-[0.32em] text-(--p-text-on-dark-muted)"
-        >
-          Project
+      <Transition
+        enter-active-class="transition duration-200 ease-out"
+        enter-from-class="opacity-0 -translate-x-1"
+        enter-to-class="opacity-100 translate-x-0"
+        leave-active-class="transition duration-150 ease-in"
+        leave-from-class="opacity-100 translate-x-0"
+        leave-to-class="opacity-0 -translate-x-1"
+      >
+        <span v-if="!collapsed" class="min-w-0 grow overflow-hidden">
+          <span
+            class="block text-[0.7rem] font-medium uppercase tracking-[0.32em] text-(--p-text-on-dark-muted)"
+          >
+            Project
+          </span>
+          <span class="mt-1 block truncate text-base font-semibold tracking-[0.02em]">
+            {{ projectTitle }}
+          </span>
         </span>
-        <span class="mt-1 block truncate text-base font-semibold tracking-[0.02em]">
-          {{ projectTitle }}
-        </span>
-      </span>
+      </Transition>
     </div>
   </div>
 </template>
@@ -43,12 +57,14 @@ export interface TopComponentProps {
   projectTitle: string
   projectLogo?: string
   projectLogoAlt?: string
+  collapsed?: boolean
 }
 
 const {
   projectTitle,
   projectLogo = undefined,
   projectLogoAlt = undefined,
+  collapsed = false,
 } = defineProps<TopComponentProps>()
 
 const projectAvatarLabel = computed(() => {
