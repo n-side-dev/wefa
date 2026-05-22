@@ -20,7 +20,8 @@
 - Contribution guides: `django/CONTRIBUTE.md` & `vue/CONTRIBUTE.md` cover human onboarding; the agent guides cover conventions and the quality gate.
 
 ## Instruction Routing
-- For frontend work inside `vue/` (components, containers, stories/docs, translations, tests), use the repo-local skills `wefa-vue-frontend` and `wefa-tanstack-query` from `.agents/skills/`. Codex can auto-discover them; agents that do not auto-load skills should read `.agents/skills/wefa-vue-frontend/SKILL.md`, `.agents/skills/wefa-tanstack-query/SKILL.md`, and `vue/AGENTS.md`.
+- For Vue work in consuming projects that use `@nside/wefa`, use the shared skill `wefa-vue-cookbook` from `.agents/skills/`.
+- For frontend work inside this repository's `vue/` workspace (components, containers, stories/docs, translations, tests, network code), load `wefa-vue-cookbook` first and then `wefa-vue-frontend`. Codex can auto-discover them; agents that do not auto-load skills should read `.agents/skills/wefa-vue-cookbook/SKILL.md`, `.agents/skills/wefa-vue-frontend/SKILL.md`, and `vue/AGENTS.md`.
 - For backend work inside `django/`, see `django/AGENTS.md` for app conventions, the quality gate, the new-app checklist, and known gotchas.
 - For BFF work inside `bff/`, see `bff/AGENTS.md` for blueprint layout, OAuth/cookie conventions, OpenAPI flow, and the quality gate.
 - For cross-cutting work (Django ↔ BFF ↔ Vue), follow this file for shared expectations plus the relevant workspace AGENTS / SKILL files.

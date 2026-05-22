@@ -8,8 +8,8 @@ Frontend slice of the N-SIDE WeFa monorepo. This file is the entry point for any
 
 ## Where the conventions live
 
-- **`../.agents/skills/wefa-vue-frontend/SKILL.md`** — component reuse hierarchy (WeFa → PrimeVue → native), folder shape, i18n, delivery workflow, quality-gate commands. Read first for any UI work. Codex can auto-discover this skill; non-Codex agents should open the `SKILL.md` file directly.
-- **`../.agents/skills/wefa-tanstack-query/SKILL.md`** — TanStack Query Vue v5 patterns, when to use `apiClient` / `typedApiClient` / direct hooks, cache invalidation, mutations, v5 vs pre-v5 review checklist. Read when adding or reviewing network code.
+- **`../.agents/skills/wefa-vue-cookbook/SKILL.md`** — the shared WeFa Vue cookbook. It is the base skill for consuming projects that use `@nside/wefa`, and it is also the first skill to load for work inside this `vue/` workspace. It covers reuse hierarchy (WeFa → PrimeVue → native), layout and i18n rules, validation routing, and TanStack Query Vue v5 guidance including wrapper choice, query keys, invalidation, and v5 review checks.
+- **`../.agents/skills/wefa-vue-frontend/SKILL.md`** — the maintainer skill for this repository's Vue library. Read it after the cookbook when working inside this repo. It adds repo-specific rules for exports, Storybook and MDX docs, demo wiring, generated artifacts, frontend tests, and the Vue package quality gate.
 - **[`CONTRIBUTE.md`](CONTRIBUTE.md)** — human onboarding, project layout, full npm scripts table, release flow.
 - **[`README.md`](README.md)** — package capabilities, exports, install, demo flow.
 - **[`.github/copilot-instructions.md`](.github/copilot-instructions.md)** — compatibility entry point for tools that look for `copilot-instructions.md`; it points back to this file and the skills above and is not the source of truth.
@@ -58,7 +58,7 @@ Coverage is Istanbul, output in `./coverage` (`text` + `cobertura` + `lcov` repo
 
 - `copilot-instructions.md` is a compatibility pointer only. Keep the current rules in this file and the two skill files above.
 - `withDefaults()` is discouraged; use `const { prop = default } = defineProps<Type>()` (per the frontend SKILL).
-- Treat data returned from queries as immutable; copy before binding to `v-model` or local mutation (per the TanStack SKILL).
+- Treat data returned from queries as immutable; copy before binding to `v-model` or local mutation (per the cookbook SKILL).
 - Test runs default to low-verbosity reporters (`--reporter=dot --silent`); rerun the failing scope with detail only when debugging.
 - Keep user-facing literals (including `aria-label`, `title`, placeholders) translated through i18n keys — never hard-code English copy.
 - **SFC block order is enforced**: `<template>` → `<script>` → `<style>` (eslint `vue/block-order`). Composition-API instinct is to write script first; ESLint will fail the build.
