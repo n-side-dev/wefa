@@ -38,9 +38,3 @@ playwright-report/
 
 *storybook.log
 storybook-static
-
-# ALA
-/src/components/EnergyGridComponent/scotland-260417.osm.pbf
-/public/scotland-power.geojson
-/src/components/EnergyGridComponent/scotland-power.geojson
-/src/components/EnergyGridComponent/scotland-power.osm.pbf

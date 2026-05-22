@@ -17,9 +17,9 @@ Codex loads AGENTS instructions from the repository root down to the current wor
 ## Repository Map
 
 - `README.md` is the top-level overview; defer to per-workspace `README.md` files for package specifics.
-- `django/` contains reusable Django apps plus the `demo/` validation project. See [django/AGENTS.md](/Users/ala/N-SIDE/wefa/django/AGENTS.md).
-- `vue/` contains the library, demo app, Storybook docs, and package tooling. See [vue/AGENTS.md](/Users/ala/N-SIDE/wefa/vue/AGENTS.md).
-- `bff/` contains the Flask BFF and its generated OpenAPI spec. See [bff/AGENTS.md](/Users/ala/N-SIDE/wefa/bff/AGENTS.md).
+- `django/` contains reusable Django apps plus the `demo/` validation project. See [django/AGENTS.md](django/AGENTS.md).
+- `vue/` contains the library, demo app, Storybook docs, and package tooling. See [vue/AGENTS.md](vue/AGENTS.md).
+- `bff/` contains the Flask BFF and its generated OpenAPI spec. See [bff/AGENTS.md](bff/AGENTS.md).
 - `.agents/skills/` contains repo-local Codex skills.
 - `docs/agent-roadmap.md` records cross-cutting infrastructure direction.
 - `code_review.md` is the review checklist.
@@ -32,8 +32,8 @@ Codex loads AGENTS instructions from the repository root down to the current wor
 - `wefa-vue-cookbook` is the shared base skill: it applies both to consuming apps and to shared Vue conventions inside this repo.
 - `wefa-vue-frontend` adds only repo-specific maintainer guidance for this monorepo's `vue/` workspace: exports, docs, demo wiring, generated artifacts, tests, and quality-gate expectations.
 - For TanStack Query work in `vue/`, also use `wefa-tanstack-query` when the task is specifically about query wiring, invalidation, mutation flows, or wrapper choice.
-- For `django/` work, follow [django/AGENTS.md](/Users/ala/N-SIDE/wefa/django/AGENTS.md).
-- For `bff/` work, follow [bff/AGENTS.md](/Users/ala/N-SIDE/wefa/bff/AGENTS.md).
+- For `django/` work, follow [django/AGENTS.md](django/AGENTS.md).
+- For `bff/` work, follow [bff/AGENTS.md](bff/AGENTS.md).
 - For cross-cutting changes, coordinate backend/API shape first, then update consumers and documentation in the affected workspaces.
 
 ## Shared Engineering Rules

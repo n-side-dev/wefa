@@ -4,7 +4,7 @@
 
 This file applies to the Flask backend-for-frontend in `bff/`. The service handles OAuth login/logout/session checks, encrypted token cookies, health endpoints, OpenAPI generation, and proxying backend REST calls.
 
-Read [README.md](/Users/ala/N-SIDE/wefa/bff/README.md) before changing environment contracts, auth/session behavior, OpenAPI output, Docker behavior, or deployment-facing docs.
+Read [README.md](README.md) before changing environment contracts, auth/session behavior, OpenAPI output, Docker behavior, or deployment-facing docs.
 
 ## Security And Configuration Rules
 

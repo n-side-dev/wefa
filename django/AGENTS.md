@@ -4,7 +4,7 @@
 
 This file applies to the Django toolkit in `django/`. The package publishes `nside-wefa` and contains reusable apps under `nside_wefa/` plus the `demo/` project used for local and CI validation.
 
-Read [README.md](/Users/ala/N-SIDE/wefa/django/README.md) and [CONTRIBUTE.md](/Users/ala/N-SIDE/wefa/django/CONTRIBUTE.md) before changing public behavior, settings, migrations, or release-facing docs.
+Read [README.md](README.md) and [CONTRIBUTE.md](CONTRIBUTE.md) before changing public behavior, settings, migrations, or release-facing docs.
 
 ## Architecture Rules
 
@@ -50,4 +50,4 @@ If running a smaller subset while iterating, choose the narrowest command that e
 ## When In Doubt
 
 - Mirror the closest existing app, usually `audit/` for the fullest reference or `locale/` for the smallest end-to-end shape.
-- Check [../docs/agent-roadmap.md](/Users/ala/N-SIDE/wefa/docs/agent-roadmap.md) before inventing new cross-cutting infrastructure.
+- Check [../docs/agent-roadmap.md](../docs/agent-roadmap.md) before inventing new cross-cutting infrastructure.

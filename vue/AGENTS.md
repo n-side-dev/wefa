@@ -4,7 +4,7 @@
 
 This file applies to the `@nside/wefa` Vue 3 workspace in `vue/`: components, containers, composables, stores, router helpers, network helpers, locales, demo code, Storybook docs, tests, and packaging helpers.
 
-Read [README.md](/Users/ala/N-SIDE/wefa/vue/README.md) and [CONTRIBUTE.md](/Users/ala/N-SIDE/wefa/vue/CONTRIBUTE.md) before changing public exports, package behavior, docs, or validation commands.
+Read [README.md](README.md) and [CONTRIBUTE.md](CONTRIBUTE.md) before changing public exports, package behavior, docs, or validation commands.
 
 ## Skill Routing
 
@@ -13,7 +13,7 @@ Read [README.md](/Users/ala/N-SIDE/wefa/vue/README.md) and [CONTRIBUTE.md](/User
 - After the cookbook, load `wefa-vue-frontend` for repo-specific maintainer guidance in this `vue/` workspace.
 - `wefa-vue-frontend` adds only repo-specific rules for exports, Storybook and MDX docs, demo wiring, generated artifacts, frontend tests, and the package quality gate.
 - For TanStack Query setup, query or mutation flows, invalidation, or wrapper-choice work, also use `wefa-tanstack-query`.
-- [`.github/copilot-instructions.md`](/Users/ala/N-SIDE/wefa/vue/.github/copilot-instructions.md) is a compatibility pointer only, not the source of truth.
+- [`.github/copilot-instructions.md`](.github/copilot-instructions.md) is a compatibility pointer only, not the source of truth.
 
 ## UI And Composition Rules
 
