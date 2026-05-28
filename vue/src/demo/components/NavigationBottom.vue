@@ -21,7 +21,8 @@
     <div
       :class="[
         'flex text-(--p-text-on-dark)',
-        collapsed ? 'flex-col items-center gap-2' : 'flex-col gap-2',
+        'flex-col gap-2',
+        collapsed && 'items-center',
       ]"
     >
       <span v-if="!collapsed" class="truncate text-sm">
@@ -54,7 +55,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import Button from 'primevue/button'
 import Divider from 'primevue/divider'
@@ -75,7 +75,7 @@ const router = useRouter()
 
 // The demo backend store does not expose user identity; use a placeholder
 // until a user-profile endpoint is wired into the library's auth store.
-const username = computed(() => 'demo')
+const username = 'demo'
 
 /**
  * Sign the user out and send them back to the login page.
