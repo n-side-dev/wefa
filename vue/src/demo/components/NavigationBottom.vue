@@ -18,13 +18,7 @@
       <Divider class="!my-1" />
     </template>
 
-    <div
-      :class="[
-        'flex text-(--p-text-on-dark)',
-        'flex-col gap-2',
-        collapsed && 'items-center',
-      ]"
-    >
+    <div :class="['flex text-(--p-text-on-dark)', 'flex-col gap-2', collapsed && 'items-center']">
       <span v-if="!collapsed" class="truncate text-sm">
         {{ $t('demo.navigation.signed_in_as', { username }) }}
       </span>
