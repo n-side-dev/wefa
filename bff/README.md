@@ -32,6 +32,7 @@ For more information on the BFF architecture, see:
 - `OAUTH_ENDPOINT_LOGOUT`
 - `FRONTEND_REDIRECT`
 - `OAUTH_LOGIN_REDIRECT_URI`
+- `SESSION_TOKEN_ENCRYPTION_KEY` (ECDSA P-256 private key in PEM format)
 - Session cookie configuration:
 - `SESSION_COOKIE_NAME`
 - `SESSION_COOKIE_PATH`
@@ -42,12 +43,26 @@ For more information on the BFF architecture, see:
 - `BACKEND_CONNECT_TIMEOUT_SECONDS` (default: `3`)
 - `BACKEND_READ_TIMEOUT_SECONDS` (default: `30`)
 
+Generate a random `FLASK_SECRET_KEY` (see [Flask docs](https://flask.palletsprojects.com/en/stable/config/#SECRET_KEY)):
+```bash
+python -c 'import secrets; print(secrets.token_hex(32))'
+```
+
 Generate a random `TOKEN_COOKIE_ENCRYPTION_KEY`:
 ```bash
 python - <<'PY'
 import base64, secrets
 print(base64.urlsafe_b64encode(secrets.token_bytes(32)).rstrip(b'=').decode())
 PY
+```
+
+Generate a `SESSION_TOKEN_ENCRYPTION_KEY` (ECDSA P-256 private key in PEM format):
+```bash
+openssl ecparam -name prime256v1 -genkey -noout
+```
+Store the output as a single-line value with literal `\n` separators in `.env`:
+```
+SESSION_TOKEN_ENCRYPTION_KEY="-----BEGIN EC PRIVATE KEY-----\n...\n-----END EC PRIVATE KEY-----"
 ```
 
 **Run Locally (Flask / PyCharm)**
