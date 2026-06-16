@@ -1,5 +1,5 @@
 <template>
-  <div ref="gantt-container" class="w-full h-full p-2 bg-surface-50">
+  <div ref="gantt-container" class="w-full h-full">
     <GanttChartGrid
       :card-style="cardStyle"
       :body-height-px="bodyHeightPx"
