@@ -2,12 +2,15 @@ import type { MenuItem } from 'primevue/menuitem'
 import { inject, provide, type Ref } from 'vue'
 import {
   type RouteLocationMatched,
+  type RouteLocationNormalizedLoaded,
   type RouteRecordRaw,
   type RouteLocationAsRelativeGeneric,
   type RouteLocationAsPathGeneric,
 } from 'vue-router'
 import type { WeFaRouteMeta } from '@/router'
 import { useI18nLib } from '@/locales'
+
+const ROUTE_PARAM_PATTERN = /:(\w+)[^/]*/g
 
 export interface GenericContainerProps {
   depth?: number
@@ -25,14 +28,44 @@ export interface GenericContainerProps {
 }
 
 /**
+ * Extracts the current route params required by a target path.
+ * @param targetPath Full route path pattern, including parent segments
+ * @param currentRoute Current route used as the source of param values
+ * @returns Params relevant to the target route, or undefined when no params are needed
+ */
+function paramsForPath(
+  targetPath: string,
+  currentRoute?: RouteLocationNormalizedLoaded
+): Record<string, string | string[]> | undefined {
+  if (!currentRoute) {
+    return undefined
+  }
+
+  const params: Record<string, string | string[]> = {}
+
+  for (const match of targetPath.matchAll(ROUTE_PARAM_PATTERN)) {
+    const paramName = match[1]
+    const paramValue = currentRoute.params[paramName]
+
+    if (paramValue !== undefined) {
+      params[paramName] = paramValue
+    }
+  }
+
+  return Object.keys(params).length > 0 ? params : undefined
+}
+
+/**
  * Generates a list of PrimeVue-compatible MenuItem by inspecting children of a provided route
  * @param routeLocationMatched route to inspect, obtain with useRoute().matched[routerViewDepth]
  * @param depth how deep to recursively look for children, 1 is the base
+ * @param currentRoute current route used to preserve params when child links target named routes
  * @returns MenuItem[] compatible with PrimeVue Menu components
  */
 export function menuItemsFromRoute(
   routeLocationMatched: Ref<RouteLocationMatched>,
-  depth: number = 1
+  depth: number = 1,
+  currentRoute?: RouteLocationNormalizedLoaded
 ): MenuItem[] {
   return routeLocationMatched.value.children
     ?.filter((child: RouteRecordRaw) => {
@@ -40,7 +73,7 @@ export function menuItemsFromRoute(
       return routeMeta?.showInNavigation === undefined || routeMeta.showInNavigation
     })
     .map((child: RouteRecordRaw) => {
-      return itemizeRouteRecordRaw(child, routeLocationMatched.value.path, depth, 1)
+      return itemizeRouteRecordRaw(child, routeLocationMatched.value.path, depth, 1, currentRoute)
     })
 }
 
@@ -50,13 +83,15 @@ export function menuItemsFromRoute(
  * @param parentPath required to build full paths
  * @param maxDepth recursion limiter
  * @param currentDepth recursion accumulator
+ * @param currentRoute current route used to preserve params when child links target named routes
  * @returns MenuItem instance
  */
 export function itemizeRouteRecordRaw(
   routeRecordRaw: RouteRecordRaw,
   parentPath: string,
   maxDepth: number,
-  currentDepth: number
+  currentDepth: number,
+  currentRoute?: RouteLocationNormalizedLoaded
 ): MenuItem {
   const currentPath = `${parentPath}/${routeRecordRaw.path}`
   const routeMeta = routeRecordRaw.meta?.wefa as WeFaRouteMeta | undefined
@@ -64,12 +99,25 @@ export function itemizeRouteRecordRaw(
   const menuItem: MenuItem = {
     label: routeMeta?.title ?? String(routeRecordRaw.name ?? routeRecordRaw.path),
     icon: routeMeta?.icon,
-    to: { path: currentPath },
+    // Prefer named routes so dynamic parent params are resolved by Vue Router instead of kept as
+    // literal `:param` path segments. Unnamed routes keep the historical path fallback.
+    to: routeRecordRaw.name
+      ? {
+          name: routeRecordRaw.name,
+          params: paramsForPath(currentPath, currentRoute),
+        }
+      : { path: currentPath },
     depth: currentDepth,
     items:
       currentDepth < maxDepth
         ? routeRecordRaw.children?.map((child: RouteRecordRaw) => {
-            return itemizeRouteRecordRaw(child, currentPath, maxDepth, currentDepth + 1)
+            return itemizeRouteRecordRaw(
+              child,
+              currentPath,
+              maxDepth,
+              currentDepth + 1,
+              currentRoute
+            )
           })
         : undefined,
   }

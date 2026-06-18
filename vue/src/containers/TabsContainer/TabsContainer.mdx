@@ -1,0 +1,144 @@
+import { Meta, Story, Canvas, ArgTypes } from '@storybook/addon-docs/blocks'
+import TabsContainer from './TabsContainer.vue'
+import * as TabsContainerStories from './TabsContainer.stories'
+
+<Meta
+  title='Router containers/TabsContainer/Documentation'
+  component={TabsContainer}
+  of={TabsContainerStories}
+/>
+
+# TabsContainer
+
+`TabsContainer` renders a PrimeVue tab bar from the current route's child routes and displays the
+selected child route through `<RouterView />`.
+
+Use it when sibling child routes should be presented as tabs and the route hierarchy should be the
+source of truth, similar to `NavbarContainer` and `SideMenuContainer`.
+
+<Canvas>
+  <Story of={TabsContainerStories.Default} />
+</Canvas>
+
+## Props
+
+<ArgTypes of={TabsContainer} />
+
+## Usage
+
+### Basic Child Routes
+
+```ts
+import { TabsContainer } from '@nside/wefa/containers'
+
+const routes = [
+  {
+    path: '/planning-instance/:planningInstanceId',
+    name: 'planning-instance',
+    component: TabsContainer,
+    children: [
+      {
+        path: 'work-planning',
+        name: 'work-planning',
+        meta: { wefa: { title: 'Work planning', icon: 'pi pi-chart-bar' } },
+        component: WorkPlanningView,
+      },
+      {
+        path: 'outage-planning',
+        name: 'outage-planning',
+        meta: { wefa: { title: 'Outage planning', icon: 'pi pi-wrench' } },
+        component: OutagePlanningView,
+      },
+    ],
+  },
+]
+```
+
+### Nested Containers
+
+You can use another container inside one of the tab routes when a tab needs its own local navigation.
+
+```ts
+import { NavbarContainer, TabsContainer } from '@nside/wefa/containers'
+
+const routes = [
+  {
+    path: '/planning-instance/:planningInstanceId',
+    name: 'planning-instance',
+    component: TabsContainer,
+    children: [
+      {
+        path: 'work-planning',
+        name: 'work-planning',
+        meta: { wefa: { title: 'Work planning', icon: 'pi pi-chart-bar' } },
+        component: WorkPlanningView,
+      },
+      {
+        path: 'results',
+        name: 'optimization-results',
+        meta: { wefa: { title: 'Results', icon: 'pi pi-sparkles' } },
+        component: NavbarContainer,
+        children: [
+          {
+            path: 'summary',
+            name: 'optimization-results-summary',
+            meta: { wefa: { title: 'Summary', icon: 'pi pi-info-circle' } },
+            component: OptimizationSummaryView,
+          },
+          {
+            path: 'audit',
+            name: 'optimization-results-audit',
+            meta: { wefa: { title: 'Audit', icon: 'pi pi-history' } },
+            component: OptimizationAuditView,
+          },
+        ],
+      },
+    ],
+  },
+]
+```
+
+### Dynamic Parent Params
+
+When the parent route has params, define named child routes. `TabsContainer` will keep the current
+params when switching tabs.
+
+```ts
+const routes = [
+  {
+    path: '/planning-instance/:planningInstanceId',
+    name: 'planning-instance',
+    component: TabsContainer,
+    redirect: (route) => ({
+      name: 'work-planning',
+      params: route.params,
+    }),
+    children: [
+      {
+        path: 'work-planning',
+        name: 'work-planning',
+        meta: { wefa: { title: 'Work planning' } },
+        component: WorkPlanningView,
+      },
+      {
+        path: 'outage-planning',
+        name: 'outage-planning',
+        meta: { wefa: { title: 'Outage planning' } },
+        component: OutagePlanningView,
+      },
+    ],
+  },
+]
+```
+
+## Routing Behavior
+
+The container:
+
+- reads the route matched at the current router-container depth;
+- creates one tab per visible child route using `meta.wefa.title` and `meta.wefa.icon`;
+- preserves current route params when navigating to named child routes;
+- keeps the parent tab active when a child route renders nested content below it.
+
+Routes with `meta.wefa.showInNavigation: false` are hidden from the tab bar, matching the behavior
+of the other WeFa router containers.
