@@ -17,6 +17,7 @@ The GanttChart component renders a calendar grid with month and week headers, an
 - **Layered Activities**: Stripe, bar, and mini styles with overlap rules.
 - **Stacked Minis**: Overlapping minis grow row height automatically.
 - **Virtualized Rows**: Smooth scrolling for large datasets.
+- **Activity Interactions**: Hover, popover, and selection APIs share the same interaction payload.
 - **Translation Ready**: All user-facing labels are passed through `t()`.
 - **Configurable Sidebar**: Adjust the label column width via `leftHeaderWidthPx`.
 
@@ -107,6 +108,52 @@ Activities support a `visualType`:
 />
 ```
 
+## Activity Interactions
+
+Use `activityHover`, `activitySelect`, and `v-model:selected-interaction` when the consumer needs row, activity, and column context. Hover, popover, and selection use the same payload shape so consumers can reuse formatting and lookup logic.
+
+<Canvas of={GanttChartStories.ActivityInteractions} />
+
+```vue
+<template>
+  <GanttChartComponent
+    v-model:selected-interaction="selectedInteraction"
+    :start-date="startDate"
+    :end-date="endDate"
+    :rows="rows"
+    :activity-hover="handleActivityHover"
+    hover-highlight-class="bg-sky-100/80"
+    selected-highlight-class="bg-emerald-100/80"
+  >
+    <template #activity-popover="{ interaction }">
+      <div class="text-sm">
+        {{ interaction.rowData?.header }} / {{ interaction.activity.label }} / column
+        {{ interaction.context.columnIndex }}
+      </div>
+    </template>
+  </GanttChartComponent>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+import GanttChartComponent from '@/components/GanttChartComponent/GanttChartComponent.vue'
+import type { GanttChartActivityInteractionPayload } from '@/components/GanttChartComponent/ganttChartTypes'
+
+const selectedInteraction = ref<GanttChartActivityInteractionPayload | null>(null)
+
+const handleActivityHover = (
+  _activity,
+  _row,
+  _context,
+  interaction?: GanttChartActivityInteractionPayload
+) => {
+  console.log(interaction)
+}
+</script>
+```
+
+The payload is intentionally data-oriented. `rowKey`, `activityKey`, and `context.columnIndex` are stable enough for highlighting and lookup. `context.anchorClientX` and `context.anchorClientY` are only for floating UI positioning.
+
 ## Custom Row Labels
 
 Use the `row-label` slot to replace the default left-hand row label with your own content, such as checkboxes or action buttons.
@@ -161,6 +208,24 @@ export type GanttChartLinkData = {
   toId: string | number
   type?: 'finish-start' | 'start-start'
   color?: string
+}
+
+export type GanttChartActivityInteractionContext = {
+  columnIndex: number
+  viewMode: 'day' | 'week'
+  date?: Date
+  week?: WeekColumn
+  anchorClientX?: number
+  anchorClientY?: number
+}
+
+export type GanttChartActivityInteractionPayload = {
+  activity: GanttChartActivityData
+  rowData?: GanttChartRowData
+  rowIndex?: number
+  rowKey?: string | number
+  activityKey?: string | number
+  context: GanttChartActivityInteractionContext
 }
 ```
 

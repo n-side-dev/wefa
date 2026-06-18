@@ -1,19 +1,36 @@
 <template>
-  <div class="size-full">
+  <div class="flex size-full flex-col gap-3">
+    <div
+      class="shrink-0 rounded border border-surface-200 bg-surface-0 p-3 text-sm text-surface-700"
+    >
+      {{ hoverDebug }}
+    </div>
     <GanttChartComponent
+      class="min-h-0 flex-1"
       :start-date="startDate"
       :end-date="endDate"
       :rows="rows"
       :links="links"
+      :activity-hover="activityHover"
       header-label="gantt_chart.header"
-    />
+    >
+      <template #activity-popover="{ activity, rowData, hoverContext }">
+        <GanttHoverResizableTooltip
+          :activity="activity"
+          :row-data="rowData"
+          :hover-context="hoverContext"
+        />
+      </template>
+    </GanttChartComponent>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { GanttChartComponent } from '@/components/GanttChartComponent'
+import GanttHoverResizableTooltip from '@/demo/components/GanttHoverResizableTooltip.vue'
 import type {
+  GanttChartActivityInteractionContext,
   GanttChartActivityData,
   GanttChartRowData,
 } from '@/components/GanttChartComponent/ganttChartTypes'
@@ -88,4 +105,38 @@ const links = computed(() => {
   }
   return linkPairs
 })
+
+const hoverDebug = ref('Hover an activity to inspect its column context.')
+
+const hoverLabel = (hoverContext?: GanttChartActivityInteractionContext) => {
+  if (!hoverContext) {
+    return 'no hover context'
+  }
+
+  if (hoverContext.date) {
+    return hoverContext.date.toLocaleDateString()
+  }
+
+  return hoverContext.week
+    ? `Week ${hoverContext.week.weekNumber}`
+    : `Column ${hoverContext.columnIndex + 1}`
+}
+
+const activityHover = (
+  activity: GanttChartActivityData,
+  rowData?: GanttChartRowData,
+  hoverContext?: GanttChartActivityInteractionContext
+) => {
+  if (!hoverContext) {
+    hoverDebug.value = 'Hover an activity to inspect its column context.'
+    return
+  }
+
+  hoverDebug.value = [
+    `row=${rowData?.header ?? rowData?.label ?? 'unknown'}`,
+    `activity=${activity.label ?? activity.id ?? 'unknown'}`,
+    `column=${hoverContext.columnIndex}`,
+    `value=${hoverLabel(hoverContext)}`,
+  ].join(' | ')
+}
 </script>

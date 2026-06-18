@@ -1,10 +1,16 @@
 import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
-import { h } from 'vue'
+import { h, nextTick } from 'vue'
 import GanttChartComponent from './GanttChartComponent.vue'
 import GanttChartRowGrid from './GanttChartRowGrid.vue'
-import { BASE_ROW_HEIGHT_PX, MINI_GAP_PX, MINI_HEIGHT_PX, getWeekColumns } from './ganttChartLayout'
-import type { GanttChartRowData } from './ganttChartTypes'
+import {
+  BASE_ROW_HEIGHT_PX,
+  DAY_CELL_WIDTH_PX,
+  MINI_GAP_PX,
+  MINI_HEIGHT_PX,
+  getWeekColumns,
+} from './ganttChartLayout'
+import type { GanttChartActivityInteractionPayload, GanttChartRowData } from './ganttChartTypes'
 
 vi.mock('@/locales', () => ({
   useI18nLib: () => ({ t: (key: string) => key }),
@@ -141,6 +147,136 @@ describe('GanttChartComponent', () => {
     const payload = emitted?.[0] as Array<{ label?: string; id?: number }>
     expect(payload?.[0]?.label).toBe('Optimized')
     expect(payload?.[1]?.id).toBe(1)
+  })
+
+  it('selects an activity interaction when an activity is clicked', async () => {
+    const activitySelect = vi.fn()
+    const wrapper = mount(GanttChartComponent, {
+      props: {
+        startDate: new Date(2026, 0, 1),
+        endDate: new Date(2026, 0, 7),
+        rows: baseRows,
+        selectedHighlightClass: 'selected-test-class',
+        activitySelect,
+      },
+      global: {
+        directives: {
+          tooltip: () => {
+            /* no-op */
+          },
+        },
+      },
+    })
+
+    await wrapper.find('span').trigger('click')
+
+    const selected = wrapper.emitted('activitySelect')?.[0]?.[0] as
+      | GanttChartActivityInteractionPayload
+      | undefined
+    expect(selected?.activity.id).toBe('bar-1')
+    expect(selected?.rowData?.id).toBe(1)
+    expect(selected?.rowKey).toBe(1)
+    expect(selected?.activityKey).toBe('bar-1')
+    expect(selected?.context.columnIndex).toBe(0)
+    expect(wrapper.emitted('update:selectedInteraction')?.[0]?.[0]).toEqual(selected)
+    expect(activitySelect).toHaveBeenCalledWith(selected)
+    expect(wrapper.html()).toContain('selected-test-class')
+  })
+
+  it('forwards the shared interaction payload when an activity is hovered', async () => {
+    const activityHover = vi.fn()
+    const wrapper = mount(GanttChartComponent, {
+      props: {
+        startDate: new Date(2026, 0, 1),
+        endDate: new Date(2026, 0, 7),
+        rows: baseRows,
+        activityHover,
+      },
+      global: {
+        directives: {
+          tooltip: () => {
+            /* no-op */
+          },
+        },
+      },
+    })
+
+    wrapper.find('span').element.dispatchEvent(
+      new MouseEvent('mousemove', {
+        clientX: DAY_CELL_WIDTH_PX * 2 + 1,
+        clientY: 12,
+        bubbles: true,
+      })
+    )
+    await nextTick()
+
+    const payload = activityHover.mock.calls[0]?.[3] as
+      | GanttChartActivityInteractionPayload
+      | undefined
+    expect(payload?.activity.id).toBe('bar-1')
+    expect(payload?.rowData?.id).toBe(1)
+    expect(payload?.rowIndex).toBe(0)
+    expect(payload?.rowKey).toBe(1)
+    expect(payload?.context.columnIndex).toBe(2)
+    expect(payload?.context.date).toEqual(new Date(2026, 0, 3))
+  })
+
+  it('does not mutate internal selection when selectedInteraction is controlled', async () => {
+    const wrapper = mount(GanttChartComponent, {
+      props: {
+        startDate: new Date(2026, 0, 1),
+        endDate: new Date(2026, 0, 7),
+        rows: baseRows,
+        selectedInteraction: null,
+        selectedHighlightClass: 'selected-test-class',
+      },
+      global: {
+        directives: {
+          tooltip: () => {
+            /* no-op */
+          },
+        },
+      },
+    })
+
+    await wrapper.find('span').trigger('click')
+
+    expect(wrapper.emitted('update:selectedInteraction')).toBeTruthy()
+    expect(wrapper.html()).not.toContain('selected-test-class')
+  })
+
+  it('renders controlled selected interaction highlights', () => {
+    const selectedInteraction: GanttChartActivityInteractionPayload = {
+      activity: baseRows[0]!.activities[0]!,
+      rowData: baseRows[0],
+      rowIndex: 0,
+      rowKey: 1,
+      activityKey: 'bar-1',
+      context: {
+        columnIndex: 2,
+        viewMode: 'day',
+        date: new Date(2026, 0, 3),
+      },
+    }
+
+    const wrapper = mount(GanttChartComponent, {
+      props: {
+        startDate: new Date(2026, 0, 1),
+        endDate: new Date(2026, 0, 7),
+        rows: baseRows,
+        selectedInteraction,
+        selectedHighlightClass: 'selected-test-class',
+      },
+      global: {
+        directives: {
+          tooltip: () => {
+            /* no-op */
+          },
+        },
+      },
+    })
+
+    expect(wrapper.html()).toContain('selected-test-class')
   })
 
   it('renders link paths when links are provided', () => {

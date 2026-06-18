@@ -4,7 +4,11 @@ import { ref } from 'vue'
 import Button from 'primevue/button'
 
 import GanttChartComponent from './GanttChartComponent.vue'
-import type { GanttChartActivityData, GanttChartRowData } from './ganttChartTypes'
+import type {
+  GanttChartActivityData,
+  GanttChartActivityInteractionPayload,
+  GanttChartRowData,
+} from './ganttChartTypes'
 
 const buildRows = (count: number): GanttChartRowData[] => {
   return Array.from({ length: count }, (_, index) => {
@@ -166,6 +170,15 @@ The story wraps the component in a fixed-height container to demonstrate scrolli
     activityClick: {
       control: false,
     },
+    activityHover: {
+      control: false,
+    },
+    activitySelect: {
+      control: false,
+    },
+    selectedInteraction: {
+      control: false,
+    },
   },
 }
 
@@ -216,6 +229,62 @@ export const CustomTooltipAndClick: Story = {
           v-bind="args"
           :activity-tooltip="activityTooltip"
           :activity-click="activityClick"
+        />
+      </div>
+    `,
+  }),
+}
+
+export const ActivityInteractions: Story = {
+  render: (args) => ({
+    components: { GanttChartComponent },
+    setup() {
+      const selectedInteraction = ref<GanttChartActivityInteractionPayload | null>(null)
+      const hoveredInteraction = ref<GanttChartActivityInteractionPayload | null>(null)
+
+      const describeInteraction = (interaction: GanttChartActivityInteractionPayload | null) => {
+        if (!interaction) {
+          return 'None'
+        }
+
+        const dayOrWeek = interaction.context.date
+          ? interaction.context.date.toDateString()
+          : `week ${interaction.context.week?.weekNumber ?? '-'}`
+
+        return `${interaction.rowData?.header ?? interaction.rowData?.label ?? '-'} / ${
+          interaction.activity.label ?? interaction.activity.id ?? '-'
+        } / column ${interaction.context.columnIndex} / ${dayOrWeek}`
+      }
+
+      const activityHover = (
+        _activity: GanttChartActivityData,
+        _row: GanttChartRowData | undefined,
+        _context: unknown,
+        interaction?: GanttChartActivityInteractionPayload
+      ) => {
+        hoveredInteraction.value = interaction ?? null
+      }
+
+      return {
+        args,
+        selectedInteraction,
+        hoveredInteraction,
+        describeInteraction,
+        activityHover,
+      }
+    },
+    template: `
+      <div class="bg-slate-50 p-4" style="height: 760px;">
+        <div class="mb-3 grid gap-1 rounded border border-surface-200 bg-surface-0 p-3 text-sm text-surface-700">
+          <div><span class="font-semibold">Hovered:</span> {{ describeInteraction(hoveredInteraction) }}</div>
+          <div><span class="font-semibold">Selected:</span> {{ describeInteraction(selectedInteraction) }}</div>
+        </div>
+        <GanttChartComponent
+          v-bind="args"
+          v-model:selected-interaction="selectedInteraction"
+          selected-highlight-class="bg-emerald-100/80"
+          hover-highlight-class="bg-sky-100/80"
+          :activity-hover="activityHover"
         />
       </div>
     `,

@@ -1,3 +1,5 @@
+import type { WeekColumn } from '@/components/GanttChartComponent/ganttChartLayout'
+
 export type GanttChartActivityData = {
   id?: string | number
   label?: string
@@ -22,4 +24,25 @@ export type GanttChartLinkData = {
   toId: string | number
   type?: 'finish-start' | 'start-start'
   color?: string
+}
+
+// Shared activity interaction shape used by hover, popover, and selection APIs.
+export type GanttChartActivityInteractionContext = {
+  columnIndex: number
+  viewMode: 'day' | 'week'
+  // Day view exposes the concrete date. Week view exposes the computed week column.
+  date?: Date
+  week?: WeekColumn
+  // Client coordinates are intended for floating UI anchoring, not data identity.
+  anchorClientX?: number
+  anchorClientY?: number
+}
+
+export type GanttChartActivityInteractionPayload = {
+  activity: GanttChartActivityData
+  rowData?: GanttChartRowData
+  rowIndex?: number
+  rowKey?: string | number
+  activityKey?: string | number
+  context: GanttChartActivityInteractionContext
 }
