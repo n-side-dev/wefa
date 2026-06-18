@@ -1,0 +1,4 @@
+interface:
+  display_name: "WeFa Vue Cookbook"
+  short_description: "Shared WeFa Vue rules for consumers and the library"
+  default_prompt: "Use $wefa-vue-cookbook to implement or review Vue code in a consuming app that uses `@nside/wefa`, or as the shared base when working inside the WeFa `vue/` package. Apply WeFa's preferred architecture, flex-first styling, parent-owned layout rules, and TanStack Query Vue v5 conventions."
