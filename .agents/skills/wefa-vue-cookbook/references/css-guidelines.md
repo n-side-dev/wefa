@@ -36,7 +36,7 @@ The default expectation is utility-first styling, not custom CSS-first styling.
   use it only when the parent chain makes height resolvable.
 - Prefer layout-driven sizing through flex, grid, and min/max constraints over fixed `h-*` or `w-*` values. Use fixed sizes sparingly.
 - For parent/child layout interfaces, prefer parent-owned `gap`, padding, and placement rules over child margins or offsets when expressing layout between siblings.
-- Reusable children should usually avoid defining decorative backgrounds, borders, shadows, or similar chrome at the outer interface level. Keep those at the parent level unless they are semantic, serve a clear purpose, or are an explicit part of the child component contract.
+- Reusable children should usually avoid defining decorative backgrounds, borders, shadows, or similar chrome at the outer interface level. The only exception is if it serves a clearly defined purpose (e.g a red background for an error status).
 
 ## Practical Heuristics
 
