@@ -178,9 +178,12 @@ export const useGanttLinks = ({
   }
 
   // Computes the SVG path data for each link between activities.
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   const linkPaths = computed(() => {
     const paths: GanttLinkLayer[] = []
 
+    // Link routing is intentionally kept as an explicit case-by-case geometry block.
+    // eslint-disable-next-line sonarjs/cognitive-complexity
     links.value.forEach((link, index) => {
       const from = visibleActivityPositions.value.get(link.fromId)
       const to = visibleActivityPositions.value.get(link.toId)
@@ -212,6 +215,11 @@ export const useGanttLinks = ({
       // From
       points.push({ x: fromX, y: from.y }, { x: fromOffsetX, y: from.y })
 
+      // Intermediary points
+      // The general ideas are, in order of priority :
+      // - Use the minimum possible amount of segments
+      // - Leave some space for turns when snaking around, to avoid 180 deg turns
+      // - When snaking around, make vertical moves first, then horizontal
       switch (linkTypeKey) {
         case 'start-start':
           // 3 lines needed : go left, go down (or up if reversed), go right
