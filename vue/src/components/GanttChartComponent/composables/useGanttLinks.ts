@@ -31,6 +31,7 @@ export interface GanttLinkLayer {
   toId: string | number
   path: string
   color: string
+  class?: string
   layer: 'base' | 'mini'
 }
 
@@ -60,6 +61,7 @@ export const useGanttLinks = ({
   columnWidthPx,
   weekColumns,
   links,
+  svgIdPrefix,
   stackMiniActivities,
 }: {
   list: Ref<GanttListItem[]>
@@ -70,6 +72,7 @@ export const useGanttLinks = ({
   columnWidthPx: Ref<number>
   weekColumns: Ref<WeekColumn[]>
   links: Ref<GanttChartLinkData[]>
+  svgIdPrefix: string
   stackMiniActivities: Ref<boolean>
 }) => {
   // Computes the vertical offset in pixels of the virtual list.
@@ -178,7 +181,6 @@ export const useGanttLinks = ({
   }
 
   // Computes the SVG path data for each link between activities.
-  // eslint-disable-next-line sonarjs/cognitive-complexity
   const linkPaths = computed(() => {
     const paths: GanttLinkLayer[] = []
 
@@ -324,11 +326,12 @@ export const useGanttLinks = ({
 
       paths.push({
         id: link.id ?? `${link.fromId}-${link.toId}`,
-        markerId: `gantt-link-arrow-${isMiniLink ? 'mini' : 'base'}-${index}`,
+        markerId: `${svgIdPrefix}-gantt-link-arrow-${isMiniLink ? 'mini' : 'base'}-${index}`,
         fromId: link.fromId,
         toId: link.toId,
         path,
         color: link.color ?? 'black',
+        class: link.class,
         layer: isMiniLink ? 'mini' : 'base',
       })
     })

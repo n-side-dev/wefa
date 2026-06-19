@@ -4,20 +4,6 @@
       class="grid shrink-0 gap-2 rounded border border-surface-200 bg-surface-0 p-3 text-sm text-surface-700"
     >
       <div>{{ hoverDebug }}</div>
-      <div class="flex flex-wrap gap-2 text-xs">
-        <span
-          v-for="linkCase in linkCases"
-          :key="linkCase.type"
-          class="inline-flex items-center gap-1 rounded border border-surface-200 px-2 py-1"
-        >
-          <span
-            class="size-2 rounded-full"
-            :style="{ backgroundColor: linkCase.color }"
-            aria-hidden="true"
-          />
-          {{ linkCase.type }}
-        </span>
-      </div>
     </div>
     <GanttChartComponent
       class="min-h-0 flex-1"
@@ -55,24 +41,36 @@ const { t } = useI18nLib()
 
 const startDate = new Date(2026, 0, 1)
 const endDate = new Date(2026, 1, 28)
+const okLinkClass = '[stroke-dasharray:2,5]'
 const linkCases = [
-  { type: 'start-start', fromIndex: 2, toIndex: 0, color: 'green' },
-  { type: 'start-start', fromIndex: 2, toIndex: 1, color: 'green' },
-  { type: 'start-start', fromIndex: 2, toIndex: 3, color: 'green' },
-  { type: 'start-start', fromIndex: 2, toIndex: 4, color: 'green' },
+  { type: 'start-start', fromIndex: 2, toIndex: 0, color: 'green', class: okLinkClass  },
+  { type: 'start-start', fromIndex: 2, toIndex: 1, color: 'green', class: okLinkClass  },
+  { type: 'start-start', fromIndex: 2, toIndex: 3, color: 'green', class: okLinkClass  },
+  { type: 'start-start', fromIndex: 2, toIndex: 4, color: 'green', class: okLinkClass  },
   { type: 'end-end', fromIndex: 2, toIndex: 0, color: 'red' },
   { type: 'end-end', fromIndex: 2, toIndex: 1, color: 'red' },
   { type: 'end-end', fromIndex: 2, toIndex: 3, color: 'red' },
   { type: 'end-end', fromIndex: 2, toIndex: 4, color: 'red' },
-  { type: 'end-start', fromIndex: 8, toIndex: 5, color: 'green' },
-  { type: 'end-start', fromIndex: 8, toIndex: 6, color: 'green' },
-  { type: 'end-start', fromIndex: 8, toIndex: 7, color: 'green' },
-  { type: 'end-start', fromIndex: 8, toIndex: 9, color: 'green' },
+  { type: 'end-start', fromIndex: 8, toIndex: 5, color: 'green', class: okLinkClass  },
+  { type: 'end-start', fromIndex: 8, toIndex: 6, color: 'green', class: okLinkClass  },
+  { type: 'end-start', fromIndex: 8, toIndex: 7, color: 'green', class: okLinkClass  },
+  { type: 'end-start', fromIndex: 8, toIndex: 9, color: 'green', class: okLinkClass  },
   { type: 'start-end', fromIndex: 6, toIndex: 5, color: 'red' },
   { type: 'start-end', fromIndex: 6, toIndex: 7, color: 'red' },
   { type: 'start-end', fromIndex: 6, toIndex: 8, color: 'red' },
   { type: 'start-end', fromIndex: 6, toIndex: 9, color: 'red' },
   { type: 'start-end', fromIndex: 8, toIndex: 5, color: 'blue' },
+  { type: 'end-start', fromIndex: 10, toIndex: 11, color: 'green', class: okLinkClass  },
+  { type: 'end-start', fromIndex: 10, toIndex: 12, color: 'green', class: okLinkClass  },
+  { type: 'end-start', fromIndex: 10, toIndex: 13, color: 'red' },
+  { type: 'end-start', fromIndex: 10, toIndex: 14, color: 'green', class: okLinkClass  },
+  { type: 'start-end', fromIndex: 15, toIndex: 11, color: 'green', class: okLinkClass  },
+  { type: 'start-end', fromIndex: 15, toIndex: 12, color: 'red' },
+  { type: 'start-end', fromIndex: 15, toIndex: 13, color: 'green', class: okLinkClass  },
+  { type: 'start-end', fromIndex: 15, toIndex: 14, color: 'green', class: okLinkClass  },
+  { type: 'end-start', fromIndex: 11, toIndex: 14, color: 'red' },
+  { type: 'start-start', fromIndex: 16, toIndex: 17, color: 'blue' },
+  { type: 'end-end', fromIndex: 17, toIndex: 16, color: 'blue' },
   //{ type: 'start-start', fromIndex: 10, toIndex: 11, color: 'rgb(37 99 235)' },
   //{ type: 'start-end', fromIndex: 12, toIndex: 13, color: 'rgb(217 119 6)' },
   //{ type: 'end-start', fromIndex: 14, toIndex: 1, color: 'rgb(5 150 105)' },
@@ -81,10 +79,11 @@ const linkCases = [
   type: NonNullable<GanttChartLinkData['type']>
   fromIndex: number
   toIndex: number
-  color: string
+  color?: string
+  class?: string
 }>
 // Custom-placed activities to test activity links
-const optimizedOnlyStartOffsets = [3, 12, 9, 6, 15, 3, 12, 9, 6, 15]
+const optimizedOnlyStartOffsets = [3, 12, 9, 6, 15, 3, 12, 9, 6, 15, 3, 9, 13, 6, 10, 16, 8, 8]
 
 const rows = computed<GanttChartRowData[]>(() =>
   Array.from({ length: 30 }, (_, index) => {
@@ -128,7 +127,7 @@ const rows = computed<GanttChartRowData[]>(() =>
         activities: [
           {
             ...optimizedActivity,
-            label: 'Activity links tester',
+            label: t('demo.playground.activity_links_tester'),
             startDate: new Date(2026, 0, 3 + startDay),
             endDate: new Date(2026, 0, 6 + startDay),
           },
@@ -194,17 +193,18 @@ const links = computed<GanttChartLinkData[]>(() => {
         toId: to.id,
         type: linkCase.type,
         color: linkCase.color,
+        class: linkCase.class,
       })
     }
   })
   return linkPairs
 })
 
-const hoverDebug = ref('Hover an activity to inspect its column context.')
+const hoverDebug = ref(t('demo.playground.hover_prompt'))
 
 const hoverLabel = (hoverContext?: GanttChartActivityInteractionContext) => {
   if (!hoverContext) {
-    return 'no hover context'
+    return t('demo.playground.no_hover_context')
   }
 
   if (hoverContext.date) {
@@ -212,8 +212,8 @@ const hoverLabel = (hoverContext?: GanttChartActivityInteractionContext) => {
   }
 
   return hoverContext.week
-    ? `Week ${hoverContext.week.weekNumber}`
-    : `Column ${hoverContext.columnIndex + 1}`
+    ? t('demo.playground.week', { n: hoverContext.week.weekNumber })
+    : t('demo.playground.column', { n: hoverContext.columnIndex + 1 })
 }
 
 const activityHover = (
@@ -222,7 +222,7 @@ const activityHover = (
   hoverContext?: GanttChartActivityInteractionContext
 ) => {
   if (!hoverContext) {
-    hoverDebug.value = 'Hover an activity to inspect its column context.'
+    hoverDebug.value = t('demo.playground.hover_prompt')
     return
   }
 

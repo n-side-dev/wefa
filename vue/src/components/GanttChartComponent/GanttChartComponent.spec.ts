@@ -10,7 +10,11 @@ import {
   MINI_HEIGHT_PX,
   getWeekColumns,
 } from './ganttChartLayout'
-import type { GanttChartActivityInteractionPayload, GanttChartRowData } from './ganttChartTypes'
+import type {
+  GanttChartActivityInteractionPayload,
+  GanttChartLinkData,
+  GanttChartRowData,
+} from './ganttChartTypes'
 
 vi.mock('@/locales', () => ({
   useI18nLib: () => ({ t: (key: string) => key }),
@@ -122,6 +126,64 @@ describe('GanttChartComponent', () => {
     expect(wrapper.find('.custom-row-label').exists()).toBe(true)
     expect(wrapper.text()).toContain('Run Line A')
     expect(wrapper.text()).not.toContain('gantt_chart.row')
+  })
+
+  it('prefixes SVG marker and clip-path ids per chart instance', () => {
+    const links: GanttChartLinkData[] = [
+      {
+        id: 'same-link',
+        fromId: 'bar-1',
+        toId: 'bar-2',
+        type: 'end-start',
+        color: 'red',
+      },
+    ]
+    const wrapper = mount(
+      {
+        render: () =>
+          h('div', [
+            h(GanttChartComponent, {
+              startDate: new Date(2026, 0, 1),
+              endDate: new Date(2026, 0, 7),
+              rows: baseRows,
+              links,
+            }),
+            h(GanttChartComponent, {
+              startDate: new Date(2026, 0, 1),
+              endDate: new Date(2026, 0, 7),
+              rows: baseRows,
+              links,
+            }),
+          ]),
+      },
+      {
+        global: {
+          directives: {
+            tooltip: () => {
+              /* no-op */
+            },
+          },
+        },
+      }
+    )
+
+    const markerIds = wrapper.findAll('marker').map((marker) => marker.attributes('id'))
+    expect(markerIds).toHaveLength(2)
+    expect(markerIds.every((id) => id !== undefined)).toBe(true)
+    expect(new Set(markerIds).size).toBe(2)
+    expect(markerIds.every((id) => id?.endsWith('gantt-link-arrow-base-0'))).toBe(true)
+
+    const markerEnds = wrapper
+      .findAll('path[data-link-id="same-link"]')
+      .map((path) => path.attributes('marker-end'))
+    expect(markerEnds).toHaveLength(2)
+    markerEnds.forEach((markerEnd) => {
+      expect(markerIds.map((id) => `url(#${id})`)).toContain(markerEnd)
+    })
+
+    const clipPathIds = wrapper.findAll('clipPath').map((clipPath) => clipPath.attributes('id'))
+    expect(clipPathIds).toHaveLength(4)
+    expect(new Set(clipPathIds).size).toBe(4)
   })
 
   it('emits activityClick with activity and row data', async () => {
@@ -385,7 +447,7 @@ describe('GanttChartComponent', () => {
         startDate: new Date(2026, 0, 1),
         endDate: new Date(2026, 0, 7),
         rows: baseRows,
-        links: [{ fromId: 'bar-1', toId: 'bar-2' }],
+        links: [{ fromId: 'bar-1', toId: 'bar-2', class: '[stroke-dasharray:2,5]' }],
       },
       global: {
         directives: {
@@ -397,6 +459,9 @@ describe('GanttChartComponent', () => {
     })
 
     expect(wrapper.find('[data-link-id="bar-1-bar-2"]').exists()).toBe(true)
+    expect(wrapper.get('[data-link-id="bar-1-bar-2"]').classes()).toContain(
+      '[stroke-dasharray:2,5]'
+    )
   })
 
   it('supports all source and target endpoint combinations for activity links', () => {

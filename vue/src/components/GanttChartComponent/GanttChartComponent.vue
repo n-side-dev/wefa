@@ -54,6 +54,7 @@
           :highlighted-link-marker-ids="effectiveHighlightedLinkMarkerIds"
           :link-class="linkClass"
           :link-highlight-class="linkHighlightClass"
+          :svg-id-prefix="svgIdPrefix"
           :grid-width-px="gridWidthPx"
           :virtual-height-px="virtualHeightPx"
           :left-header-width-px="0"
@@ -132,7 +133,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, ref, useSlots, useTemplateRef } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref, useId, useSlots, useTemplateRef } from 'vue'
 import { useResizeObserver, useVirtualList } from '@vueuse/core'
 
 import GanttChartGrid from '@/components/GanttChartComponent/GanttChartGrid.vue'
@@ -164,6 +165,7 @@ import type {
 const container = useTemplateRef('gantt-container')
 const header = useTemplateRef('gantt-header')
 const activityPopoverPanel = useTemplateRef('activity-popover-panel')
+const svgIdPrefix = `gantt-${useId()}`
 const { bodyHeightPx, cardStyle } = useGanttSizing(container, header)
 const slots = useSlots()
 
@@ -603,6 +605,7 @@ const { virtualOffsetPx, linkLayers } = useGanttLinks({
   columnWidthPx,
   weekColumns,
   links: computed(() => links),
+  svgIdPrefix,
   stackMiniActivities: computed(() => stackMiniActivities),
 })
 

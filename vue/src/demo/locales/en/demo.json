@@ -40,6 +40,16 @@
     "optimized": "Optimized",
     "desired": "Desired",
     "alt": "Alt",
+    "activity_links_tester": "Activity links tester",
+    "hover_prompt": "Hover an activity to inspect its column context.",
+    "no_hover_context": "no hover context",
+    "week": "Week {n}",
+    "column": "Column {n}",
+    "unknown": "unknown",
+    "debug_row": "row={value}",
+    "debug_activity": "activity={value}",
+    "debug_column": "column={value}",
+    "debug_value": "value={value}",
     "row_label": "Row {n}",
     "row_header": "Line {n}"
   }

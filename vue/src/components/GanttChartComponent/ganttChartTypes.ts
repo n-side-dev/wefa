@@ -34,6 +34,7 @@ export type GanttChartLinkData = {
   toId: string | number
   type?: 'start-start' | 'start-end' | 'end-start' | 'end-end' | 'finish-start'
   color?: string
+  class?: string
 }
 
 // Shared activity interaction shape used by hover, popover, and selection APIs.

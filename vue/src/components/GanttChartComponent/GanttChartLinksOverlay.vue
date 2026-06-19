@@ -9,7 +9,7 @@
   >
     <defs>
       <!-- Clip to the virtualized viewport so paths don't bleed outside. -->
-      <clipPath id="gantt-link-clip">
+      <clipPath :id="baseClipPathId">
         <rect x="0" y="0" :width="gridWidthPx" :height="virtualHeightPx" />
       </clipPath>
       <!-- Each link gets its own marker so color matches the stroke. -->
@@ -27,7 +27,7 @@
         <path d="M 0 0 L 4 2 L 0 4 z" :fill="link.color" :stroke="link.color" />
       </marker>
     </defs>
-    <g clip-path="url(#gantt-link-clip)">
+    <g :clip-path="`url(#${baseClipPathId})`">
       <!-- Paths are precomputed in useGanttLinks (row offsets + column widths). -->
       <path
         v-for="link in linkLayers.base"
@@ -57,7 +57,7 @@
   >
     <defs>
       <!-- Clip to the virtualized viewport so paths don't bleed outside. -->
-      <clipPath id="gantt-link-clip-mini">
+      <clipPath :id="miniClipPathId">
         <rect x="0" y="0" :width="gridWidthPx" :height="virtualHeightPx" />
       </clipPath>
       <!-- Each link gets its own marker so color matches the stroke. -->
@@ -75,7 +75,7 @@
         <path d="M 0 0 L 4 2 L 0 4 z" :fill="link.color" :stroke="link.color" />
       </marker>
     </defs>
-    <g clip-path="url(#gantt-link-clip-mini)">
+    <g :clip-path="`url(#${miniClipPathId})`">
       <path
         v-for="link in linkLayers.mini"
         :key="`mini-${link.markerId}`"
@@ -107,6 +107,7 @@ export interface GanttChartLinksOverlayProps {
   highlightedLinkMarkerIds?: Array<string>
   linkClass?: string
   linkHighlightClass?: string
+  svgIdPrefix: string
   gridWidthPx: number
   virtualHeightPx: number
   leftHeaderWidthPx: number
@@ -120,6 +121,7 @@ const {
   highlightedLinkMarkerIds = [],
   linkClass = 'opacity-70 transition-opacity',
   linkHighlightClass = 'opacity-100 [stroke-width:4]',
+  svgIdPrefix,
 } = defineProps<GanttChartLinksOverlayProps>()
 
 const emit = defineEmits<{
@@ -127,6 +129,11 @@ const emit = defineEmits<{
   (event: 'linkPointerLeave', link: GanttLinkLayer): void
 }>()
 
-const linkPathClass = (link: GanttLinkLayer) =>
-  highlightedLinkMarkerIds.includes(link.markerId) ? linkHighlightClass : linkClass
+const linkPathClass = (link: GanttLinkLayer) => [
+  link.class,
+  highlightedLinkMarkerIds.includes(link.markerId) ? linkHighlightClass : linkClass,
+]
+
+const baseClipPathId = `${svgIdPrefix}-gantt-link-clip`
+const miniClipPathId = `${svgIdPrefix}-gantt-link-clip-mini`
 </script>
