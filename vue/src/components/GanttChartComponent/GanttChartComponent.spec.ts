@@ -183,6 +183,33 @@ describe('GanttChartComponent', () => {
     expect(wrapper.html()).toContain('selected-test-class')
   })
 
+  it('clears internal selection when the selected activity cell is clicked again', async () => {
+    const activitySelect = vi.fn()
+    const wrapper = mount(GanttChartComponent, {
+      props: {
+        startDate: new Date(2026, 0, 1),
+        endDate: new Date(2026, 0, 7),
+        rows: baseRows,
+        selectedHighlightClass: 'selected-test-class',
+        activitySelect,
+      },
+      global: {
+        directives: {
+          tooltip: () => {
+            /* no-op */
+          },
+        },
+      },
+    })
+
+    await wrapper.find('span').trigger('click')
+    await wrapper.find('span').trigger('click')
+
+    expect(wrapper.emitted('update:selectedInteraction')?.[1]?.[0]).toBeNull()
+    expect(activitySelect).toHaveBeenLastCalledWith(null)
+    expect(wrapper.html()).not.toContain('selected-test-class')
+  })
+
   it('forwards the shared interaction payload when an activity is hovered', async () => {
     const activityHover = vi.fn()
     const wrapper = mount(GanttChartComponent, {
@@ -245,6 +272,42 @@ describe('GanttChartComponent', () => {
     expect(wrapper.html()).not.toContain('selected-test-class')
   })
 
+  it('requests clearing controlled selection when the selected activity cell is clicked again', async () => {
+    const selectedInteraction: GanttChartActivityInteractionPayload = {
+      activity: baseRows[0]!.activities[0]!,
+      rowData: baseRows[0],
+      rowIndex: 0,
+      rowKey: 1,
+      activityKey: 'bar-1',
+      context: {
+        columnIndex: 0,
+        viewMode: 'day',
+        date: new Date(2026, 0, 1),
+      },
+    }
+    const wrapper = mount(GanttChartComponent, {
+      props: {
+        startDate: new Date(2026, 0, 1),
+        endDate: new Date(2026, 0, 7),
+        rows: baseRows,
+        selectedInteraction,
+        selectedHighlightClass: 'selected-test-class',
+      },
+      global: {
+        directives: {
+          tooltip: () => {
+            /* no-op */
+          },
+        },
+      },
+    })
+
+    await wrapper.find('span').trigger('click')
+
+    expect(wrapper.emitted('update:selectedInteraction')?.[0]?.[0]).toBeNull()
+    expect(wrapper.html()).toContain('selected-test-class')
+  })
+
   it('renders controlled selected interaction highlights', () => {
     const selectedInteraction: GanttChartActivityInteractionPayload = {
       activity: baseRows[0]!.activities[0]!,
@@ -279,6 +342,43 @@ describe('GanttChartComponent', () => {
     expect(wrapper.html()).toContain('selected-test-class')
   })
 
+  it('applies activity and related link highlight classes for a selected activity', () => {
+    const selectedInteraction: GanttChartActivityInteractionPayload = {
+      activity: baseRows[0]!.activities[0]!,
+      rowData: baseRows[0],
+      rowIndex: 0,
+      rowKey: 1,
+      activityKey: 'bar-1',
+      context: {
+        columnIndex: 2,
+        viewMode: 'day',
+        date: new Date(2026, 0, 3),
+      },
+    }
+
+    const wrapper = mount(GanttChartComponent, {
+      props: {
+        startDate: new Date(2026, 0, 1),
+        endDate: new Date(2026, 0, 7),
+        rows: baseRows,
+        links: [{ id: 'related', fromId: 'bar-1', toId: 'bar-2' }],
+        selectedInteraction,
+        activityHighlightClass: 'activity-highlight-test',
+        linkHighlightClass: 'link-highlight-test',
+      },
+      global: {
+        directives: {
+          tooltip: () => {
+            /* no-op */
+          },
+        },
+      },
+    })
+
+    expect(wrapper.html()).toContain('activity-highlight-test')
+    expect(wrapper.get('[data-link-id="related"]').classes()).toContain('link-highlight-test')
+  })
+
   it('renders link paths when links are provided', () => {
     const wrapper = mount(GanttChartComponent, {
       props: {
@@ -297,6 +397,242 @@ describe('GanttChartComponent', () => {
     })
 
     expect(wrapper.find('[data-link-id="bar-1-bar-2"]').exists()).toBe(true)
+  })
+
+  it('supports all source and target endpoint combinations for activity links', () => {
+    const linkRows: GanttChartRowData[] = [
+      {
+        id: 'source-row',
+        header: 'Source',
+        activities: [
+          {
+            id: 'source',
+            label: 'Source',
+            startDate: new Date(2026, 0, 1),
+            endDate: new Date(2026, 0, 2),
+            visualType: 'bar',
+          },
+        ],
+      },
+      {
+        id: 'target-row',
+        header: 'Target',
+        activities: [
+          {
+            id: 'target',
+            label: 'Target',
+            startDate: new Date(2026, 0, 4),
+            endDate: new Date(2026, 0, 5),
+            visualType: 'bar',
+          },
+        ],
+      },
+    ]
+    const wrapper = mount(GanttChartComponent, {
+      props: {
+        startDate: new Date(2026, 0, 1),
+        endDate: new Date(2026, 0, 7),
+        rows: linkRows,
+        links: [
+          { id: 'start-start', fromId: 'source', toId: 'target', type: 'start-start' },
+          { id: 'start-end', fromId: 'source', toId: 'target', type: 'start-end' },
+          { id: 'end-start', fromId: 'source', toId: 'target', type: 'end-start' },
+          { id: 'end-end', fromId: 'source', toId: 'target', type: 'end-end' },
+        ],
+      },
+      global: {
+        directives: {
+          tooltip: () => {
+            /* no-op */
+          },
+        },
+      },
+    })
+
+    const pathFor = (id: string) => wrapper.get(`[data-link-id="${id}"]`).attributes('d') ?? ''
+
+    expect(pathFor('start-start')).toMatch(/^M 0 /)
+    expect(pathFor('start-start')).toMatch(/ L 120 45$/)
+    expect(pathFor('start-end')).toMatch(/^M 0 /)
+    expect(pathFor('start-end')).toMatch(/ L 200 45$/)
+    expect(pathFor('end-start')).toMatch(/^M 80 /)
+    expect(pathFor('end-start')).toMatch(/ L 120 45$/)
+    expect(pathFor('end-end')).toMatch(/^M 80 /)
+    expect(pathFor('end-end')).toMatch(/ L 200 45$/)
+  })
+
+  it('uses unique arrow markers when multiple links share the same id', () => {
+    const linkRows: GanttChartRowData[] = [
+      {
+        id: 'source-row',
+        header: 'Source',
+        activities: [
+          {
+            id: 'source',
+            label: 'Source',
+            startDate: new Date(2026, 0, 1),
+            endDate: new Date(2026, 0, 2),
+            visualType: 'bar',
+          },
+        ],
+      },
+      {
+        id: 'target-row-a',
+        header: 'Target A',
+        activities: [
+          {
+            id: 'target-a',
+            label: 'Target A',
+            startDate: new Date(2026, 0, 4),
+            endDate: new Date(2026, 0, 5),
+            visualType: 'bar',
+          },
+        ],
+      },
+      {
+        id: 'target-row-b',
+        header: 'Target B',
+        activities: [
+          {
+            id: 'target-b',
+            label: 'Target B',
+            startDate: new Date(2026, 0, 6),
+            endDate: new Date(2026, 0, 7),
+            visualType: 'bar',
+          },
+        ],
+      },
+    ]
+    const wrapper = mount(GanttChartComponent, {
+      props: {
+        startDate: new Date(2026, 0, 1),
+        endDate: new Date(2026, 0, 7),
+        rows: linkRows,
+        links: [
+          {
+            id: 'duplicate',
+            fromId: 'source',
+            toId: 'target-a',
+            type: 'start-start',
+            color: 'red',
+          },
+          {
+            id: 'duplicate',
+            fromId: 'source',
+            toId: 'target-b',
+            type: 'start-start',
+            color: 'green',
+          },
+        ],
+      },
+      global: {
+        directives: {
+          tooltip: () => {
+            /* no-op */
+          },
+        },
+      },
+    })
+
+    const paths = wrapper.findAll('[data-link-id="duplicate"]')
+    expect(paths).toHaveLength(2)
+    expect(paths[0]?.attributes('marker-end')).not.toBe(paths[1]?.attributes('marker-end'))
+
+    const markers = wrapper.findAll('marker')
+    expect(markers[0]?.find('path').attributes('fill')).toBe('red')
+    expect(markers[1]?.find('path').attributes('fill')).toBe('green')
+  })
+
+  it('highlights related links when an activity is hovered', async () => {
+    const wrapper = mount(GanttChartComponent, {
+      props: {
+        startDate: new Date(2026, 0, 1),
+        endDate: new Date(2026, 0, 7),
+        rows: baseRows,
+        links: [{ id: 'related', fromId: 'bar-1', toId: 'bar-2' }],
+        linkHighlightClass: 'link-highlight-test',
+      },
+      global: {
+        directives: {
+          tooltip: () => {
+            /* no-op */
+          },
+        },
+      },
+    })
+
+    wrapper.find('span').element.dispatchEvent(
+      new MouseEvent('mousemove', {
+        clientX: DAY_CELL_WIDTH_PX * 2 + 1,
+        clientY: 12,
+        bubbles: true,
+      })
+    )
+    await nextTick()
+
+    expect(wrapper.get('[data-link-id="related"]').classes()).toContain('link-highlight-test')
+  })
+
+  it('highlights related activities when a link is hovered without opening a popover', async () => {
+    const activityHover = vi.fn()
+    const wrapper = mount(GanttChartComponent, {
+      props: {
+        startDate: new Date(2026, 0, 1),
+        endDate: new Date(2026, 0, 7),
+        rows: baseRows,
+        links: [{ id: 'related', fromId: 'bar-1', toId: 'bar-2' }],
+        activityHover,
+        activityPopoverShowDelayMs: 0,
+        activityHighlightClass: 'activity-highlight-test',
+        linkHighlightClass: 'link-highlight-test',
+      },
+      slots: {
+        'activity-popover': () => h('div', { class: 'activity-popover-test' }, 'Popover'),
+      },
+      global: {
+        directives: {
+          tooltip: () => {
+            /* no-op */
+          },
+        },
+      },
+    })
+
+    await wrapper.get('[data-link-id="related"]').trigger('pointerenter')
+
+    expect(activityHover).not.toHaveBeenCalled()
+    expect(wrapper.find('.activity-popover-test').exists()).toBe(false)
+    expect(wrapper.html()).toContain('activity-highlight-test')
+    expect(wrapper.get('[data-link-id="related"]').classes()).toContain('link-highlight-test')
+
+    await wrapper.get('[data-link-id="related"]').trigger('pointerleave')
+
+    expect(wrapper.get('[data-link-id="related"]').classes()).not.toContain('link-highlight-test')
+  })
+
+  it('applies programmatic activity and link highlights', () => {
+    const wrapper = mount(GanttChartComponent, {
+      props: {
+        startDate: new Date(2026, 0, 1),
+        endDate: new Date(2026, 0, 7),
+        rows: baseRows,
+        links: [{ id: 'related', fromId: 'bar-1', toId: 'bar-2' }],
+        highlightedActivityIds: ['bar-1'],
+        highlightedLinkIds: ['related'],
+        activityHighlightClass: 'activity-highlight-test',
+        linkHighlightClass: 'link-highlight-test',
+      },
+      global: {
+        directives: {
+          tooltip: () => {
+            /* no-op */
+          },
+        },
+      },
+    })
+
+    expect(wrapper.html()).toContain('activity-highlight-test')
+    expect(wrapper.get('[data-link-id="related"]').classes()).toContain('link-highlight-test')
   })
 
   it('renders weekly headers with month spans across overlapping weeks', () => {

@@ -26,11 +26,12 @@
           :activity="activity"
           :style="backgroundStyle(activity)"
           :visual-type="'background'"
+          :highlighted="isActivityHighlighted(activity)"
         >
           <div
             v-tooltip="tooltipForActivity(activity)"
             class="absolute z-0 cursor-pointer"
-            :class="activity.colorClass"
+            :class="activityClass(activity, activity.colorClass)"
             :style="backgroundStyle(activity)"
             @pointermove="updateActivityHover(activity, $event)"
             @mousemove="updateActivityHover(activity, $event)"
@@ -48,10 +49,12 @@
           :activity="activity"
           :style="stripeStyle(activity)"
           :visual-type="'stripe'"
+          :highlighted="isActivityHighlighted(activity)"
         >
           <div
             v-tooltip="tooltipForActivity(activity)"
             class="absolute z-0 cursor-pointer"
+            :class="activityClass(activity)"
             :style="stripeStyle(activity)"
             @pointermove="updateActivityHover(activity, $event)"
             @mousemove="updateActivityHover(activity, $event)"
@@ -61,11 +64,17 @@
         </slot>
       </template>
       <template v-for="(activity, index) in barActivities" :key="activity.id ?? `bar-${index}`">
-        <slot name="activity" :activity="activity" :style="barStyle(activity)" :visual-type="'bar'">
+        <slot
+          name="activity"
+          :activity="activity"
+          :style="barStyle(activity)"
+          :visual-type="'bar'"
+          :highlighted="isActivityHighlighted(activity)"
+        >
           <div
             v-tooltip="tooltipForActivity(activity)"
             class="absolute z-20 rounded-lg overflow-hidden cursor-pointer"
-            :class="activity.colorClass ?? activityColorClass"
+            :class="activityClass(activity, activity.colorClass ?? activityColorClass)"
             :style="barStyle(activity)"
             @pointermove="updateActivityHover(activity, $event)"
             @mousemove="updateActivityHover(activity, $event)"
@@ -87,11 +96,12 @@
           :activity="item.activity"
           :style="miniStyle(item)"
           :visual-type="'mini'"
+          :highlighted="isActivityHighlighted(item.activity)"
         >
           <div
             v-tooltip="tooltipForActivity(item.activity)"
             class="absolute z-30 rounded-md overflow-hidden cursor-pointer"
-            :class="item.activity.colorClass ?? activityColorClass"
+            :class="activityClass(item.activity, item.activity.colorClass ?? activityColorClass)"
             :style="miniStyle(item)"
             @pointermove="updateActivityHover(item.activity, $event)"
             @mousemove="updateActivityHover(item.activity, $event)"
@@ -153,6 +163,8 @@ export interface GanttChartRowGridProps {
     hoverContext?: GanttChartActivityInteractionContext,
     payload?: GanttChartActivityInteractionPayload
   ) => void
+  highlightedActivityIds?: Array<string | number>
+  activityHighlightClass?: string
   useActivityTooltip?: boolean
   highlightedCellColumnIndex?: number
   hoverHighlightClass?: string
@@ -182,6 +194,8 @@ const {
   rowData = undefined,
   activityTooltip = undefined,
   activityHover = undefined,
+  highlightedActivityIds = [],
+  activityHighlightClass = 'ring-2 ring-primary-500/70 brightness-110',
   useActivityTooltip = true,
   highlightedCellColumnIndex = undefined,
   hoverHighlightClass = 'bg-primary-50/60',
@@ -330,6 +344,14 @@ const stripeActivities = computed(() =>
 const barActivities = computed(() =>
   activities.filter((activity) => activityType(activity) === 'bar')
 )
+
+const isActivityHighlighted = (activity: GanttChartActivityData) =>
+  activity.id !== undefined && highlightedActivityIds.includes(activity.id)
+
+const activityClass = (activity: GanttChartActivityData, baseClass?: string) => [
+  baseClass,
+  isActivityHighlighted(activity) ? activityHighlightClass : undefined,
+]
 
 const hoverContextForActivity = (activity: GanttChartActivityData) => {
   const hovered = hoveredActivity.value

@@ -51,9 +51,14 @@
       <template #overlay>
         <GanttChartLinksOverlay
           :link-layers="linkLayers"
+          :highlighted-link-marker-ids="effectiveHighlightedLinkMarkerIds"
+          :link-class="linkClass"
+          :link-highlight-class="linkHighlightClass"
           :grid-width-px="gridWidthPx"
           :virtual-height-px="virtualHeightPx"
           :left-header-width-px="0"
+          @link-pointer-enter="handleLinkPointerEnter"
+          @link-pointer-leave="handleLinkPointerLeave"
         />
       </template>
       <template #body-left>
@@ -101,6 +106,8 @@
           :stack-mini-activities="stackMiniActivities"
           :activity-tooltip="activityTooltip"
           :activity-hover="handleActivityHover"
+          :highlighted-activity-ids="effectiveHighlightedActivityIds"
+          :activity-highlight-class="activityHighlightClass"
           :use-activity-tooltip="!hasActivityPopover"
           :highlighted-cell-column-index="
             highlightHoveredRow &&
@@ -135,7 +142,10 @@ import GanttChartLinksOverlay from '@/components/GanttChartComponent/GanttChartL
 import GanttChartRowGrid from '@/components/GanttChartComponent/GanttChartRowGrid.vue'
 import GanttChartRowLabel from '@/components/GanttChartComponent/GanttChartRowLabel.vue'
 import { useGanttSizing } from '@/components/GanttChartComponent/composables/useGanttSizing'
-import { useGanttLinks } from '@/components/GanttChartComponent/composables/useGanttLinks'
+import {
+  useGanttLinks,
+  type GanttLinkLayer,
+} from '@/components/GanttChartComponent/composables/useGanttLinks'
 import {
   BASE_ROW_HEIGHT_PX,
   DAY_CELL_WIDTH_PX,
@@ -173,26 +183,57 @@ type ActivityHoverHandler = (
 type ActivitySelectHandler = (payload: GanttChartActivityInteractionPayload | null) => void
 
 interface GanttChartComponentProps {
+  /** First visible date in the Gantt grid. */
   startDate?: Date
+  /** Last visible date in the Gantt grid. */
   endDate?: Date
+  /** Row data rendered by the Gantt body. */
   rows?: ActivityRow[]
+  /** Activity dependency links rendered as SVG paths over the grid. */
   links?: GanttChartLinkData[]
+  /** Translation key or label rendered in the top-left header cell. */
   headerLabel?: string
+  /** Calendar granularity used for columns and activity spans. */
   viewMode?: 'day' | 'week'
+  /** Enables weekend background shading in day view. */
   showWeekendShading?: boolean
+  /** Stacks overlapping mini activities into separate vertical lanes. */
   stackMiniActivities?: boolean
+  /** Returns PrimeVue tooltip text for an activity when no popover slot is used. */
   activityTooltip?: ActivityTooltip
+  /** Called when an activity is clicked, before selection toggling is applied. */
   activityClick?: ActivityClickHandler
+  /** Called on direct activity hover with activity, row, cell context, and payload. */
   activityHover?: ActivityHoverHandler
+  /** Called when activity selection changes; receives null when selection is cleared. */
   activitySelect?: ActivitySelectHandler
+  /** Controlled selected activity/cell interaction. Use v-model:selected-interaction. */
   selectedInteraction?: GanttChartActivityInteractionPayload | null
+  /** Delay before showing the custom activity popover after direct activity hover. */
   activityPopoverShowDelayMs?: number
+  /** Delay before hiding the custom activity popover after activity/popover leave. */
   activityPopoverHideDelayMs?: number
+  /** Highlights the row header for the directly hovered activity row. */
   highlightHoveredRow?: boolean
+  /** Highlights the column header and cell for the directly hovered activity cell. */
   highlightHoveredColumn?: boolean
+  /** Class applied to hovered row/column/cell background highlights. */
   hoverHighlightClass?: string
+  /** Activity ids to highlight programmatically without selecting or opening popovers. */
+  highlightedActivityIds?: Array<string | number>
+  /** Link ids to highlight programmatically without selecting or opening popovers. */
+  highlightedLinkIds?: Array<string | number>
+  /** Class applied to highlighted activities from hover, selection, link hover, or props. */
+  activityHighlightClass?: string
+  /** Class applied to links in their normal, non-highlighted state. */
+  linkClass?: string
+  /** Class applied to highlighted links from hover, selection, or props. */
+  linkHighlightClass?: string
+  /** Highlights the selected row header, column header, and cell background. */
   highlightSelectedInteraction?: boolean
+  /** Class applied to selected row/column/cell background highlights. */
   selectedHighlightClass?: string
+  /** Width of the sticky row-label column in pixels. */
   leftHeaderWidthPx?: number
 }
 
@@ -215,6 +256,11 @@ const {
   highlightHoveredRow = true,
   highlightHoveredColumn = true,
   hoverHighlightClass = 'bg-primary-700/10',
+  highlightedActivityIds = [],
+  highlightedLinkIds = [],
+  activityHighlightClass = 'ring-2 ring-primary-500/70 brightness-110',
+  linkClass = 'opacity-70 transition-opacity',
+  linkHighlightClass = 'opacity-100 [stroke-width:4]',
   highlightSelectedInteraction = true,
   selectedHighlightClass = 'bg-primary-100/80',
   leftHeaderWidthPx = 320,
@@ -237,6 +283,8 @@ const activityPopoverShowTimeout = ref<ReturnType<typeof setTimeout>>()
 const activityPopoverClearTimeout = ref<ReturnType<typeof setTimeout>>()
 const hoveredRowKey = ref<string | number>()
 const hoveredColumnIndex = ref<number>()
+const hoveredActivityId = ref<string | number>()
+const hoveredLink = ref<GanttLinkLayer>()
 const effectiveSelectedInteraction = computed(() =>
   selectedInteraction === undefined ? internalSelectedInteraction.value : selectedInteraction
 )
@@ -308,9 +356,11 @@ const handleActivityHover = (
   if (hoverContext) {
     hoveredRowKey.value = rowData ? rowKey(rowData) : undefined
     hoveredColumnIndex.value = hoverContext.columnIndex
+    hoveredActivityId.value = payload?.activityKey
   } else {
     hoveredRowKey.value = undefined
     hoveredColumnIndex.value = undefined
+    hoveredActivityId.value = undefined
   }
 
   if (!hasActivityPopover.value) {
@@ -359,13 +409,39 @@ const scheduleActivityPopoverShow = (payload: GanttChartActivityInteractionPaylo
 }
 
 const selectActivityInteraction = (payload: GanttChartActivityInteractionPayload) => {
+  const nextSelection = isSameActivityInteraction(effectiveSelectedInteraction.value, payload)
+    ? null
+    : payload
+
   if (selectedInteraction === undefined) {
-    internalSelectedInteraction.value = payload
+    internalSelectedInteraction.value = nextSelection
   }
 
-  activitySelect?.(payload)
-  emit('activitySelect', payload)
-  emit('update:selectedInteraction', payload)
+  activitySelect?.(nextSelection)
+  emit('activitySelect', nextSelection)
+  emit('update:selectedInteraction', nextSelection)
+}
+
+const isSameActivityInteraction = (
+  current: GanttChartActivityInteractionPayload | null | undefined,
+  next: GanttChartActivityInteractionPayload
+) => {
+  if (!current) {
+    return false
+  }
+
+  const currentDateMs = current.context.date?.getTime()
+  const nextDateMs = next.context.date?.getTime()
+
+  return (
+    current.activityKey === next.activityKey &&
+    current.rowKey === next.rowKey &&
+    current.context.columnIndex === next.context.columnIndex &&
+    current.context.viewMode === next.context.viewMode &&
+    currentDateMs === nextDateMs &&
+    current.context.week?.weekYear === next.context.week?.weekYear &&
+    current.context.week?.weekNumber === next.context.week?.weekNumber
+  )
 }
 
 const keepActivityPopoverOpen = () => {
@@ -529,6 +605,65 @@ const { virtualOffsetPx, linkLayers } = useGanttLinks({
   links: computed(() => links),
   stackMiniActivities: computed(() => stackMiniActivities),
 })
+
+const allLinkLayers = computed(() => [...linkLayers.value.base, ...linkLayers.value.mini])
+const linkMatchesActivity = (link: GanttLinkLayer, activityId: string | number) =>
+  link.fromId === activityId || link.toId === activityId
+const selectedActivityId = computed(() => effectiveSelectedInteraction.value?.activityKey)
+
+const effectiveHighlightedActivityIds = computed(() => {
+  const ids = new Set<string | number>(highlightedActivityIds)
+
+  if (hoveredActivityId.value !== undefined) {
+    ids.add(hoveredActivityId.value)
+  }
+  if (selectedActivityId.value !== undefined) {
+    ids.add(selectedActivityId.value)
+  }
+
+  const link = hoveredLink.value
+  if (link) {
+    ids.add(link.fromId)
+    ids.add(link.toId)
+  }
+
+  return [...ids]
+})
+
+const effectiveHighlightedLinkMarkerIds = computed(() => {
+  const markerIds = new Set<string>()
+  const externalHighlightedIds = new Set<string | number>(highlightedLinkIds)
+  const activityId = hoveredActivityId.value
+  const selectedId = selectedActivityId.value
+  const hoveredLinkMarkerId = hoveredLink.value?.markerId
+
+  allLinkLayers.value.forEach((link) => {
+    if (externalHighlightedIds.has(link.id)) {
+      markerIds.add(link.markerId)
+    }
+    if (activityId !== undefined && linkMatchesActivity(link, activityId)) {
+      markerIds.add(link.markerId)
+    }
+    if (selectedId !== undefined && linkMatchesActivity(link, selectedId)) {
+      markerIds.add(link.markerId)
+    }
+    if (hoveredLinkMarkerId === link.markerId) {
+      markerIds.add(link.markerId)
+    }
+  })
+
+  return [...markerIds]
+})
+
+const handleLinkPointerEnter = (link: GanttLinkLayer) => {
+  hoveredLink.value = link
+}
+
+const handleLinkPointerLeave = (link: GanttLinkLayer) => {
+  if (hoveredLink.value?.markerId === link.markerId) {
+    hoveredLink.value = undefined
+  }
+}
 
 const virtualHeightPx = computed(() => Math.max(0, totalHeightPx.value - virtualOffsetPx.value))
 </script>

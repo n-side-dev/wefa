@@ -179,6 +179,12 @@ The story wraps the component in a fixed-height container to demonstrate scrolli
     selectedInteraction: {
       control: false,
     },
+    highlightedActivityIds: {
+      control: { type: 'object' },
+    },
+    highlightedLinkIds: {
+      control: { type: 'object' },
+    },
   },
 }
 
@@ -285,6 +291,32 @@ export const ActivityInteractions: Story = {
           selected-highlight-class="bg-emerald-100/80"
           hover-highlight-class="bg-sky-100/80"
           :activity-hover="activityHover"
+        />
+      </div>
+    `,
+  }),
+}
+
+export const ActivityAndLinkHighlights: Story = {
+  render: (args) => ({
+    components: { GanttChartComponent },
+    setup() {
+      const highlightedActivityIds = ref<Array<string | number>>(['optimized-0'])
+      const highlightedLinkIds = ref<Array<string | number>>(['optimized-0-optimized-1'])
+
+      return { args, highlightedActivityIds, highlightedLinkIds }
+    },
+    template: `
+      <div class="bg-slate-50 p-4" style="height: 760px;">
+        <div class="mb-3 rounded border border-surface-200 bg-surface-0 p-3 text-sm text-surface-700">
+          Hover an activity to highlight related links. Hover a link to highlight its source and target activities without opening the activity popover.
+        </div>
+        <GanttChartComponent
+          v-bind="args"
+          :highlighted-activity-ids="highlightedActivityIds"
+          :highlighted-link-ids="highlightedLinkIds"
+          activity-highlight-class="ring-2 ring-primary-500/70 brightness-110"
+          link-highlight-class="opacity-100 [stroke-width:4]"
         />
       </div>
     `,

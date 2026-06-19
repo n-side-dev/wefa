@@ -16,12 +16,143 @@ import type {
 } from '@/components/GanttChartComponent/ganttChartTypes'
 
 type GanttListItem = { data: GanttChartRowData; index: number }
+type GanttLinkEndpoint = 'start' | 'end'
+type GanttPoint = { x: number; y: number }
+type GanttActivityPosition = {
+  startX: number
+  endX: number
+  y: number
+  visualType: GanttChartActivityData['visualType']
+}
+type GanttLinkRouteParams = {
+  from: GanttActivityPosition
+  to: GanttActivityPosition
+  fromEndpoint: GanttLinkEndpoint
+  toEndpoint: GanttLinkEndpoint
+  fromX: number
+  toX: number
+  fromOffsetX: number
+  toOffsetX: number
+  maneuveringOffsetY: number
+}
 
 export interface GanttLinkLayer {
   id: string | number
+  markerId: string
+  fromId: string | number
+  toId: string | number
   path: string
   color: string
   layer: 'base' | 'mini'
+}
+
+const sourceEndpoint = (linkType: GanttChartLinkData['type']): GanttLinkEndpoint =>
+  linkType?.startsWith('start-') ? 'start' : 'end'
+
+const targetEndpoint = (linkType: GanttChartLinkData['type']): GanttLinkEndpoint =>
+  linkType?.endsWith('-end') ? 'end' : 'start'
+
+const sourceEndpointX = (
+  endpoint: GanttLinkEndpoint,
+  position: { startX: number; endX: number }
+) => (endpoint === 'start' ? position.startX : position.endX)
+
+const targetEndpointX = (
+  endpoint: GanttLinkEndpoint,
+  position: { startX: number; endX: number }
+) => (endpoint === 'end' ? position.endX : position.startX)
+
+const addStartStartRoutePoints = (points: GanttPoint[], params: GanttLinkRouteParams) => {
+  if (params.toX > params.fromX) {
+    points.push({ x: params.fromOffsetX, y: params.to.y })
+  }
+  if (params.toX < params.fromX) {
+    points.push({ x: params.toOffsetX, y: params.from.y })
+  }
+}
+
+const addEndEndRoutePoints = (points: GanttPoint[], params: GanttLinkRouteParams) => {
+  if (params.toX > params.fromX) {
+    points.push({ x: params.toOffsetX, y: params.from.y })
+  }
+  if (params.toX < params.fromX) {
+    points.push({ x: params.fromOffsetX, y: params.to.y })
+  }
+}
+
+const addForwardEndStartRoutePoints = (points: GanttPoint[], params: GanttLinkRouteParams) => {
+  if (params.fromOffsetX < params.toOffsetX) {
+    points.push({ x: params.fromOffsetX, y: params.to.y })
+  }
+}
+
+const addCrossingRoutePoints = (points: GanttPoint[], params: GanttLinkRouteParams) => {
+  const verticalDirection = Math.sign(params.to.y - params.from.y)
+  if (verticalDirection === 0) {
+    return
+  }
+
+  points.push(
+    {
+      x: params.fromOffsetX,
+      y: params.from.y + params.maneuveringOffsetY * verticalDirection,
+    },
+    {
+      x: params.fromOffsetX,
+      y: params.to.y - params.maneuveringOffsetY * verticalDirection,
+    },
+    {
+      x: params.toOffsetX,
+      y: params.to.y - params.maneuveringOffsetY * verticalDirection,
+    }
+  )
+}
+
+const addEndStartRoutePoints = (points: GanttPoint[], params: GanttLinkRouteParams) => {
+  addForwardEndStartRoutePoints(points, params)
+  if (params.fromOffsetX >= params.toOffsetX) {
+    addCrossingRoutePoints(points, params)
+  }
+}
+
+const addStartEndRoutePoints = (points: GanttPoint[], params: GanttLinkRouteParams) => {
+  if (params.fromOffsetX > params.toOffsetX) {
+    points.push({ x: params.toOffsetX, y: params.from.y })
+    return
+  }
+
+  addCrossingRoutePoints(points, params)
+}
+
+const routeLinkPoints = (params: GanttLinkRouteParams) => {
+  const points: GanttPoint[] = [
+    { x: params.fromX, y: params.from.y },
+    { x: params.fromOffsetX, y: params.from.y },
+  ]
+  const linkTypeKey = `${params.fromEndpoint}-${params.toEndpoint}` as
+    | 'start-start'
+    | 'end-end'
+    | 'start-end'
+    | 'end-start'
+
+  switch (linkTypeKey) {
+    case 'start-start':
+      addStartStartRoutePoints(points, params)
+      break
+    case 'end-end':
+      addEndEndRoutePoints(points, params)
+      break
+    case 'end-start':
+      addEndStartRoutePoints(points, params)
+      break
+    case 'start-end':
+      addStartEndRoutePoints(points, params)
+      break
+  }
+
+  points.push({ x: params.toOffsetX, y: params.to.y }, { x: params.toX, y: params.to.y })
+
+  return points
 }
 
 // Composable for computing and managing Gantt chart links between activities.
@@ -58,10 +189,7 @@ export const useGanttLinks = ({
 
   // Computes the positions of visible activities in the Gantt chart.
   const visibleActivityPositions = computed(() => {
-    const positions = new Map<
-      string | number,
-      { startX: number; endX: number; y: number; visualType: GanttChartActivityData['visualType'] }
-    >()
+    const positions = new Map<string | number, GanttActivityPosition>()
 
     for (const item of list.value) {
       const rowIndex = item.index
@@ -158,51 +286,49 @@ export const useGanttLinks = ({
   const linkPaths = computed(() => {
     const paths: GanttLinkLayer[] = []
 
-    links.value.forEach((link) => {
+    links.value.forEach((link, index) => {
       const from = visibleActivityPositions.value.get(link.fromId)
       const to = visibleActivityPositions.value.get(link.toId)
       if (!from || !to) {
         return
       }
 
-      const startX = link.type === 'start-start' ? from.startX : from.endX
-      const endX = to.startX
-      const isBackward = endX < startX
-      const gap = Math.abs(endX - startX)
-      const bend = Math.min(28, Math.max(10, gap / 2))
-      const startOutX = startX + bend
-      const endInX = endX - bend
-      const midY = from.y + (to.y - from.y) / 2
-      const points: Array<{ x: number; y: number }> = []
+      // From and to connection points
+      const fromEndpoint = sourceEndpoint(link.type) // 'start' or 'end'
+      const toEndpoint = targetEndpoint(link.type) // 'start' or 'end'
+      const fromX = sourceEndpointX(fromEndpoint, from)
+      const toX = targetEndpointX(toEndpoint, to)
 
-      if (isBackward) {
-        const loopX = startX + bend + 16
-        points.push(
-          { x: startX, y: from.y },
-          { x: loopX, y: from.y },
-          { x: loopX, y: midY },
-          { x: endInX, y: midY },
-          { x: endInX, y: to.y },
-          { x: endX, y: to.y }
-        )
-      } else {
-        points.push(
-          { x: startX, y: from.y },
-          { x: startOutX, y: from.y },
-          { x: startOutX, y: midY },
-          { x: endInX, y: midY },
-          { x: endInX, y: to.y },
-          { x: endX, y: to.y }
-        )
-      }
+      // Connection points offsets,
+      const maneuveringOffsetX = columnWidthPx.value / 2 //px
+      const maneuveringOffsetY = Math.min(MINI_HEIGHT_PX, Math.abs(from.y - to.y) / 2)
+      const fromOffsetDirection = fromEndpoint === 'start' ? -1 : 1
+      const fromOffsetX = fromX + maneuveringOffsetX * fromOffsetDirection
+      const toOffsetDirection = toEndpoint === 'start' ? -1 : 1
+      const toOffsetX = toX + maneuveringOffsetX * toOffsetDirection
 
-      const path = roundedPath(points, 6)
+      const points = routeLinkPoints({
+        from,
+        to,
+        fromEndpoint,
+        toEndpoint,
+        fromX,
+        toX,
+        fromOffsetX,
+        toOffsetX,
+        maneuveringOffsetY,
+      })
+
+      const path = roundedPath(points, 4)
       const isMiniLink = from.visualType === 'mini' || to.visualType === 'mini'
 
       paths.push({
         id: link.id ?? `${link.fromId}-${link.toId}`,
+        markerId: `gantt-link-arrow-${isMiniLink ? 'mini' : 'base'}-${index}`,
+        fromId: link.fromId,
+        toId: link.toId,
         path,
-        color: link.color ?? 'rgba(100, 116, 139, 0.8)',
+        color: link.color ?? 'black',
         layer: isMiniLink ? 'mini' : 'base',
       })
     })

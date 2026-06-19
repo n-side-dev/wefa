@@ -154,6 +154,28 @@ const handleActivityHover = (
 
 The payload is intentionally data-oriented. `rowKey`, `activityKey`, and `context.columnIndex` are stable enough for highlighting and lookup. `context.anchorClientX` and `context.anchorClientY` are only for floating UI positioning.
 
+## Activity and Link Highlights
+
+Activity and link highlighting is separate from popover behavior. Hovering or selecting an activity highlights related links and can still show the activity popover when the highlight comes from direct hover. Hovering a link highlights its source and target activities, but does not call `activityHover` and does not open the popover.
+
+<Canvas of={GanttChartStories.ActivityAndLinkHighlights} />
+
+```vue
+<GanttChartComponent
+  :start-date="startDate"
+  :end-date="endDate"
+  :rows="rows"
+  :links="links"
+  :highlighted-activity-ids="['activity-a']"
+  :highlighted-link-ids="['link-a']"
+  activity-highlight-class="ring-2 ring-primary-500/70 brightness-110"
+  link-class="opacity-70 transition-opacity"
+  link-highlight-class="opacity-100 [stroke-width:4]"
+/>
+```
+
+Use `highlightedActivityIds` and `highlightedLinkIds` for programmatic highlight. Hover-derived and selection-derived highlights are merged with these props. Programmatic highlights do not select activities, emit events, or open popovers.
+
 ## Custom Row Labels
 
 Use the `row-label` slot to replace the default left-hand row label with your own content, such as checkboxes or action buttons.
@@ -206,7 +228,7 @@ export type GanttChartLinkData = {
   id?: string | number
   fromId: string | number
   toId: string | number
-  type?: 'finish-start' | 'start-start'
+  type?: 'start-start' | 'start-end' | 'end-start' | 'end-end' | 'finish-start'
   color?: string
 }
 

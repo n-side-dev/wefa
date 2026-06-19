@@ -22,7 +22,7 @@ export type GanttChartLinkData = {
   id?: string | number
   fromId: string | number
   toId: string | number
-  type?: 'finish-start' | 'start-start'
+  type?: 'start-start' | 'start-end' | 'end-start' | 'end-end' | 'finish-start'
   color?: string
 }
 
