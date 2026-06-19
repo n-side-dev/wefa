@@ -53,7 +53,7 @@ const rows = ref([
         startDate: new Date(2026, 0, 1),
         endDate: new Date(2026, 0, 4),
         visualType: 'stripe',
-        color: 'rgba(59, 130, 246, 0.2)',
+        fillStyle: { backgroundColor: 'rgba(59, 130, 246, 0.2)' },
       },
       {
         id: 'optimized',
@@ -61,7 +61,19 @@ const rows = ref([
         startDate: new Date(2026, 0, 2),
         endDate: new Date(2026, 0, 8),
         visualType: 'bar',
-        colorClass: 'bg-emerald-400/80',
+        fillClass: 'bg-emerald-400/80',
+        fillSegments: [
+          {
+            startDate: new Date(2026, 0, 2),
+            endDate: new Date(2026, 0, 4),
+            class: 'bg-emerald-300/90',
+          },
+          {
+            startDate: new Date(2026, 0, 5),
+            endDate: new Date(2026, 0, 8),
+            class: 'bg-emerald-600/90',
+          },
+        ],
       },
     ],
   },
@@ -94,6 +106,36 @@ Activities support a `visualType`:
 - `stripe`: diagonal background context
 - `bar`: primary rounded bar
 - `mini`: compact bar, stacked into lanes when overlapping
+
+## Activity Styling
+
+Activity styling separates the outer shell from the fill. Use `class` and `style` for shell-level concerns such as borders, rounded corners, and highlight-friendly effects. Use `fillClass` and `fillStyle` for the default activity fill.
+
+Bars can also render ranged fills with `fillSegments`. Segment ranges are inclusive by day and are clipped inside the bar shell. If `fillSegments` is empty or omitted, the bar uses the full-size `fillClass` / `fillStyle` fallback.
+
+```ts
+const activity = {
+  id: 'optimized',
+  label: 'Optimized',
+  startDate: new Date(2026, 0, 2),
+  endDate: new Date(2026, 0, 8),
+  visualType: 'bar',
+  class: 'border border-surface-400',
+  fillClass: 'bg-emerald-400/80',
+  fillSegments: [
+    {
+      startDate: new Date(2026, 0, 2),
+      endDate: new Date(2026, 0, 4),
+      class: 'bg-emerald-300/90',
+    },
+    {
+      startDate: new Date(2026, 0, 5),
+      endDate: new Date(2026, 0, 8),
+      class: 'bg-emerald-600/90',
+    },
+  ],
+}
+```
 
 ## Tooltips and Clicks
 
@@ -206,14 +248,24 @@ Slot props:
 <ArgTypes of={GanttChartStories} />
 
 ```ts
+export type GanttChartActivityFillSegment = {
+  startDate: Date
+  endDate: Date
+  class?: string
+  style?: Record<string, string>
+}
+
 export type GanttChartActivityData = {
   id?: string | number
   label?: string
   startDate: Date
   endDate: Date
   visualType?: 'background' | 'stripe' | 'bar' | 'mini'
-  color?: string
-  colorClass?: string
+  class?: string
+  style?: Record<string, string>
+  fillClass?: string
+  fillStyle?: Record<string, string>
+  fillSegments?: GanttChartActivityFillSegment[]
   barOffsetTopPx?: number
 }
 

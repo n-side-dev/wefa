@@ -31,7 +31,7 @@
           <div
             v-tooltip="tooltipForActivity(activity)"
             class="absolute z-0 cursor-pointer"
-            :class="activityClass(activity, activity.colorClass)"
+            :class="activityClass(activity, activity.fillClass)"
             :style="backgroundStyle(activity)"
             @pointermove="updateActivityHover(activity, $event)"
             @mousemove="updateActivityHover(activity, $event)"
@@ -74,16 +74,32 @@
           <div
             v-tooltip="tooltipForActivity(activity)"
             class="absolute z-20 rounded-lg overflow-hidden cursor-pointer"
-            :class="activityClass(activity, activity.colorClass ?? activityColorClass)"
-            :style="barStyle(activity)"
+            :class="activityClass(activity, activity.class)"
+            :style="[barStyle(activity), activity.style]"
             @pointermove="updateActivityHover(activity, $event)"
             @mousemove="updateActivityHover(activity, $event)"
             @mouseleave="clearActivityHover(activity)"
             @click="handleActivityClick(activity, $event)"
           >
-            <span class="px-2 text-xs font-medium text-white truncate whitespace-nowrap">{{
-              t(activity.label ?? 'gantt_chart.activity')
-            }}</span>
+            <template v-if="activity.fillSegments?.length">
+              <div
+                v-for="(segment, segmentIndex) in activity.fillSegments"
+                :key="`${activity.id ?? index}-fill-${segmentIndex}`"
+                class="absolute inset-y-0"
+                :class="segment.class"
+                :style="fillSegmentStyle(segment, activity)"
+              />
+            </template>
+            <div
+              v-else
+              class="absolute inset-0"
+              :class="activity.fillClass ?? activityColorClass"
+              :style="activity.fillStyle"
+            />
+            <span
+              class="relative z-10 px-2 text-xs font-medium text-white truncate whitespace-nowrap"
+              >{{ t(activity.label ?? 'gantt_chart.activity') }}</span
+            >
           </div>
         </slot>
       </template>
@@ -101,7 +117,7 @@
           <div
             v-tooltip="tooltipForActivity(item.activity)"
             class="absolute z-30 rounded-md overflow-hidden cursor-pointer"
-            :class="activityClass(item.activity, item.activity.colorClass ?? activityColorClass)"
+            :class="activityClass(item.activity, item.activity.fillClass ?? activityColorClass)"
             :style="miniStyle(item)"
             @pointermove="updateActivityHover(item.activity, $event)"
             @mousemove="updateActivityHover(item.activity, $event)"
@@ -135,6 +151,7 @@ import {
   type GanttChartViewMode,
 } from '@/components/GanttChartComponent/ganttChartLayout'
 import type {
+  GanttChartActivityFillSegment,
   GanttChartActivityInteractionContext,
   GanttChartActivityInteractionPayload,
   GanttChartActivityData,
@@ -349,9 +366,42 @@ const isActivityHighlighted = (activity: GanttChartActivityData) =>
   activity.id !== undefined && highlightedActivityIds.includes(activity.id)
 
 const activityClass = (activity: GanttChartActivityData, baseClass?: string) => [
+  activity.class,
   baseClass,
   isActivityHighlighted(activity) ? activityHighlightClass : undefined,
 ]
+
+const fillSegmentStyle = (
+  segment: GanttChartActivityFillSegment,
+  activity: GanttChartActivityData
+) => {
+  const activitySpan = getActivitySpanPx(
+    activity,
+    dateRange,
+    viewMode,
+    columnWidthPx.value,
+    weekColumns.value
+  )
+  const segmentSpan = getActivitySpanPx(
+    { startDate: segment.startDate, endDate: segment.endDate },
+    dateRange,
+    viewMode,
+    columnWidthPx.value,
+    weekColumns.value
+  )
+  const left = Math.max(0, segmentSpan.left - activitySpan.left)
+  const right = Math.min(
+    activitySpan.width,
+    segmentSpan.left + segmentSpan.width - activitySpan.left
+  )
+  const width = Math.max(0, right - left)
+
+  return {
+    left: `${left}px`,
+    width: `${width}px`,
+    ...segment.style,
+  }
+}
 
 const hoverContextForActivity = (activity: GanttChartActivityData) => {
   const hovered = hoveredActivity.value
@@ -470,7 +520,7 @@ const tooltipForActivity = (activity: GanttChartActivityData) => {
 }
 
 const stripeStyle = (activity: GanttChartActivityData) => {
-  const color = activity.color ?? stripeColor
+  const color = activity.fillStyle?.backgroundColor ?? stripeColor
   return {
     ...activityPositionStyle(activity),
     top: '0px',
@@ -486,10 +536,8 @@ const backgroundStyle = (activity: GanttChartActivityData) => {
     ...activityPositionStyle(activity),
     top: '0px',
     height: `${resolvedRowHeightPx.value}px`,
-  }
-
-  if (activity.color) {
-    style.backgroundColor = activity.color
+    ...activity.style,
+    ...activity.fillStyle,
   }
 
   return style
@@ -497,17 +545,11 @@ const backgroundStyle = (activity: GanttChartActivityData) => {
 
 const barStyle = (activity: GanttChartActivityData) => {
   const topOffsetPx = activity.barOffsetTopPx ?? 0
-  const style: Record<string, string> = {
+  return {
     ...activityPositionStyle(activity),
     top: `${BAR_VERTICAL_PADDING_PX + topOffsetPx}px`,
     height: `${resolvedBarHeightPx.value}px`,
   }
-
-  if (activity.color) {
-    style.backgroundColor = activity.color
-  }
-
-  return style
 }
 
 const miniStyle = (item: { activity: GanttChartActivityData; laneIndex: number }) => {
@@ -518,10 +560,8 @@ const miniStyle = (item: { activity: GanttChartActivityData; laneIndex: number }
     ...activityPositionStyle(item.activity),
     top: `${topStart + item.laneIndex * (MINI_HEIGHT_PX + MINI_GAP_PX)}px`,
     height: `${MINI_HEIGHT_PX}px`,
-  }
-
-  if (item.activity.color) {
-    style.backgroundColor = item.activity.color
+    ...item.activity.style,
+    ...item.activity.fillStyle,
   }
 
   return style

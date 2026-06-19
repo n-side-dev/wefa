@@ -1,13 +1,23 @@
 import type { WeekColumn } from '@/components/GanttChartComponent/ganttChartLayout'
 
+export type GanttChartActivityFillSegment = {
+  startDate: Date
+  endDate: Date
+  class?: string
+  style?: Record<string, string>
+}
+
 export type GanttChartActivityData = {
   id?: string | number
   label?: string
   startDate: Date
   endDate: Date
   visualType?: 'background' | 'stripe' | 'bar' | 'mini'
-  color?: string
-  colorClass?: string
+  class?: string
+  style?: Record<string, string>
+  fillClass?: string
+  fillStyle?: Record<string, string>
+  fillSegments?: GanttChartActivityFillSegment[]
   barOffsetTopPx?: number
 }
 

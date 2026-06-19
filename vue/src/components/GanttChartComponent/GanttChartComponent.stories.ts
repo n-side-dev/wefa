@@ -22,7 +22,7 @@ const buildRows = (count: number): GanttChartRowData[] => {
         startDate: new Date(baseDate),
         endDate: new Date(2026, 0, 6 + startDay),
         visualType: 'stripe',
-        color: 'rgba(59, 130, 246, 0.2)',
+        fillStyle: { backgroundColor: 'rgba(59, 130, 246, 0.2)' },
       },
       {
         id: `optimized-${index}`,
@@ -30,7 +30,22 @@ const buildRows = (count: number): GanttChartRowData[] => {
         startDate: new Date(2026, 0, 3 + startDay),
         endDate: new Date(2026, 0, 9 + startDay),
         visualType: 'bar',
-        colorClass: 'bg-emerald-400/80',
+        fillClass: 'bg-emerald-400/80',
+        fillSegments:
+          index === 0
+            ? [
+                {
+                  startDate: new Date(2026, 0, 3 + startDay),
+                  endDate: new Date(2026, 0, 5 + startDay),
+                  class: 'bg-emerald-300/90',
+                },
+                {
+                  startDate: new Date(2026, 0, 6 + startDay),
+                  endDate: new Date(2026, 0, 9 + startDay),
+                  class: 'bg-emerald-600/90',
+                },
+              ]
+            : undefined,
       },
       {
         id: `desired-${index}`,
@@ -38,7 +53,7 @@ const buildRows = (count: number): GanttChartRowData[] => {
         startDate: new Date(2026, 0, 5 + startDay),
         endDate: new Date(2026, 0, 12 + startDay),
         visualType: 'mini',
-        colorClass: 'bg-amber-400/80',
+        fillClass: 'bg-amber-400/80',
       },
     ]
     const extraActivities: GanttChartActivityData[] =
@@ -50,7 +65,7 @@ const buildRows = (count: number): GanttChartRowData[] => {
               startDate: new Date(2026, 0, 7 + startDay),
               endDate: new Date(2026, 0, 10 + startDay),
               visualType: 'mini',
-              colorClass: 'bg-amber-500/80',
+              fillClass: 'bg-amber-500/80',
             },
           ]
         : []
@@ -63,7 +78,7 @@ const buildRows = (count: number): GanttChartRowData[] => {
               startDate: new Date(2026, 0, 14 + startDay),
               endDate: new Date(2026, 0, 16 + startDay),
               visualType: 'mini',
-              colorClass: 'bg-amber-300/80',
+              fillClass: 'bg-amber-300/80',
             },
           ]
         : []

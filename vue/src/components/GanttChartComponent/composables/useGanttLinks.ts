@@ -17,23 +17,11 @@ import type {
 
 type GanttListItem = { data: GanttChartRowData; index: number }
 type GanttLinkEndpoint = 'start' | 'end'
-type GanttPoint = { x: number; y: number }
 type GanttActivityPosition = {
   startX: number
   endX: number
   y: number
   visualType: GanttChartActivityData['visualType']
-}
-type GanttLinkRouteParams = {
-  from: GanttActivityPosition
-  to: GanttActivityPosition
-  fromEndpoint: GanttLinkEndpoint
-  toEndpoint: GanttLinkEndpoint
-  fromX: number
-  toX: number
-  fromOffsetX: number
-  toOffsetX: number
-  maneuveringOffsetY: number
 }
 
 export interface GanttLinkLayer {
@@ -61,99 +49,6 @@ const targetEndpointX = (
   endpoint: GanttLinkEndpoint,
   position: { startX: number; endX: number }
 ) => (endpoint === 'end' ? position.endX : position.startX)
-
-const addStartStartRoutePoints = (points: GanttPoint[], params: GanttLinkRouteParams) => {
-  if (params.toX > params.fromX) {
-    points.push({ x: params.fromOffsetX, y: params.to.y })
-  }
-  if (params.toX < params.fromX) {
-    points.push({ x: params.toOffsetX, y: params.from.y })
-  }
-}
-
-const addEndEndRoutePoints = (points: GanttPoint[], params: GanttLinkRouteParams) => {
-  if (params.toX > params.fromX) {
-    points.push({ x: params.toOffsetX, y: params.from.y })
-  }
-  if (params.toX < params.fromX) {
-    points.push({ x: params.fromOffsetX, y: params.to.y })
-  }
-}
-
-const addForwardEndStartRoutePoints = (points: GanttPoint[], params: GanttLinkRouteParams) => {
-  if (params.fromOffsetX < params.toOffsetX) {
-    points.push({ x: params.fromOffsetX, y: params.to.y })
-  }
-}
-
-const addCrossingRoutePoints = (points: GanttPoint[], params: GanttLinkRouteParams) => {
-  const verticalDirection = Math.sign(params.to.y - params.from.y)
-  if (verticalDirection === 0) {
-    return
-  }
-
-  points.push(
-    {
-      x: params.fromOffsetX,
-      y: params.from.y + params.maneuveringOffsetY * verticalDirection,
-    },
-    {
-      x: params.fromOffsetX,
-      y: params.to.y - params.maneuveringOffsetY * verticalDirection,
-    },
-    {
-      x: params.toOffsetX,
-      y: params.to.y - params.maneuveringOffsetY * verticalDirection,
-    }
-  )
-}
-
-const addEndStartRoutePoints = (points: GanttPoint[], params: GanttLinkRouteParams) => {
-  addForwardEndStartRoutePoints(points, params)
-  if (params.fromOffsetX >= params.toOffsetX) {
-    addCrossingRoutePoints(points, params)
-  }
-}
-
-const addStartEndRoutePoints = (points: GanttPoint[], params: GanttLinkRouteParams) => {
-  if (params.fromOffsetX > params.toOffsetX) {
-    points.push({ x: params.toOffsetX, y: params.from.y })
-    return
-  }
-
-  addCrossingRoutePoints(points, params)
-}
-
-const routeLinkPoints = (params: GanttLinkRouteParams) => {
-  const points: GanttPoint[] = [
-    { x: params.fromX, y: params.from.y },
-    { x: params.fromOffsetX, y: params.from.y },
-  ]
-  const linkTypeKey = `${params.fromEndpoint}-${params.toEndpoint}` as
-    | 'start-start'
-    | 'end-end'
-    | 'start-end'
-    | 'end-start'
-
-  switch (linkTypeKey) {
-    case 'start-start':
-      addStartStartRoutePoints(points, params)
-      break
-    case 'end-end':
-      addEndEndRoutePoints(points, params)
-      break
-    case 'end-start':
-      addEndStartRoutePoints(points, params)
-      break
-    case 'start-end':
-      addStartEndRoutePoints(points, params)
-      break
-  }
-
-  points.push({ x: params.toOffsetX, y: params.to.y }, { x: params.toX, y: params.to.y })
-
-  return points
-}
 
 // Composable for computing and managing Gantt chart links between activities.
 export const useGanttLinks = ({
@@ -307,17 +202,114 @@ export const useGanttLinks = ({
       const toOffsetDirection = toEndpoint === 'start' ? -1 : 1
       const toOffsetX = toX + maneuveringOffsetX * toOffsetDirection
 
-      const points = routeLinkPoints({
-        from,
-        to,
-        fromEndpoint,
-        toEndpoint,
-        fromX,
-        toX,
-        fromOffsetX,
-        toOffsetX,
-        maneuveringOffsetY,
-      })
+      const points: Array<{ x: number; y: number }> = []
+      const linkTypeKey = `${fromEndpoint}-${toEndpoint}` as
+        | 'start-start'
+        | 'end-end'
+        | 'start-end'
+        | 'end-start'
+
+      // From
+      points.push({ x: fromX, y: from.y }, { x: fromOffsetX, y: from.y })
+
+      switch (linkTypeKey) {
+        case 'start-start':
+          // 3 lines needed : go left, go down (or up if reversed), go right
+          // If the from and end endpoints are not aligned, we need one midpoint
+          if (toX > fromX) {
+            points.push({
+              x: fromOffsetX,
+              y: to.y,
+            })
+          }
+          if (toX < fromX) {
+            points.push({
+              x: toOffsetX,
+              y: from.y,
+            })
+          }
+          // If aligned, none needed
+          break
+        case 'end-end':
+          // 3 lines needed : go right, go down (or up if reversed), go left
+          // If the from and end endpoints are not aligned, we need one midpoint
+          if (toX > fromX) {
+            points.push({
+              x: toOffsetX,
+              y: from.y,
+            })
+          }
+          if (toX < fromX) {
+            points.push({
+              x: fromOffsetX,
+              y: to.y,
+            })
+          }
+          // If aligned, none needed
+          break
+        case 'end-start':
+          // Easy case, the from-end is before the to-start
+          // 3 lines needed : go right just to cover the offset, go down (or up) directly, go right all the way
+          if (fromOffsetX < toOffsetX) {
+            points.push({
+              x: fromOffsetX,
+              y: to.y,
+            })
+          } else {
+            // Harder case, the from-end is after the to-start
+            // We have to snake around in this case, or do a simple diagonal
+            // Case 1 : From is above, arrow goes down
+            if (from.y < to.y) {
+              points.push(
+                { x: fromOffsetX, y: from.y + maneuveringOffsetY },
+                { x: fromOffsetX, y: to.y - maneuveringOffsetY },
+                { x: toOffsetX, y: to.y - maneuveringOffsetY }
+              )
+            }
+            // Case 2 : From is below, arrow goes up
+            if (from.y > to.y) {
+              points.push(
+                { x: fromOffsetX, y: from.y - maneuveringOffsetY },
+                { x: fromOffsetX, y: to.y + maneuveringOffsetY },
+                { x: toOffsetX, y: to.y + maneuveringOffsetY }
+              )
+            }
+          }
+          break
+        case 'start-end':
+          // Easy case, the from-start is after the to-end
+          // It is rarer case, mostly could appear as a symmetry to the end-start case
+          // 3 lines needed : go left all the way, go down (or up) to target, go left to finish the offset
+          if (fromOffsetX > toOffsetX) {
+            points.push({
+              x: fromOffsetX,
+              y: to.y,
+            })
+          } else {
+            // Harder case, the from-start is before the to-end
+            // We have to snake around in this case, or do a simple diagonal
+            // Case 1 : From is above, arrow goes down
+            if (from.y < to.y) {
+              points.push(
+                { x: fromOffsetX, y: from.y + maneuveringOffsetY },
+                { x: fromOffsetX, y: to.y - maneuveringOffsetY },
+                { x: toOffsetX, y: to.y - maneuveringOffsetY }
+              )
+            }
+            // Case 2 : From is below, arrow goes up
+            if (from.y > to.y) {
+              points.push(
+                { x: fromOffsetX, y: from.y - maneuveringOffsetY },
+                { x: fromOffsetX, y: to.y + maneuveringOffsetY },
+                { x: toOffsetX, y: to.y + maneuveringOffsetY }
+              )
+            }
+          }
+          break
+      }
+
+      // End
+      points.push({ x: toOffsetX, y: to.y }, { x: toX, y: to.y })
 
       const path = roundedPath(points, 4)
       const isMiniLink = from.visualType === 'mini' || to.visualType === 'mini'

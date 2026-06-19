@@ -72,6 +72,7 @@ const linkCases = [
   { type: 'start-end', fromIndex: 6, toIndex: 7, color: 'red' },
   { type: 'start-end', fromIndex: 6, toIndex: 8, color: 'red' },
   { type: 'start-end', fromIndex: 6, toIndex: 9, color: 'red' },
+  { type: 'start-end', fromIndex: 8, toIndex: 5, color: 'blue' },
   //{ type: 'start-start', fromIndex: 10, toIndex: 11, color: 'rgb(37 99 235)' },
   //{ type: 'start-end', fromIndex: 12, toIndex: 13, color: 'rgb(217 119 6)' },
   //{ type: 'end-start', fromIndex: 14, toIndex: 1, color: 'rgb(5 150 105)' },
@@ -95,7 +96,28 @@ const rows = computed<GanttChartRowData[]>(() =>
       startDate: new Date(2026, 0, 3 + startDay),
       endDate: new Date(2026, 0, 9 + startDay),
       visualType: 'bar',
-      colorClass: 'bg-emerald-400/80',
+      fillClass: 'bg-emerald-400/80',
+      fillSegments:
+        index === 0
+          ? [
+              {
+                startDate: new Date(2026, 0, 3 + startDay),
+                endDate: new Date(2026, 0, 3 + startDay),
+                class: 'bg-emerald-500/90',
+              },
+              {
+                startDate: new Date(2026, 0, 4 + startDay),
+                endDate: new Date(2026, 0, 5 + startDay),
+                class:
+                  'bg-[repeating-linear-gradient(135deg,rgb(16_185_129)_0_6px,rgb(59_130_246)_6px_12px)]',
+              },
+              {
+                startDate: new Date(2026, 0, 6 + startDay),
+                endDate: new Date(2026, 0, 6 + startDay),
+                class: 'bg-blue-500/90',
+              },
+            ]
+          : undefined,
     }
 
     if (index < optimizedOnlyStartOffsets.length) {
@@ -121,7 +143,7 @@ const rows = computed<GanttChartRowData[]>(() =>
         startDate: new Date(baseDate),
         endDate: new Date(2026, 0, 6 + startDay),
         visualType: 'stripe',
-        color: 'rgba(59, 130, 246, 0.2)',
+        fillStyle: { backgroundColor: 'rgba(59, 130, 246, 0.2)' },
       },
       optimizedActivity,
       {
@@ -130,7 +152,7 @@ const rows = computed<GanttChartRowData[]>(() =>
         startDate: new Date(2026, 0, 5 + startDay),
         endDate: new Date(2026, 0, 12 + startDay),
         visualType: 'mini',
-        colorClass: 'bg-amber-400/80',
+        fillClass: 'bg-amber-400/80',
       },
     ]
     const extraActivities: GanttChartActivityData[] =
@@ -142,7 +164,7 @@ const rows = computed<GanttChartRowData[]>(() =>
               startDate: new Date(2026, 0, 7 + startDay),
               endDate: new Date(2026, 0, 10 + startDay),
               visualType: 'mini',
-              colorClass: 'bg-amber-500/80',
+              fillClass: 'bg-amber-500/80',
             },
           ]
         : []

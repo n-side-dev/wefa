@@ -56,7 +56,7 @@ const baseRows: GanttChartRowData[] = [
         startDate: new Date(2026, 0, 3),
         endDate: new Date(2026, 0, 5),
         visualType: 'bar',
-        colorClass: 'bg-emerald-400/80',
+        fillClass: 'bg-emerald-400/80',
       },
     ],
   },
@@ -71,7 +71,7 @@ const baseRows: GanttChartRowData[] = [
         startDate: new Date(2026, 0, 5),
         endDate: new Date(2026, 0, 7),
         visualType: 'bar',
-        colorClass: 'bg-emerald-400/80',
+        fillClass: 'bg-emerald-400/80',
       },
     ],
   },
@@ -698,7 +698,7 @@ describe('GanttChartComponent', () => {
             startDate: new Date(2026, 0, 1),
             endDate: new Date(2026, 0, 2),
             visualType: 'mini',
-            colorClass: 'bg-amber-400/80',
+            fillClass: 'bg-amber-400/80',
           },
           {
             id: 'mini-2',
@@ -706,7 +706,7 @@ describe('GanttChartComponent', () => {
             startDate: new Date(2026, 0, 3),
             endDate: new Date(2026, 0, 4),
             visualType: 'mini',
-            colorClass: 'bg-amber-400/80',
+            fillClass: 'bg-amber-400/80',
           },
         ],
       },
@@ -763,7 +763,7 @@ describe('GanttChartComponent', () => {
             startDate: new Date(2026, 0, 1),
             endDate: new Date(2026, 0, 2),
             visualType: 'background',
-            color: 'rgb(255, 0, 0)',
+            fillStyle: { backgroundColor: 'rgb(255, 0, 0)' },
           },
         ],
       },
@@ -780,6 +780,80 @@ describe('GanttChartComponent', () => {
     expect(wrapper.html()).toContain(`height: ${BASE_ROW_HEIGHT_PX}px`)
   })
 
+  it('renders a default full bar fill when no fill segments are provided', () => {
+    const wrapper = mount(GanttChartRowGrid, {
+      props: {
+        dateRange: [new Date(2026, 0, 1), new Date(2026, 0, 2), new Date(2026, 0, 3)],
+        activities: [
+          {
+            id: 'bar-fill',
+            label: 'Fill',
+            startDate: new Date(2026, 0, 1),
+            endDate: new Date(2026, 0, 2),
+            visualType: 'bar',
+            fillClass: 'bg-emerald-400/80',
+          },
+        ],
+      },
+      global: {
+        directives: {
+          tooltip: () => {
+            /* no-op */
+          },
+        },
+      },
+    })
+
+    expect(wrapper.html()).toContain('bg-emerald-400/80')
+    expect(wrapper.html()).toContain('absolute inset-0')
+  })
+
+  it('renders ranged fill segments inside bar activities', () => {
+    const wrapper = mount(GanttChartRowGrid, {
+      props: {
+        dateRange: [
+          new Date(2026, 0, 1),
+          new Date(2026, 0, 2),
+          new Date(2026, 0, 3),
+          new Date(2026, 0, 4),
+        ],
+        activities: [
+          {
+            id: 'bar-segments',
+            label: 'Segments',
+            startDate: new Date(2026, 0, 1),
+            endDate: new Date(2026, 0, 4),
+            visualType: 'bar',
+            fillSegments: [
+              {
+                startDate: new Date(2026, 0, 1),
+                endDate: new Date(2026, 0, 2),
+                class: 'bg-emerald-300/90',
+              },
+              {
+                startDate: new Date(2026, 0, 3),
+                endDate: new Date(2026, 0, 4),
+                class: 'bg-emerald-600/90',
+              },
+            ],
+          },
+        ],
+      },
+      global: {
+        directives: {
+          tooltip: () => {
+            /* no-op */
+          },
+        },
+      },
+    })
+
+    expect(wrapper.html()).toContain('bg-emerald-300/90')
+    expect(wrapper.html()).toContain('bg-emerald-600/90')
+    expect(wrapper.html()).toContain('left: 0px; width: 80px;')
+    expect(wrapper.html()).toContain('left: 80px; width: 80px;')
+  })
+
   it('adds row height and bar top offset when barOffsetTopPx is provided', () => {
     const wrapper = mount(GanttChartRowGrid, {
       props: {
@@ -791,7 +865,7 @@ describe('GanttChartComponent', () => {
             startDate: new Date(2026, 0, 1),
             endDate: new Date(2026, 0, 2),
             visualType: 'bar',
-            colorClass: 'bg-emerald-400/80',
+            fillClass: 'bg-emerald-400/80',
             barOffsetTopPx: 8,
           },
         ],
