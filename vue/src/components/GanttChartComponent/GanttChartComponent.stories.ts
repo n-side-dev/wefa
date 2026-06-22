@@ -4,7 +4,11 @@ import { ref } from 'vue'
 import Button from 'primevue/button'
 
 import GanttChartComponent from './GanttChartComponent.vue'
-import type { GanttChartActivityData, GanttChartRowData } from './ganttChartTypes'
+import type {
+  GanttChartActivityData,
+  GanttChartActivityInteractionPayload,
+  GanttChartRowData,
+} from './ganttChartTypes'
 
 const buildRows = (count: number): GanttChartRowData[] => {
   return Array.from({ length: count }, (_, index) => {
@@ -18,7 +22,7 @@ const buildRows = (count: number): GanttChartRowData[] => {
         startDate: new Date(baseDate),
         endDate: new Date(2026, 0, 6 + startDay),
         visualType: 'stripe',
-        color: 'rgba(59, 130, 246, 0.2)',
+        fillStyle: { backgroundColor: 'rgba(59, 130, 246, 0.2)' },
       },
       {
         id: `optimized-${index}`,
@@ -26,7 +30,22 @@ const buildRows = (count: number): GanttChartRowData[] => {
         startDate: new Date(2026, 0, 3 + startDay),
         endDate: new Date(2026, 0, 9 + startDay),
         visualType: 'bar',
-        colorClass: 'bg-emerald-400/80',
+        fillClass: 'bg-emerald-400/80',
+        fillSegments:
+          index === 0
+            ? [
+                {
+                  startDate: new Date(2026, 0, 3 + startDay),
+                  endDate: new Date(2026, 0, 5 + startDay),
+                  class: 'bg-emerald-300/90',
+                },
+                {
+                  startDate: new Date(2026, 0, 6 + startDay),
+                  endDate: new Date(2026, 0, 9 + startDay),
+                  class: 'bg-emerald-600/90',
+                },
+              ]
+            : undefined,
       },
       {
         id: `desired-${index}`,
@@ -34,7 +53,7 @@ const buildRows = (count: number): GanttChartRowData[] => {
         startDate: new Date(2026, 0, 5 + startDay),
         endDate: new Date(2026, 0, 12 + startDay),
         visualType: 'mini',
-        colorClass: 'bg-amber-400/80',
+        fillClass: 'bg-amber-400/80',
       },
     ]
     const extraActivities: GanttChartActivityData[] =
@@ -46,7 +65,7 @@ const buildRows = (count: number): GanttChartRowData[] => {
               startDate: new Date(2026, 0, 7 + startDay),
               endDate: new Date(2026, 0, 10 + startDay),
               visualType: 'mini',
-              colorClass: 'bg-amber-500/80',
+              fillClass: 'bg-amber-500/80',
             },
           ]
         : []
@@ -59,7 +78,7 @@ const buildRows = (count: number): GanttChartRowData[] => {
               startDate: new Date(2026, 0, 14 + startDay),
               endDate: new Date(2026, 0, 16 + startDay),
               visualType: 'mini',
-              colorClass: 'bg-amber-300/80',
+              fillClass: 'bg-amber-300/80',
             },
           ]
         : []
@@ -166,6 +185,21 @@ The story wraps the component in a fixed-height container to demonstrate scrolli
     activityClick: {
       control: false,
     },
+    activityHover: {
+      control: false,
+    },
+    activitySelect: {
+      control: false,
+    },
+    selectedInteraction: {
+      control: false,
+    },
+    highlightedActivityIds: {
+      control: { type: 'object' },
+    },
+    highlightedLinkIds: {
+      control: { type: 'object' },
+    },
   },
 }
 
@@ -216,6 +250,88 @@ export const CustomTooltipAndClick: Story = {
           v-bind="args"
           :activity-tooltip="activityTooltip"
           :activity-click="activityClick"
+        />
+      </div>
+    `,
+  }),
+}
+
+export const ActivityInteractions: Story = {
+  render: (args) => ({
+    components: { GanttChartComponent },
+    setup() {
+      const selectedInteraction = ref<GanttChartActivityInteractionPayload | null>(null)
+      const hoveredInteraction = ref<GanttChartActivityInteractionPayload | null>(null)
+
+      const describeInteraction = (interaction: GanttChartActivityInteractionPayload | null) => {
+        if (!interaction) {
+          return 'None'
+        }
+
+        const dayOrWeek = interaction.context.date
+          ? interaction.context.date.toDateString()
+          : `week ${interaction.context.week?.weekNumber ?? '-'}`
+
+        return `${interaction.rowData?.header ?? interaction.rowData?.label ?? '-'} / ${
+          interaction.activity.label ?? interaction.activity.id ?? '-'
+        } / column ${interaction.context.columnIndex} / ${dayOrWeek}`
+      }
+
+      const activityHover = (
+        _activity: GanttChartActivityData,
+        _row: GanttChartRowData | undefined,
+        _context: unknown,
+        interaction?: GanttChartActivityInteractionPayload
+      ) => {
+        hoveredInteraction.value = interaction ?? null
+      }
+
+      return {
+        args,
+        selectedInteraction,
+        hoveredInteraction,
+        describeInteraction,
+        activityHover,
+      }
+    },
+    template: `
+      <div class="bg-slate-50 p-4" style="height: 760px;">
+        <div class="mb-3 grid gap-1 rounded border border-surface-200 bg-surface-0 p-3 text-sm text-surface-700">
+          <div><span class="font-semibold">Hovered:</span> {{ describeInteraction(hoveredInteraction) }}</div>
+          <div><span class="font-semibold">Selected:</span> {{ describeInteraction(selectedInteraction) }}</div>
+        </div>
+        <GanttChartComponent
+          v-bind="args"
+          v-model:selected-interaction="selectedInteraction"
+          selected-highlight-class="bg-emerald-100/80"
+          hover-highlight-class="bg-sky-100/80"
+          :activity-hover="activityHover"
+        />
+      </div>
+    `,
+  }),
+}
+
+export const ActivityAndLinkHighlights: Story = {
+  render: (args) => ({
+    components: { GanttChartComponent },
+    setup() {
+      const highlightedActivityIds = ref<Array<string | number>>(['optimized-0'])
+      const highlightedLinkIds = ref<Array<string | number>>(['optimized-0-optimized-1'])
+
+      return { args, highlightedActivityIds, highlightedLinkIds }
+    },
+    template: `
+      <div class="bg-slate-50 p-4" style="height: 760px;">
+        <div class="mb-3 rounded border border-surface-200 bg-surface-0 p-3 text-sm text-surface-700">
+          Hover an activity to highlight related links. Hover a link to highlight its source and target activities without opening the activity popover.
+        </div>
+        <GanttChartComponent
+          v-bind="args"
+          :highlighted-activity-ids="highlightedActivityIds"
+          :highlighted-link-ids="highlightedLinkIds"
+          activity-highlight-class="ring-2 ring-primary-500/70 brightness-110"
+          link-highlight-class="opacity-100 [stroke-width:4]"
         />
       </div>
     `,

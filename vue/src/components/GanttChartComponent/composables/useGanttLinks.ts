@@ -16,13 +16,40 @@ import type {
 } from '@/components/GanttChartComponent/ganttChartTypes'
 
 type GanttListItem = { data: GanttChartRowData; index: number }
+type GanttLinkEndpoint = 'start' | 'end'
+type GanttActivityPosition = {
+  startX: number
+  endX: number
+  y: number
+  visualType: GanttChartActivityData['visualType']
+}
 
 export interface GanttLinkLayer {
   id: string | number
+  markerId: string
+  fromId: string | number
+  toId: string | number
   path: string
   color: string
+  class?: string
   layer: 'base' | 'mini'
 }
+
+const sourceEndpoint = (linkType: GanttChartLinkData['type']): GanttLinkEndpoint =>
+  linkType?.startsWith('start-') ? 'start' : 'end'
+
+const targetEndpoint = (linkType: GanttChartLinkData['type']): GanttLinkEndpoint =>
+  linkType?.endsWith('-end') ? 'end' : 'start'
+
+const sourceEndpointX = (
+  endpoint: GanttLinkEndpoint,
+  position: { startX: number; endX: number }
+) => (endpoint === 'start' ? position.startX : position.endX)
+
+const targetEndpointX = (
+  endpoint: GanttLinkEndpoint,
+  position: { startX: number; endX: number }
+) => (endpoint === 'end' ? position.endX : position.startX)
 
 // Composable for computing and managing Gantt chart links between activities.
 export const useGanttLinks = ({
@@ -34,6 +61,7 @@ export const useGanttLinks = ({
   columnWidthPx,
   weekColumns,
   links,
+  svgIdPrefix,
   stackMiniActivities,
 }: {
   list: Ref<GanttListItem[]>
@@ -44,6 +72,7 @@ export const useGanttLinks = ({
   columnWidthPx: Ref<number>
   weekColumns: Ref<WeekColumn[]>
   links: Ref<GanttChartLinkData[]>
+  svgIdPrefix: string
   stackMiniActivities: Ref<boolean>
 }) => {
   // Computes the vertical offset in pixels of the virtual list.
@@ -58,10 +87,7 @@ export const useGanttLinks = ({
 
   // Computes the positions of visible activities in the Gantt chart.
   const visibleActivityPositions = computed(() => {
-    const positions = new Map<
-      string | number,
-      { startX: number; endX: number; y: number; visualType: GanttChartActivityData['visualType'] }
-    >()
+    const positions = new Map<string | number, GanttActivityPosition>()
 
     for (const item of list.value) {
       const rowIndex = item.index
@@ -158,51 +184,154 @@ export const useGanttLinks = ({
   const linkPaths = computed(() => {
     const paths: GanttLinkLayer[] = []
 
-    links.value.forEach((link) => {
+    // Link routing is intentionally kept as an explicit case-by-case geometry block.
+    // eslint-disable-next-line sonarjs/cognitive-complexity
+    links.value.forEach((link, index) => {
       const from = visibleActivityPositions.value.get(link.fromId)
       const to = visibleActivityPositions.value.get(link.toId)
       if (!from || !to) {
         return
       }
 
-      const startX = link.type === 'start-start' ? from.startX : from.endX
-      const endX = to.startX
-      const isBackward = endX < startX
-      const gap = Math.abs(endX - startX)
-      const bend = Math.min(28, Math.max(10, gap / 2))
-      const startOutX = startX + bend
-      const endInX = endX - bend
-      const midY = from.y + (to.y - from.y) / 2
-      const points: Array<{ x: number; y: number }> = []
+      // From and to connection points
+      const fromEndpoint = sourceEndpoint(link.type) // 'start' or 'end'
+      const toEndpoint = targetEndpoint(link.type) // 'start' or 'end'
+      const fromX = sourceEndpointX(fromEndpoint, from)
+      const toX = targetEndpointX(toEndpoint, to)
 
-      if (isBackward) {
-        const loopX = startX + bend + 16
-        points.push(
-          { x: startX, y: from.y },
-          { x: loopX, y: from.y },
-          { x: loopX, y: midY },
-          { x: endInX, y: midY },
-          { x: endInX, y: to.y },
-          { x: endX, y: to.y }
-        )
-      } else {
-        points.push(
-          { x: startX, y: from.y },
-          { x: startOutX, y: from.y },
-          { x: startOutX, y: midY },
-          { x: endInX, y: midY },
-          { x: endInX, y: to.y },
-          { x: endX, y: to.y }
-        )
+      // Connection points offsets,
+      const maneuveringOffsetX = columnWidthPx.value / 2 //px
+      const maneuveringOffsetY = Math.min(MINI_HEIGHT_PX, Math.abs(from.y - to.y) / 2)
+      const fromOffsetDirection = fromEndpoint === 'start' ? -1 : 1
+      const fromOffsetX = fromX + maneuveringOffsetX * fromOffsetDirection
+      const toOffsetDirection = toEndpoint === 'start' ? -1 : 1
+      const toOffsetX = toX + maneuveringOffsetX * toOffsetDirection
+
+      const points: Array<{ x: number; y: number }> = []
+      const linkTypeKey = `${fromEndpoint}-${toEndpoint}` as
+        | 'start-start'
+        | 'end-end'
+        | 'start-end'
+        | 'end-start'
+
+      // From
+      points.push({ x: fromX, y: from.y }, { x: fromOffsetX, y: from.y })
+
+      // Intermediary points
+      // The general ideas are, in order of priority :
+      // - Use the minimum possible amount of segments
+      // - Leave some space for turns when snaking around, to avoid 180 deg turns
+      // - When snaking around, make vertical moves first, then horizontal
+      switch (linkTypeKey) {
+        case 'start-start':
+          // 3 lines needed : go left, go down (or up if reversed), go right
+          // If the from and end endpoints are not aligned, we need one midpoint
+          if (toX > fromX) {
+            points.push({
+              x: fromOffsetX,
+              y: to.y,
+            })
+          }
+          if (toX < fromX) {
+            points.push({
+              x: toOffsetX,
+              y: from.y,
+            })
+          }
+          // If aligned, none needed
+          break
+        case 'end-end':
+          // 3 lines needed : go right, go down (or up if reversed), go left
+          // If the from and end endpoints are not aligned, we need one midpoint
+          if (toX > fromX) {
+            points.push({
+              x: toOffsetX,
+              y: from.y,
+            })
+          }
+          if (toX < fromX) {
+            points.push({
+              x: fromOffsetX,
+              y: to.y,
+            })
+          }
+          // If aligned, none needed
+          break
+        case 'end-start':
+          // Easy case, the from-end is before the to-start
+          // 3 lines needed : go right just to cover the offset, go down (or up) directly, go right all the way
+          if (fromOffsetX < toOffsetX) {
+            points.push({
+              x: fromOffsetX,
+              y: to.y,
+            })
+          } else {
+            // Harder case, the from-end is after the to-start
+            // We have to snake around in this case, or do a simple diagonal
+            // Case 1 : From is above, arrow goes down
+            if (from.y < to.y) {
+              points.push(
+                { x: fromOffsetX, y: from.y + maneuveringOffsetY },
+                { x: fromOffsetX, y: to.y - maneuveringOffsetY },
+                { x: toOffsetX, y: to.y - maneuveringOffsetY }
+              )
+            }
+            // Case 2 : From is below, arrow goes up
+            if (from.y > to.y) {
+              points.push(
+                { x: fromOffsetX, y: from.y - maneuveringOffsetY },
+                { x: fromOffsetX, y: to.y + maneuveringOffsetY },
+                { x: toOffsetX, y: to.y + maneuveringOffsetY }
+              )
+            }
+          }
+          break
+        case 'start-end':
+          // Easy case, the from-start is after the to-end
+          // It is rarer case, mostly could appear as a symmetry to the end-start case
+          // 3 lines needed : go left all the way, go down (or up) to target, go left to finish the offset
+          if (fromOffsetX > toOffsetX) {
+            points.push({
+              x: fromOffsetX,
+              y: to.y,
+            })
+          } else {
+            // Harder case, the from-start is before the to-end
+            // We have to snake around in this case, or do a simple diagonal
+            // Case 1 : From is above, arrow goes down
+            if (from.y < to.y) {
+              points.push(
+                { x: fromOffsetX, y: from.y + maneuveringOffsetY },
+                { x: fromOffsetX, y: to.y - maneuveringOffsetY },
+                { x: toOffsetX, y: to.y - maneuveringOffsetY }
+              )
+            }
+            // Case 2 : From is below, arrow goes up
+            if (from.y > to.y) {
+              points.push(
+                { x: fromOffsetX, y: from.y - maneuveringOffsetY },
+                { x: fromOffsetX, y: to.y + maneuveringOffsetY },
+                { x: toOffsetX, y: to.y + maneuveringOffsetY }
+              )
+            }
+          }
+          break
       }
 
-      const path = roundedPath(points, 6)
+      // End
+      points.push({ x: toOffsetX, y: to.y }, { x: toX, y: to.y })
+
+      const path = roundedPath(points, 4)
       const isMiniLink = from.visualType === 'mini' || to.visualType === 'mini'
 
       paths.push({
         id: link.id ?? `${link.fromId}-${link.toId}`,
+        markerId: `${svgIdPrefix}-gantt-link-arrow-${isMiniLink ? 'mini' : 'base'}-${index}`,
+        fromId: link.fromId,
+        toId: link.toId,
         path,
-        color: link.color ?? 'rgba(100, 116, 139, 0.8)',
+        color: link.color ?? 'black',
+        class: link.class,
         layer: isMiniLink ? 'mini' : 'base',
       })
     })
