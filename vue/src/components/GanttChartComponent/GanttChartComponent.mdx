@@ -137,6 +137,24 @@ const activity = {
 }
 ```
 
+## Layering and Z-Index
+
+The chart uses a fixed internal layering model so activities, dependency links, sticky headers, and popovers stay predictable. Consumer-provided classes such as `activityHighlightClass`, `linkClass`, `linkHighlightClass`, row slots, and activity slots should avoid changing `z-index` unless they deliberately opt out of this model.
+
+| Layer                            | Source                                          |     Z-index | Purpose                                                                      |
+| -------------------------------- | ----------------------------------------------- | ----------: | ---------------------------------------------------------------------------- |
+| Background and stripe activities | `GanttChartRowGrid`                             |         `0` | Full-row context layers rendered behind interactive bars.                    |
+| Base dependency links            | `GanttChartLinksOverlay`                        |        `10` | Standard links drawn above backgrounds but below primary bars.               |
+| Hovered/selected cell background | `GanttChartRowGrid`                             | `10` / `11` | Cell highlight layers; selected cells sit just above hovered cells.          |
+| Primary bar activities           | `GanttChartRowGrid`                             |        `20` | Main interactive bars.                                                       |
+| Mini dependency links            | `GanttChartLinksOverlay`                        |        `25` | Links involving mini activities, rendered above bars so they are not hidden. |
+| Mini activities                  | `GanttChartRowGrid`                             |        `30` | Compact stacked activity bars.                                               |
+| Row labels                       | `GanttChartRowLabel`                            |        `50` | Sticky left row headers.                                                     |
+| Calendar and top-left headers    | `GanttChartHeaderGrid`, `GanttChartHeaderLabel` |        `60` | Sticky date headers and top-left header cell.                                |
+| Activity popover                 | `GanttChartComponent`                           |        `70` | Floating custom popover slot content.                                        |
+
+The two SVG link overlays are intentionally split: base links are below normal bars, while mini links are above normal bars and below mini activities. This keeps regular activities visually dominant while preserving visibility for compact activity dependencies.
+
 ## Tooltips and Clicks
 
 ```vue
