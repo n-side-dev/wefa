@@ -32,7 +32,6 @@ For more information on the BFF architecture, see:
 - `OAUTH_ENDPOINT_LOGOUT`
 - `FRONTEND_REDIRECT`
 - `OAUTH_LOGIN_REDIRECT_URI`
-- `SESSION_TOKEN_ENCRYPTION_KEY` (ECDSA P-256 private key in PEM format)
 - Session cookie configuration:
 - `SESSION_COOKIE_NAME`
 - `SESSION_COOKIE_PATH`
@@ -56,14 +55,6 @@ print(base64.urlsafe_b64encode(secrets.token_bytes(32)).rstrip(b'=').decode())
 PY
 ```
 
-Generate a `SESSION_TOKEN_ENCRYPTION_KEY` (ECDSA P-256 private key in PEM format):
-```bash
-openssl ecparam -name prime256v1 -genkey -noout
-```
-Store the output as a single-line value with literal `\n` separators in `.env`:
-```
-SESSION_TOKEN_ENCRYPTION_KEY="-----BEGIN EC PRIVATE KEY-----\n...\n-----END EC PRIVATE KEY-----"
-```
 
 **Run Locally (Flask / PyCharm)**
 1. Ensure `.env` exists in the repo root.
