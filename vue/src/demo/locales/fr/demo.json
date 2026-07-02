@@ -40,6 +40,16 @@
     "optimized": "Optimisé",
     "desired": "Souhaité",
     "alt": "Alt.",
+    "activity_links_tester": "Testeur de liens d'activité",
+    "hover_prompt": "Survolez une activité pour inspecter son contexte de colonne.",
+    "no_hover_context": "aucun contexte de survol",
+    "week": "Semaine {n}",
+    "column": "Colonne {n}",
+    "unknown": "inconnu",
+    "debug_row": "rangée={value}",
+    "debug_activity": "activité={value}",
+    "debug_column": "colonne={value}",
+    "debug_value": "valeur={value}",
     "row_label": "Rangée {n}",
     "row_header": "Ligne {n}"
   }

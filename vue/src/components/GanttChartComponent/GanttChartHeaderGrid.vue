@@ -37,9 +37,10 @@
       <div class="flex flex-row w-full">
         <template v-if="isWeekView">
           <div
-            v-for="week in weekColumns"
+            v-for="(week, index) in weekColumns"
             :key="`${week.weekYear}-W${week.weekNumber}-${week.start.toISOString()}`"
-            class="flex-none box-border border-b border-r border-surface-200 bg-surface-0 text-surface-600 text-[11px] font-semibold h-9 flex items-center justify-center text-center leading-tight px-1"
+            class="flex-none box-border border-b border-r border-surface-200 text-surface-600 text-[11px] font-semibold h-9 flex items-center justify-center text-center leading-tight px-1"
+            :class="columnHeaderClass(index)"
             :style="{ width: `${columnWidthPx}px` }"
             :title="`${t('gantt_chart.week')} ${week.weekNumber}`"
             :aria-label="`${t('gantt_chart.week')} ${week.weekNumber}`"
@@ -63,9 +64,10 @@
       <!-- Days row -->
       <div v-if="!isWeekView" class="flex flex-row w-full">
         <div
-          v-for="date in dateRange"
+          v-for="(date, index) in dateRange"
           :key="date.toISOString()"
-          class="flex-none box-border border-b border-r border-surface-200 bg-surface-0 text-center py-2 text-xs text-surface-700 select-none"
+          class="flex-none box-border border-b border-r border-surface-200 text-center py-2 text-xs text-surface-700 select-none"
+          :class="columnHeaderClass(index)"
           :style="{ width: `${DAY_CELL_WIDTH_PX}px` }"
           :title="date.toDateString()"
         >
@@ -92,9 +94,20 @@ import {
 export interface GanttChartHeaderGridProps {
   dateRange: Date[]
   viewMode?: GanttChartViewMode
+  hoveredColumnIndex?: number
+  hoverHighlightClass?: string
+  selectedColumnIndex?: number
+  selectedHighlightClass?: string
 }
 
-const { dateRange, viewMode = 'day' } = defineProps<GanttChartHeaderGridProps>()
+const {
+  dateRange,
+  viewMode = 'day',
+  hoveredColumnIndex = undefined,
+  hoverHighlightClass = 'bg-primary-50/60',
+  selectedColumnIndex = undefined,
+  selectedHighlightClass = 'bg-primary-100/80',
+} = defineProps<GanttChartHeaderGridProps>()
 const { t } = useI18nLib()
 
 const isWeekView = computed(() => viewMode === 'week')
@@ -159,6 +172,14 @@ const months = computed(() => {
 
   return groups
 })
+
+const columnHeaderClass = (index: number) => {
+  if (index === hoveredColumnIndex) {
+    return hoverHighlightClass
+  }
+
+  return index === selectedColumnIndex ? selectedHighlightClass : 'bg-surface-0'
+}
 
 const monthSpanStyle = (month: MonthSpan) => ({
   left: `${month.startIndex * WEEK_CELL_WIDTH_PX}px`,

@@ -17,6 +17,7 @@ The GanttChart component renders a calendar grid with month and week headers, an
 - **Layered Activities**: Stripe, bar, and mini styles with overlap rules.
 - **Stacked Minis**: Overlapping minis grow row height automatically.
 - **Virtualized Rows**: Smooth scrolling for large datasets.
+- **Activity Interactions**: Hover, popover, and selection APIs share the same interaction payload.
 - **Translation Ready**: All user-facing labels are passed through `t()`.
 - **Configurable Sidebar**: Adjust the label column width via `leftHeaderWidthPx`.
 
@@ -52,7 +53,7 @@ const rows = ref([
         startDate: new Date(2026, 0, 1),
         endDate: new Date(2026, 0, 4),
         visualType: 'stripe',
-        color: 'rgba(59, 130, 246, 0.2)',
+        fillStyle: { backgroundColor: 'rgba(59, 130, 246, 0.2)' },
       },
       {
         id: 'optimized',
@@ -60,7 +61,19 @@ const rows = ref([
         startDate: new Date(2026, 0, 2),
         endDate: new Date(2026, 0, 8),
         visualType: 'bar',
-        colorClass: 'bg-emerald-400/80',
+        fillClass: 'bg-emerald-400/80',
+        fillSegments: [
+          {
+            startDate: new Date(2026, 0, 2),
+            endDate: new Date(2026, 0, 4),
+            class: 'bg-emerald-300/90',
+          },
+          {
+            startDate: new Date(2026, 0, 5),
+            endDate: new Date(2026, 0, 8),
+            class: 'bg-emerald-600/90',
+          },
+        ],
       },
     ],
   },
@@ -94,6 +107,54 @@ Activities support a `visualType`:
 - `bar`: primary rounded bar
 - `mini`: compact bar, stacked into lanes when overlapping
 
+## Activity Styling
+
+Activity styling separates the outer shell from the fill. Use `class` and `style` for shell-level concerns such as borders, rounded corners, and highlight-friendly effects. Use `fillClass` and `fillStyle` for the default activity fill.
+
+Bars can also render ranged fills with `fillSegments`. Segment ranges are inclusive by day and are clipped inside the bar shell. If `fillSegments` is empty or omitted, the bar uses the full-size `fillClass` / `fillStyle` fallback.
+
+```ts
+const activity = {
+  id: 'optimized',
+  label: 'Optimized',
+  startDate: new Date(2026, 0, 2),
+  endDate: new Date(2026, 0, 8),
+  visualType: 'bar',
+  class: 'border border-surface-400',
+  fillClass: 'bg-emerald-400/80',
+  fillSegments: [
+    {
+      startDate: new Date(2026, 0, 2),
+      endDate: new Date(2026, 0, 4),
+      class: 'bg-emerald-300/90',
+    },
+    {
+      startDate: new Date(2026, 0, 5),
+      endDate: new Date(2026, 0, 8),
+      class: 'bg-emerald-600/90',
+    },
+  ],
+}
+```
+
+## Layering and Z-Index
+
+The chart uses a fixed internal layering model so activities, dependency links, sticky headers, and popovers stay predictable. Consumer-provided classes such as `activityHighlightClass`, `linkClass`, `linkHighlightClass`, row slots, and activity slots should avoid changing `z-index` unless they deliberately opt out of this model.
+
+| Layer                            | Source                                          |     Z-index | Purpose                                                                      |
+| -------------------------------- | ----------------------------------------------- | ----------: | ---------------------------------------------------------------------------- |
+| Background and stripe activities | `GanttChartRowGrid`                             |         `0` | Full-row context layers rendered behind interactive bars.                    |
+| Base dependency links            | `GanttChartLinksOverlay`                        |        `10` | Standard links drawn above backgrounds but below primary bars.               |
+| Hovered/selected cell background | `GanttChartRowGrid`                             | `10` / `11` | Cell highlight layers; selected cells sit just above hovered cells.          |
+| Primary bar activities           | `GanttChartRowGrid`                             |        `20` | Main interactive bars.                                                       |
+| Mini dependency links            | `GanttChartLinksOverlay`                        |        `25` | Links involving mini activities, rendered above bars so they are not hidden. |
+| Mini activities                  | `GanttChartRowGrid`                             |        `30` | Compact stacked activity bars.                                               |
+| Row labels                       | `GanttChartRowLabel`                            |        `50` | Sticky left row headers.                                                     |
+| Calendar and top-left headers    | `GanttChartHeaderGrid`, `GanttChartHeaderLabel` |        `60` | Sticky date headers and top-left header cell.                                |
+| Activity popover                 | `GanttChartComponent`                           |        `70` | Floating custom popover slot content.                                        |
+
+The two SVG link overlays are intentionally split: base links are below normal bars, while mini links are above normal bars and below mini activities. This keeps regular activities visually dominant while preserving visibility for compact activity dependencies.
+
 ## Tooltips and Clicks
 
 ```vue
@@ -106,6 +167,74 @@ Activities support a `visualType`:
   :activity-click="(activity, row) => console.log(activity, row)"
 />
 ```
+
+## Activity Interactions
+
+Use `activityHover`, `activitySelect`, and `v-model:selected-interaction` when the consumer needs row, activity, and column context. Hover, popover, and selection use the same payload shape so consumers can reuse formatting and lookup logic.
+
+<Canvas of={GanttChartStories.ActivityInteractions} />
+
+```vue
+<template>
+  <GanttChartComponent
+    v-model:selected-interaction="selectedInteraction"
+    :start-date="startDate"
+    :end-date="endDate"
+    :rows="rows"
+    :activity-hover="handleActivityHover"
+    hover-highlight-class="bg-sky-100/80"
+    selected-highlight-class="bg-emerald-100/80"
+  >
+    <template #activity-popover="{ interaction }">
+      <div class="text-sm">
+        {{ interaction.rowData?.header }} / {{ interaction.activity.label }} / column
+        {{ interaction.context.columnIndex }}
+      </div>
+    </template>
+  </GanttChartComponent>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+import GanttChartComponent from '@/components/GanttChartComponent/GanttChartComponent.vue'
+import type { GanttChartActivityInteractionPayload } from '@/components/GanttChartComponent/ganttChartTypes'
+
+const selectedInteraction = ref<GanttChartActivityInteractionPayload | null>(null)
+
+const handleActivityHover = (
+  _activity,
+  _row,
+  _context,
+  interaction?: GanttChartActivityInteractionPayload
+) => {
+  console.log(interaction)
+}
+</script>
+```
+
+The payload is intentionally data-oriented. `rowKey`, `activityKey`, and `context.columnIndex` are stable enough for highlighting and lookup. `context.anchorClientX` and `context.anchorClientY` are only for floating UI positioning.
+
+## Activity and Link Highlights
+
+Activity and link highlighting is separate from popover behavior. Hovering or selecting an activity highlights related links and can still show the activity popover when the highlight comes from direct hover. Hovering a link highlights its source and target activities, but does not call `activityHover` and does not open the popover.
+
+<Canvas of={GanttChartStories.ActivityAndLinkHighlights} />
+
+```vue
+<GanttChartComponent
+  :start-date="startDate"
+  :end-date="endDate"
+  :rows="rows"
+  :links="links"
+  :highlighted-activity-ids="['activity-a']"
+  :highlighted-link-ids="['link-a']"
+  activity-highlight-class="ring-2 ring-primary-500/70 brightness-110"
+  link-class="opacity-70 transition-opacity"
+  link-highlight-class="opacity-100 [stroke-width:4]"
+/>
+```
+
+Use `highlightedActivityIds` and `highlightedLinkIds` for programmatic highlight. Hover-derived and selection-derived highlights are merged with these props. Programmatic highlights do not select activities, emit events, or open popovers.
 
 ## Custom Row Labels
 
@@ -137,14 +266,24 @@ Slot props:
 <ArgTypes of={GanttChartStories} />
 
 ```ts
+export type GanttChartActivityFillSegment = {
+  startDate: Date
+  endDate: Date
+  class?: string
+  style?: Record<string, string>
+}
+
 export type GanttChartActivityData = {
   id?: string | number
   label?: string
   startDate: Date
   endDate: Date
   visualType?: 'background' | 'stripe' | 'bar' | 'mini'
-  color?: string
-  colorClass?: string
+  class?: string
+  style?: Record<string, string>
+  fillClass?: string
+  fillStyle?: Record<string, string>
+  fillSegments?: GanttChartActivityFillSegment[]
   barOffsetTopPx?: number
 }
 
@@ -159,8 +298,26 @@ export type GanttChartLinkData = {
   id?: string | number
   fromId: string | number
   toId: string | number
-  type?: 'finish-start' | 'start-start'
+  type?: 'start-start' | 'start-end' | 'end-start' | 'end-end' | 'finish-start'
   color?: string
+}
+
+export type GanttChartActivityInteractionContext = {
+  columnIndex: number
+  viewMode: 'day' | 'week'
+  date?: Date
+  week?: WeekColumn
+  anchorClientX?: number
+  anchorClientY?: number
+}
+
+export type GanttChartActivityInteractionPayload = {
+  activity: GanttChartActivityData
+  rowData?: GanttChartRowData
+  rowIndex?: number
+  rowKey?: string | number
+  activityKey?: string | number
+  context: GanttChartActivityInteractionContext
 }
 ```
 
