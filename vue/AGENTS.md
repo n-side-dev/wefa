@@ -2,59 +2,52 @@
 
 ## Scope
 
-This file applies to the `@nside/wefa` Vue 3 workspace in `vue/`: components, containers, composables, stores, router helpers, network helpers, locales, demo code, Storybook docs, tests, and CLI installer assets.
+This file applies to the `@nside/wefa` Vue 3 workspace in `vue/`: components, containers, composables, stores, router helpers, network helpers, locales, demo code, Storybook docs, tests, and packaging helpers.
 
-Read `vue/README.md` and `vue/CONTRIBUTE.md` before changing public exports, package behavior, docs, or validation commands. Use `$wefa-vue-frontend` for frontend implementation and review work. Use `$wefa-tanstack-query` for TanStack Query setup, query/mutation flows, cache invalidation, query keys, and network wrapper decisions.
+Read [README.md](README.md) and [CONTRIBUTE.md](CONTRIBUTE.md) before changing public exports, package behavior, docs, or validation commands.
+
+## Skill Routing
+
+- Load `wefa-vue-cookbook` first for any Vue work here.
+- `wefa-vue-cookbook` is the shared base skill for the WeFa Vue ecosystem: it applies to consuming projects that use `@nside/wefa`, and it also applies inside this repository for the shared conventions that the library follows too.
+- After the cookbook, load `wefa-vue-frontend` for repo-specific maintainer guidance in this `vue/` workspace.
+- `wefa-vue-frontend` adds only repo-specific rules for exports, Storybook and MDX docs, demo wiring, generated artifacts, frontend tests, and the package quality gate.
+- For TanStack Query setup, query or mutation flows, invalidation, or wrapper-choice work, also use `wefa-tanstack-query`.
+- [`.github/copilot-instructions.md`](.github/copilot-instructions.md) is a compatibility pointer only, not the source of truth.
 
 ## UI And Composition Rules
 
-- Treat public WeFa components as an enhancement layer over PrimeVue: they should wrap, extend, or compose PrimeVue behavior with clear added value for consumers.
-- Reuse WeFa exports first. Start public-surface discovery at `src/lib.ts`, `src/containers/index.ts`, and nearest feature `index.ts` files.
-- If WeFa does not provide the needed UI, compose PrimeVue components before using native HTML.
-- Use native HTML only when WeFa and PrimeVue cannot model the requirement cleanly; leave a brief inline justification when the fallback is not obvious.
-- Prefer Tailwind utility classes for routine styling. Do not add new CSS imports.
-- Use scoped styles or bound style objects only when an existing feature pattern or layout math makes Tailwind impractical.
-- Follow adjacent component patterns for props, emits, file names, tests, stories, and docs. Prefer `const { prop = defaultValue } = defineProps<Type>()` for defaults unless local code already uses another pattern.
-- Use the `@/*` alias for source imports when it improves clarity and matches nearby files.
+- Treat public WeFa components as an enhancement layer over PrimeVue.
+- Reuse hierarchy is strict: WeFa component or container first, then PrimeVue composition, then native HTML only when neither higher layer fits cleanly.
+- Reuse public-surface exports first. Start discovery at `src/lib.ts`, `src/containers/index.ts`, and nearby feature `index.ts` files.
+- Prefer Tailwind utility classes for routine styling. Do not add new CSS imports for routine work.
+- Use scoped styles only when an existing local pattern or unavoidable layout math makes Tailwind impractical.
+- Follow adjacent component patterns for props, emits, tests, stories, docs, and file naming.
+- Keep user-facing literals translated, including labels, placeholders, validation copy, `title`, and accessibility text.
 
-## Component Deliverables
+## Repo-Specific Rules
 
-- New public components should include the SFC, colocated Storybook stories, colocated unit tests, and consumer-facing MDX docs when usage or accessibility guidance is non-trivial.
-- Storybook stories should demonstrate meaningful states and interactions; do not add the `autodocs` tag unless the Storybook setup changes to require it.
-- Use Storybook for isolated manual validation when component behavior, visual states, or accessibility affordances change.
-
-## Localization, Exports, And Generated Code
-
-- Route user-facing literals through the library i18n helpers, including labels, placeholders, validation copy, titles, and accessibility text.
-- Add or update locale resources under `src/locales/<locale>/` when library copy changes.
-- When adding public surface, update nearest `index.ts` files and shared entrypoints such as `src/lib.ts` or `src/containers/index.ts`.
-- Do not hand-edit generated OpenAPI client artifacts. Regenerate them with the existing script when needed.
-- Prefer existing network wrappers: `typedApiClient` for generated callables, `apiClient` for URL-based flows, and direct TanStack hooks only when wrappers cannot model the behavior cleanly.
-
-## Stories, Docs, And Tests
-
-- New or changed components need Storybook stories and tests matching the nearby feature style.
-- Add MDX docs when usage, accessibility, states, or props need consumer-facing guidance.
-- Update demo wiring when routed or integrated flows change.
-- Keep Storybook docs and README-facing examples consistent with implementation.
-- Place tests in the layer that owns the behavior: component tests beside component folders, network wrapper tests under `src/network/__tests__`, store/router/locales tests near their modules, and Playwright specs under `e2e/`.
-- Mock the highest stable boundary in tests: feature tests should usually mock WeFa network helpers, while network wrapper tests may mock transport or TanStack Query internals directly.
-- Codex guidance should come from `AGENTS.md` files and skills, not generated assistant instruction artifacts.
+- New or changed public components usually need source, stories, tests, and MDX docs when consumer guidance is non-trivial.
+- Update nearest `index.ts` files and shared entrypoints when public surface changes.
+- Treat `src/demo/` as a manual-validation surface, not as a home for reusable library logic.
+- Do not hand-edit generated demo OpenAPI client artifacts; regenerate them through the existing script.
+- Keep Storybook docs, demo flows, and README-facing examples aligned with implementation changes.
+- SFC block order is enforced: `<template>` then `<script>` then `<style>`.
+- Storybook stories should not add the `autodocs` tag unless the Storybook setup itself changes.
 
 ## Validation Commands
 
 Run from `vue/` unless noted:
 
 ```bash
-npm run type-check
+npm install
 npm run lint-check
+npm run type-check
 npm run format-check
 npm run test:unit -- --reporter=dot --silent
 npm run build
-npm run test:package-types
 npm run test:e2e -- --reporter=dot
-npm run knip -- --exclude exports,unlisted,duplicates,devDependencies,files
-npm audit --audit-level high
+npm run test:package-types
 ```
 
 Use `npm run test:e2e` when routing, demo flows, browser behavior, or integration paths change. Use `npm run test:package-types` when exports, packaging, declaration generation, or subpaths change. If running a subset, state what remains unrun.
