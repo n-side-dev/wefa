@@ -4,6 +4,7 @@
 *.code-workspace
 *.iml
 .claude/settings.local.json
+.claude/launch.json
 django/docs/source/api/*
 django/docs/output/**/*
 .env

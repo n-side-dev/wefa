@@ -4,6 +4,15 @@ Thanks for helping shape the WeFa (Web Factory) frontend library. This guide cov
 
 > **Namespace note**: the package is still published as `@nside/wefa` while we complete the rename. File paths and commands below use that scope until the transition lands.
 
+## Agent Guidance
+
+This document is for maintaining the Vue library inside this repository.
+
+- `../.agents/skills/wefa-vue-cookbook/SKILL.md` is the shared cookbook used by consuming projects that depend on `@nside/wefa`, and it is also the shared base guidance for this workspace.
+- `../.agents/skills/wefa-vue-frontend/SKILL.md` is the maintainer skill for this `vue/` workspace. Use it after the cookbook for repo-specific library work such as exports, Storybook or MDX docs, demo wiring, generated artifacts, and the Vue quality gate.
+
+See [AGENTS.md](AGENTS.md) for the workspace routing summary.
+
 ## Table of Contents
 
 - [Development Environment](#development-environment)
@@ -20,7 +29,7 @@ Thanks for helping shape the WeFa (Web Factory) frontend library. This guide cov
 
 ### Prerequisites
 
-- Node.js `^22.13.0 || >=24.0.0` (use `.node-version` or `.nvmrc`; the repo currently pins `24.9.0`)
+- Node.js `24.15.0` for local development (use `.node-version` or `.nvmrc`; the published package supports `^22.13.0 || >=24.0.0`)
 - npm 10 or an alternative package manager (pnpm, yarn)
 - Git
 

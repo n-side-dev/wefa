@@ -3,6 +3,8 @@
 Thank you for your interest in contributing to N-SIDE WeFa!
 This document provides guidelines and instructions for setting up your development environment and contributing to the project.
 
+> **Working with an AI agent (Codex, Claude Code, Copilot, etc.)?** Read [`AGENTS.md`](AGENTS.md) for the curated backend conventions, the quality gate, the new-app checklist, and known gotchas. This CONTRIBUTE.md focuses on the human contributor onboarding flow.
+
 ## Table of Contents
 
 - [Development Setup](#development-setup)

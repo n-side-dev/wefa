@@ -13,12 +13,6 @@
       leave-from-class="opacity-100"
       leave-to-class="opacity-0"
     >
-      <p
-        v-if="!collapsed"
-        class="px-3 text-[0.7rem] font-medium uppercase tracking-[0.28em] text-(--p-text-on-dark-soft)"
-      >
-        Navigate
-      </p>
     </Transition>
     <section v-if="topLevelEntries.length > 0" class="mt-3 flex flex-col gap-1.5">
       <NavigationLinkComponent
