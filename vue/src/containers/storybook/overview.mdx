@@ -7,10 +7,12 @@ import * as RouterContainerStories from './overview.stories.ts'
 
 ## Overview
 
-Containers are components that wrap other components. For example, a NavBar container will provide a NavBar on the top of the screen with navigation options,
-and display the chosen option on the bottom of the screen.
+Containers are components that wrap routed pages. For example, a `NavbarContainer` renders a
+navigation bar above the selected child route, while a `SideMenuContainer` renders the same route
+hierarchy as a side menu.
 
-Router Containers easily integrate with the router definition to automatically generate content, while providing some customization options.
+Router containers integrate with the router definition to automatically generate navigation from
+child routes and render the selected child route through `<RouterView />`.
 
 ## Routes and children routes
 
@@ -52,8 +54,13 @@ routes: [
 ]
 ```
 
-In such a setup, you may need to have a navigation element allowing you to see and navigate between these three children routes.
-This is the purpose of the Router Containers, and can be done by defining which container component should be used on the parent route, here "/settings".
+In such a setup, you may need a navigation element allowing users to move between the three child
+routes. This is the purpose of router containers: the parent route gets a container component, and
+the children become navigation entries.
+
+### Side Menu
+
+Use `SideMenuContainer` for a persistent vertical menu.
 
 ```ts
 /** router.ts*/
@@ -61,57 +68,234 @@ This is the purpose of the Router Containers, and can be done by defining which 
 import { SideMenuContainer } from '@nside/wefa/containers'
 
 routes: [
-    {
-      path: '/settings',
-      name: 'settings',
-      meta: { wefa: { title: 'Settings' } },
-      component: SideMenuContainer,
-      children: [
-        ...
-      ]
-    }
-  ]
+  {
+    path: '/settings',
+    name: 'settings',
+    meta: { wefa: { title: 'Settings' } },
+    component: SideMenuContainer,
+    props: {
+      depth: 1,
+      width: 50,
+    },
+    children: [
+      {
+        path: 'passwordreset',
+        name: 'passwordreset',
+        meta: { wefa: { title: 'Password reset', icon: 'pi pi-key' } },
+        component: PasswordResetView,
+      },
+      {
+        path: 'apitoken',
+        name: 'apitoken',
+        meta: { wefa: { title: 'API Token', icon: 'pi pi-lock' } },
+        component: ApiTokenView,
+      },
+      {
+        path: 'preferences',
+        name: 'preferences',
+        meta: { wefa: { title: 'Preferences', icon: 'pi pi-cog' } },
+        component: UserPreferencesView,
+      },
+    ],
+  },
+]
 ```
 
 <Canvas>
   <Story of={RouterContainerStories.Default} />
 </Canvas>
 
-You can also have deeper hierarchy, with children of children. This is the case for the "API Token" section in the example above.
+### Navbar
+
+Use `NavbarContainer` when the same child routes should be displayed horizontally above the page
+content.
 
 ```ts
 /** router.ts*/
 
-import { SideMenuContainer, NavBarContainer } from '@nside/wefa/containers'
+import { NavbarContainer } from '@nside/wefa/containers'
 
 routes: [
-    {
-      path: '/settings',
-      name: 'settings',
-      meta: { wefa: { title: 'Settings' } },
-      component: SideMenuContainer,
-      children: [
-        ...
-        {
-          path: 'apitoken',
-          name: 'apitoken',
-          meta: { wefa: { title: 'API Token' } },
-          component: NavBarContainer,
-          children: [
-            { path: 'readonly', meta: { wefa: { title: 'Read-Only' }}, ...},
-            { path: 'readwrite', meta: { wefa: { title: 'Read + Write' }}, ...},
-            { path: 'admin', meta: { wefa: { title: 'Admin' }}, ...}
-          ]
-        },
-        ...
-      ]
-    }
-  ]
+  {
+    path: '/settings',
+    name: 'settings',
+    meta: { wefa: { title: 'Settings' } },
+    component: NavbarContainer,
+    children: [
+      {
+        path: 'passwordreset',
+        name: 'passwordreset',
+        meta: { wefa: { title: 'Password reset', icon: 'pi pi-key' } },
+        component: PasswordResetView,
+      },
+      {
+        path: 'apitoken',
+        name: 'apitoken',
+        meta: { wefa: { title: 'API Token', icon: 'pi pi-lock' } },
+        component: ApiTokenView,
+      },
+      {
+        path: 'preferences',
+        name: 'preferences',
+        meta: { wefa: { title: 'Preferences', icon: 'pi pi-cog' } },
+        component: UserPreferencesView,
+      },
+    ],
+  },
+]
+```
+
+### Tabs
+
+Use `TabsContainer` when the same child routes should be displayed as tabs. Unlike
+`RoutedTabsComponent`, `TabsContainer` does not need a manually maintained `tabs` prop: it reads the
+children of the current route.
+
+```ts
+/** router.ts*/
+
+import { TabsContainer } from '@nside/wefa/containers'
+
+routes: [
+  {
+    path: '/settings',
+    name: 'settings',
+    meta: { wefa: { title: 'Settings' } },
+    component: TabsContainer,
+    children: [
+      {
+        path: 'passwordreset',
+        name: 'passwordreset',
+        meta: { wefa: { title: 'Password reset', icon: 'pi pi-key' } },
+        component: PasswordResetView,
+      },
+      {
+        path: 'apitoken',
+        name: 'apitoken',
+        meta: { wefa: { title: 'API Token', icon: 'pi pi-lock' } },
+        component: ApiTokenView,
+      },
+      {
+        path: 'preferences',
+        name: 'preferences',
+        meta: { wefa: { title: 'Preferences', icon: 'pi pi-cog' } },
+        component: UserPreferencesView,
+      },
+    ],
+  },
+]
+```
+
+## Nested Containers
+
+You can also have deeper hierarchy, with children of children. This is useful when one section owns a
+second local navigation level.
+
+```ts
+/** router.ts*/
+
+import { NavbarContainer, SideMenuContainer, TabsContainer } from '@nside/wefa/containers'
+
+routes: [
+  {
+    path: '/settings',
+    name: 'settings',
+    meta: { wefa: { title: 'Settings' } },
+    component: SideMenuContainer,
+    props: {
+      depth: 2,
+    },
+    children: [
+      {
+        path: 'passwordreset',
+        name: 'passwordreset',
+        meta: { wefa: { title: 'Password reset', icon: 'pi pi-key' } },
+        component: PasswordResetView,
+      },
+      {
+        path: 'apitoken',
+        name: 'apitoken',
+        meta: { wefa: { title: 'API Token', icon: 'pi pi-lock' } },
+        component: TabsContainer,
+        children: [
+          {
+            path: 'readonly',
+            name: 'apitoken-readonly',
+            meta: { wefa: { title: 'Read-only', icon: 'pi pi-eye' } },
+            component: ReadOnlyTokenView,
+          },
+          {
+            path: 'readwrite',
+            name: 'apitoken-readwrite',
+            meta: { wefa: { title: 'Read + write', icon: 'pi pi-pencil' } },
+            component: ReadWriteTokenView,
+          },
+          {
+            path: 'admin',
+            name: 'apitoken-admin',
+            meta: { wefa: { title: 'Admin', icon: 'pi pi-shield' } },
+            component: AdminTokenView,
+          },
+        ],
+      },
+      {
+        path: 'preferences',
+        name: 'preferences',
+        meta: { wefa: { title: 'Preferences', icon: 'pi pi-cog' } },
+        component: UserPreferencesView,
+      },
+    ],
+  },
+]
+```
+
+## Dynamic Parent Routes
+
+Containers preserve the current route params when they navigate between named child routes. This is
+the recommended shape for pages scoped to a loaded business object.
+
+```ts
+/** router.ts*/
+
+import { TabsContainer } from '@nside/wefa/containers'
+
+routes: [
+  {
+    path: '/planning-instance/:planningInstanceId',
+    name: 'planning-instance',
+    meta: { wefa: { title: 'Planning instance' } },
+    component: TabsContainer,
+    redirect: (route) => ({
+      name: 'work-planning',
+      params: route.params,
+    }),
+    children: [
+      {
+        path: 'work-planning',
+        name: 'work-planning',
+        meta: { wefa: { title: 'Work planning', icon: 'pi pi-chart-bar' } },
+        component: WorkPlanningView,
+      },
+      {
+        path: 'work-management',
+        name: 'work-management',
+        meta: { wefa: { title: 'Work management', icon: 'pi pi-file' } },
+        component: WorkManagementView,
+      },
+      {
+        path: 'outage-planning',
+        name: 'outage-planning',
+        meta: { wefa: { title: 'Outage planning', icon: 'pi pi-wrench' } },
+        component: OutagePlanningView,
+      },
+    ],
+  },
+]
 ```
 
 ## Customizing appearance with route.meta.wefa
 
-Navigation elements (e.g in the NavbarContainer or SideMenuContainer) rely on metadata specified on `route.meta.wefa`, such as:
+Navigation elements (e.g in the NavbarContainer, SideMenuContainer, or TabsContainer) rely on metadata specified on `route.meta.wefa`, such as:
 
 - title
 - icon

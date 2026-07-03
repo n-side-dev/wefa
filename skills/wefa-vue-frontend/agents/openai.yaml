@@ -1,4 +1,0 @@
-interface:
-  display_name: "WeFa Vue Frontend"
-  short_description: "Implement and review WeFa Vue frontend changes"
-  default_prompt: "Use $wefa-vue-frontend to implement or review a change in the `vue/` workspace following WeFa frontend conventions."
