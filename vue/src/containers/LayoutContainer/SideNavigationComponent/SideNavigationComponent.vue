@@ -108,6 +108,9 @@ const persistedCollapsed = collapsible
 
 const collapsed = computed(() => persistedCollapsed?.value ?? false)
 
+/**
+ * Toggle the persisted collapsed state when the rail is collapsible.
+ */
 function toggleSideNav() {
   if (!persistedCollapsed) {
     return
@@ -118,6 +121,8 @@ function toggleSideNav() {
 /**
  * True when the element (or any ancestor) is a form field or contenteditable
  * region — meaning Cmd/Ctrl+B should be left for the user, not stolen by us.
+ * @param target Event target from the keyboard interaction.
+ * @returns Whether the target belongs to editable content.
  */
 function isEditableTarget(target: EventTarget | null): boolean {
   if (!(target instanceof Element)) {
@@ -143,6 +148,7 @@ function isEditableTarget(target: EventTarget | null): boolean {
 
 /**
  * Toggles the rail with Cmd/Ctrl+B unless focus is in an editable element.
+ * @param event Keyboard event from the global shortcut listener.
  */
 function handleKeydown(event: KeyboardEvent) {
   if (event.key !== 'b' && event.key !== 'B') {
