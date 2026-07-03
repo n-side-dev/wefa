@@ -77,10 +77,10 @@ def test_token_cookie_missing_access_token_returns_none(app, build_token_payload
     cookie_map = _extract_cookie_map(response)
 
     names = token_cookie_names(settings)
-    missing_access = dict(cookie_map)
-    missing_access.pop(names["access_token"])
+    cookie_map_without_access_token = dict(cookie_map)
+    cookie_map_without_access_token.pop(names["access_token"])
 
-    assert load_token_from_cookies(missing_access, settings) is None
+    assert load_token_from_cookies(cookie_map_without_access_token, settings) is None
 
 
 def test_token_cookie_missing_refresh_token_returns_none(app, build_token_payload):
@@ -92,10 +92,10 @@ def test_token_cookie_missing_refresh_token_returns_none(app, build_token_payloa
     cookie_map = _extract_cookie_map(response)
 
     names = token_cookie_names(settings)
-    missing_refresh = dict(cookie_map)
-    missing_refresh.pop(names["refresh_token"])
+    cookie_map_without_refresh_token = dict(cookie_map)
+    cookie_map_without_refresh_token.pop(names["refresh_token"])
 
-    assert load_token_from_cookies(missing_refresh, settings) is None
+    assert load_token_from_cookies(cookie_map_without_refresh_token, settings) is None
 
 
 def test_token_cookie_oversize_raises_error(app, build_token_payload):
