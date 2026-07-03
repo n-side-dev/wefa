@@ -9,37 +9,41 @@
   >
     <defs>
       <!-- Clip to the virtualized viewport so paths don't bleed outside. -->
-      <clipPath id="gantt-link-clip">
+      <clipPath :id="baseClipPathId">
         <rect x="0" y="0" :width="gridWidthPx" :height="virtualHeightPx" />
       </clipPath>
       <!-- Each link gets its own marker so color matches the stroke. -->
       <marker
         v-for="link in linkLayers.base"
-        :id="`gantt-link-arrow-${link.id}`"
-        :key="`marker-${link.id}`"
-        markerWidth="6"
-        markerHeight="6"
-        refX="6"
-        refY="3"
+        :id="link.markerId"
+        :key="`marker-${link.markerId}`"
+        markerWidth="4"
+        markerHeight="4"
+        refX="4"
+        refY="2"
         orient="auto"
         markerUnits="strokeWidth"
       >
-        <path d="M 0 0 L 6 3 L 0 6 z" :fill="link.color" :stroke="link.color" />
+        <path d="M 0 0 L 4 2 L 0 4 z" :fill="link.color" :stroke="link.color" />
       </marker>
     </defs>
-    <g clip-path="url(#gantt-link-clip)">
+    <g :clip-path="`url(#${baseClipPathId})`">
       <!-- Paths are precomputed in useGanttLinks (row offsets + column widths). -->
       <path
         v-for="link in linkLayers.base"
-        :key="link.id"
+        :key="link.markerId"
         :data-link-id="link.id"
         :d="link.path"
         :stroke="link.color"
+        :class="linkPathClass(link)"
         stroke-width="2.5"
         fill="none"
         stroke-linecap="round"
         stroke-linejoin="round"
-        :marker-end="`url(#gantt-link-arrow-${link.id})`"
+        pointer-events="stroke"
+        :marker-end="`url(#${link.markerId})`"
+        @pointerenter="emit('linkPointerEnter', link)"
+        @pointerleave="emit('linkPointerLeave', link)"
       />
     </g>
   </svg>
@@ -53,36 +57,40 @@
   >
     <defs>
       <!-- Clip to the virtualized viewport so paths don't bleed outside. -->
-      <clipPath id="gantt-link-clip-mini">
+      <clipPath :id="miniClipPathId">
         <rect x="0" y="0" :width="gridWidthPx" :height="virtualHeightPx" />
       </clipPath>
       <!-- Each link gets its own marker so color matches the stroke. -->
       <marker
         v-for="link in linkLayers.mini"
-        :id="`gantt-link-arrow-mini-${link.id}`"
-        :key="`marker-mini-${link.id}`"
-        markerWidth="6"
-        markerHeight="6"
-        refX="6"
-        refY="3"
+        :id="link.markerId"
+        :key="`marker-mini-${link.markerId}`"
+        markerWidth="4"
+        markerHeight="4"
+        refX="4"
+        refY="4"
         orient="auto"
         markerUnits="strokeWidth"
       >
-        <path d="M 0 0 L 6 3 L 0 6 z" :fill="link.color" :stroke="link.color" />
+        <path d="M 0 0 L 4 2 L 0 4 z" :fill="link.color" :stroke="link.color" />
       </marker>
     </defs>
-    <g clip-path="url(#gantt-link-clip-mini)">
+    <g :clip-path="`url(#${miniClipPathId})`">
       <path
         v-for="link in linkLayers.mini"
-        :key="`mini-${link.id}`"
+        :key="`mini-${link.markerId}`"
         :data-link-id="link.id"
         :d="link.path"
         :stroke="link.color"
+        :class="linkPathClass(link)"
         stroke-width="2.5"
         fill="none"
         stroke-linecap="round"
         stroke-linejoin="round"
-        :marker-end="`url(#gantt-link-arrow-mini-${link.id})`"
+        pointer-events="stroke"
+        :marker-end="`url(#${link.markerId})`"
+        @pointerenter="emit('linkPointerEnter', link)"
+        @pointerleave="emit('linkPointerLeave', link)"
       />
     </g>
   </svg>
@@ -96,10 +104,36 @@ export interface GanttChartLinksOverlayProps {
     base: GanttLinkLayer[]
     mini: GanttLinkLayer[]
   }
+  highlightedLinkMarkerIds?: Array<string>
+  linkClass?: string
+  linkHighlightClass?: string
+  svgIdPrefix: string
   gridWidthPx: number
   virtualHeightPx: number
   leftHeaderWidthPx: number
 }
 
-defineProps<GanttChartLinksOverlayProps>()
+const {
+  linkLayers,
+  gridWidthPx,
+  virtualHeightPx,
+  leftHeaderWidthPx,
+  highlightedLinkMarkerIds = [],
+  linkClass = 'opacity-70 transition-opacity',
+  linkHighlightClass = 'opacity-100 [stroke-width:4]',
+  svgIdPrefix,
+} = defineProps<GanttChartLinksOverlayProps>()
+
+const emit = defineEmits<{
+  (event: 'linkPointerEnter', link: GanttLinkLayer): void
+  (event: 'linkPointerLeave', link: GanttLinkLayer): void
+}>()
+
+const linkPathClass = (link: GanttLinkLayer) => [
+  link.class,
+  highlightedLinkMarkerIds.includes(link.markerId) ? linkHighlightClass : linkClass,
+]
+
+const baseClipPathId = `${svgIdPrefix}-gantt-link-clip`
+const miniClipPathId = `${svgIdPrefix}-gantt-link-clip-mini`
 </script>

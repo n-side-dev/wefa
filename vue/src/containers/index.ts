@@ -8,6 +8,8 @@ export * from './SideMenuContainer'
 
 export * from './NavbarContainer'
 
+export * from './TabsContainer'
+
 export * from './RoutedTabsComponent'
 
 export * from './LayoutContainer'

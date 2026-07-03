@@ -16,6 +16,15 @@ N-SIDE WeFa (Web Factory) is an open-source toolkit for building full-stack, pro
 
 Explore the [interactive documentation](https://n-side-dev.github.io/wefa/) for the Django and Vue packages.
 
+## Agent Guidance
+
+For AI-agent work on Vue code, this repository keeps two distinct guidance layers under `.agents/skills/`:
+
+- `wefa-vue-cookbook` is the shared Vue skill. It is the right starting point for consuming projects that use `@nside/wefa`, and it is also the shared base for work inside this repository's `vue/` package.
+- `wefa-vue-frontend` is the maintainer skill. Use it only for work inside this repository's `vue/` package, after loading the cookbook, when the task touches repo-specific library concerns such as exports, Storybook or MDX docs, demo wiring, generated artifacts, or the Vue quality gate.
+
+See [AGENTS.md](AGENTS.md) for the repo routing rules.
+
 ## Packages at a Glance
 
 - `django/` – source code for the Django distribution published as `nside-wefa`. Includes the demo project in `django/demo`.

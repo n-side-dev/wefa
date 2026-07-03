@@ -33,6 +33,15 @@ The library is built on top of the following ecosystem:
 
 A demo playground lives alongside the library so you can experiment locally while developing components.
 
+## Agent Guidance
+
+For AI-agent work, the Vue guidance is split intentionally:
+
+- `../.agents/skills/wefa-vue-cookbook/SKILL.md` is the shared cookbook. It is the base guidance for consuming projects that use `@nside/wefa`, and it is also the first skill to load when working inside this `vue/` workspace.
+- `../.agents/skills/wefa-vue-frontend/SKILL.md` is the maintainer skill for this repository's Vue library. Load it after the cookbook when the task is specific to maintaining the library itself, such as exports, Storybook or MDX docs, demo wiring, generated artifacts, or the Vue quality gate.
+
+See [AGENTS.md](AGENTS.md) for the workspace routing rules and [CONTRIBUTE.md](CONTRIBUTE.md) for the maintainer workflow.
+
 ## Feature Highlights
 
 - Rich component catalogue following the WeFa design language
@@ -161,7 +170,7 @@ From the `vue/` directory:
 | `npm run format` / `npm run format-check` | Run Prettier in write/check mode |
 | `npm run test:package-types` | Build the package, pack it, and verify published type declarations |
 
-The project supports Node.js `^22.13.0 || >=24.0.0`. Use the included `.node-version` or `.nvmrc` to align with CI; the repository currently pins `24.9.0`.
+The published package supports Node.js `^22.13.0 || >=24.0.0`. Local development should use the included `.node-version` or `.nvmrc` to align with CI; the repository currently pins `24.15.0` because the build toolchain requires Node `^22.22.2 || ^24.15.0 || >=26.0.0`.
 
 ## Testing and quality gates
 

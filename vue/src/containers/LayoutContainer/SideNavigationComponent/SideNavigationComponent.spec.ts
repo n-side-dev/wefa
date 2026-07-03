@@ -1,7 +1,9 @@
-import { describe, it, expect } from 'vitest'
-import { mount } from '@vue/test-utils'
-import { defineComponent } from 'vue'
+import { afterEach, describe, it, expect, beforeEach, vi } from 'vitest'
+import { enableAutoUnmount, mount, type VueWrapper } from '@vue/test-utils'
+import { defineComponent, nextTick } from 'vue'
 import SideNavigationComponent from './SideNavigationComponent.vue'
+
+const STORAGE_KEY = 'wefa-side-nav-collapsed'
 
 const TopComponentStub = defineComponent({
   name: 'TopComponent',
@@ -14,34 +16,72 @@ const TopComponentStub = defineComponent({
       type: String,
       default: undefined,
     },
+    collapsed: {
+      type: Boolean,
+      default: false,
+    },
   },
-  template: '<div data-test="top">{{ projectTitle }}|{{ projectLogo }}</div>',
+  template:
+    '<div data-test="top" :data-collapsed="collapsed">{{ projectTitle }}|{{ projectLogo }}</div>',
 })
 
 const MainComponentStub = defineComponent({
   name: 'MainComponent',
-  template: '<div data-test="main">Main Navigation</div>',
+  props: {
+    collapsed: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  template: '<div data-test="main" :data-collapsed="collapsed">Main Navigation</div>',
 })
 
 const BottomComponentStub = defineComponent({
   name: 'BottomComponent',
-  template: '<div data-test="bottom">Default Footer</div>',
+  props: {
+    collapsed: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  template: '<div data-test="bottom" :data-collapsed="collapsed">Default Footer</div>',
 })
 
+const globalConfig = {
+  stubs: {
+    TopComponent: TopComponentStub,
+    MainComponent: MainComponentStub,
+    BottomComponent: BottomComponentStub,
+  },
+}
+
+function mountSideNav(
+  props: {
+    projectTitle?: string
+    projectLogo?: string
+    collapsible?: boolean
+  } = {}
+) {
+  return mount(SideNavigationComponent, {
+    props: { projectTitle: 'WeFa', collapsible: true, ...props },
+    attachTo: document.body,
+    global: globalConfig,
+  })
+}
+
+function isCollapsed(wrapper: VueWrapper): boolean {
+  return wrapper.find('button[data-test="side-nav-toggle"]').attributes('aria-pressed') === 'true'
+}
+
 describe('SideNavigationComponent', () => {
+  enableAutoUnmount(afterEach)
+
+  beforeEach(() => {
+    localStorage.removeItem(STORAGE_KEY)
+  })
+
   it('renders top, main, and default bottom sections', () => {
-    const wrapper = mount(SideNavigationComponent, {
-      props: {
-        projectTitle: 'WeFa',
-      },
-      global: {
-        stubs: {
-          TopComponent: TopComponentStub,
-          MainComponent: MainComponentStub,
-          BottomComponent: BottomComponentStub,
-        },
-      },
-    })
+    const wrapper = mountSideNav()
 
     expect(wrapper.find('[data-test="top"]').exists()).toBe(true)
     expect(wrapper.find('[data-test="main"]').exists()).toBe(true)
@@ -49,37 +89,15 @@ describe('SideNavigationComponent', () => {
   })
 
   it('passes project title to TopComponent', () => {
-    const wrapper = mount(SideNavigationComponent, {
-      props: {
-        projectTitle: 'Energy Forecast',
-      },
-      global: {
-        stubs: {
-          TopComponent: TopComponentStub,
-          MainComponent: MainComponentStub,
-          BottomComponent: BottomComponentStub,
-        },
-      },
-    })
-
+    const wrapper = mountSideNav({ projectTitle: 'Energy Forecast' })
     expect(wrapper.get('[data-test="top"]').text()).toBe('Energy Forecast|')
   })
 
   it('passes custom logo to TopComponent', () => {
-    const wrapper = mount(SideNavigationComponent, {
-      props: {
-        projectTitle: 'Energy Forecast',
-        projectLogo: 'https://example.test/logo.svg',
-      },
-      global: {
-        stubs: {
-          TopComponent: TopComponentStub,
-          MainComponent: MainComponentStub,
-          BottomComponent: BottomComponentStub,
-        },
-      },
+    const wrapper = mountSideNav({
+      projectTitle: 'Energy Forecast',
+      projectLogo: 'https://example.test/logo.svg',
     })
-
     expect(wrapper.get('[data-test="top"]').text()).toBe(
       'Energy Forecast|https://example.test/logo.svg'
     )
@@ -87,22 +105,155 @@ describe('SideNavigationComponent', () => {
 
   it('renders custom bottom slot content instead of the default footer', () => {
     const wrapper = mount(SideNavigationComponent, {
-      props: {
-        projectTitle: 'Energy Forecast',
-      },
-      slots: {
-        bottom: '<div data-test="custom-bottom">Custom Footer</div>',
-      },
-      global: {
-        stubs: {
-          TopComponent: TopComponentStub,
-          MainComponent: MainComponentStub,
-          BottomComponent: BottomComponentStub,
-        },
-      },
+      props: { projectTitle: 'Energy Forecast' },
+      slots: { bottom: '<div data-test="custom-bottom">Custom Footer</div>' },
+      global: globalConfig,
     })
 
     expect(wrapper.find('[data-test="custom-bottom"]').exists()).toBe(true)
     expect(wrapper.find('[data-test="bottom"]').exists()).toBe(false)
+  })
+
+  it('defaults to expanded (19rem) and aria-pressed=false on the toggle', () => {
+    const wrapper = mountSideNav()
+
+    const aside = wrapper.find('aside')
+    expect(aside.classes()).toContain('lg:w-[19rem]')
+    expect(aside.classes()).not.toContain('lg:w-[4.5rem]')
+
+    const toggle = wrapper.find('button[data-test="side-nav-toggle"]')
+    expect(toggle.attributes('aria-pressed')).toBe('false')
+    expect(toggle.attributes('aria-label')).toBe('Collapse navigation')
+  })
+
+  it('restores the saved collapsed state from localStorage on mount', () => {
+    localStorage.setItem(STORAGE_KEY, 'true')
+    const wrapper = mountSideNav()
+
+    const aside = wrapper.find('aside')
+    expect(aside.classes()).toContain('lg:w-[4.5rem]')
+    expect(isCollapsed(wrapper)).toBe(true)
+  })
+
+  it('toggles when the edge button is clicked and forwards collapsed to children', async () => {
+    const wrapper = mountSideNav()
+
+    expect(wrapper.get('[data-test="top"]').attributes('data-collapsed')).toBe('false')
+    expect(wrapper.get('[data-test="main"]').attributes('data-collapsed')).toBe('false')
+    expect(wrapper.get('[data-test="bottom"]').attributes('data-collapsed')).toBe('false')
+
+    await wrapper.find('button[data-test="side-nav-toggle"]').trigger('click')
+
+    expect(isCollapsed(wrapper)).toBe(true)
+    expect(wrapper.get('[data-test="top"]').attributes('data-collapsed')).toBe('true')
+    expect(wrapper.get('[data-test="main"]').attributes('data-collapsed')).toBe('true')
+    expect(wrapper.get('[data-test="bottom"]').attributes('data-collapsed')).toBe('true')
+  })
+
+  it('persists changes to localStorage', async () => {
+    const wrapper = mountSideNav()
+    await wrapper.find('button[data-test="side-nav-toggle"]').trigger('click')
+    expect(localStorage.getItem(STORAGE_KEY)).toBe('true')
+  })
+
+  it('toggles on Cmd/Ctrl+B from the window scope', async () => {
+    const wrapper = mountSideNav()
+
+    expect(isCollapsed(wrapper)).toBe(false)
+
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'b', metaKey: true }))
+    await nextTick()
+    expect(isCollapsed(wrapper)).toBe(true)
+
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'b', ctrlKey: true }))
+    await nextTick()
+    expect(isCollapsed(wrapper)).toBe(false)
+  })
+
+  it.each([
+    ['input', () => document.createElement('input')],
+    ['textarea', () => document.createElement('textarea')],
+    ['select', () => document.createElement('select')],
+    [
+      'contenteditable',
+      () => {
+        const div = document.createElement('div')
+        div.setAttribute('contenteditable', 'true')
+        return div
+      },
+    ],
+  ] as const)('ignores Cmd+B when focus is inside %s', async (_label, makeEl) => {
+    const wrapper = mountSideNav()
+    expect(isCollapsed(wrapper)).toBe(false)
+
+    const el = makeEl()
+    document.body.appendChild(el)
+    el.focus()
+
+    el.dispatchEvent(new KeyboardEvent('keydown', { key: 'b', metaKey: true, bubbles: true }))
+    await nextTick()
+    expect(isCollapsed(wrapper)).toBe(false)
+
+    document.body.removeChild(el)
+  })
+
+  it('removes the global keydown listener on unmount', () => {
+    const removeSpy = vi.spyOn(window, 'removeEventListener')
+    const wrapper = mountSideNav()
+    wrapper.unmount()
+
+    const keydownCalls = removeSpy.mock.calls.filter(([type]) => type === 'keydown')
+    expect(keydownCalls.length).toBeGreaterThan(0)
+    removeSpy.mockRestore()
+  })
+
+  describe('when collapsible is false (default)', () => {
+    it('does not render the toggle button', () => {
+      const wrapper = mountSideNav({ collapsible: false })
+      expect(wrapper.find('button[data-test="side-nav-toggle"]').exists()).toBe(false)
+    })
+
+    it('stays at expanded width regardless of any saved preference', () => {
+      localStorage.setItem(STORAGE_KEY, 'true')
+      const wrapper = mountSideNav({ collapsible: false })
+      const aside = wrapper.find('aside')
+      expect(aside.classes()).toContain('lg:w-[19rem]')
+      expect(aside.classes()).not.toContain('lg:w-[4.5rem]')
+    })
+
+    it('forwards collapsed=false to children regardless of saved preference', () => {
+      localStorage.setItem(STORAGE_KEY, 'true')
+      const wrapper = mountSideNav({ collapsible: false })
+      expect(wrapper.get('[data-test="top"]').attributes('data-collapsed')).toBe('false')
+      expect(wrapper.get('[data-test="main"]').attributes('data-collapsed')).toBe('false')
+      expect(wrapper.get('[data-test="bottom"]').attributes('data-collapsed')).toBe('false')
+    })
+
+    it('does not respond to Cmd+B', async () => {
+      const wrapper = mountSideNav({ collapsible: false })
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'b', metaKey: true }))
+      await nextTick()
+      const aside = wrapper.find('aside')
+      expect(aside.classes()).toContain('lg:w-[19rem]')
+    })
+
+    it('does not register a global keydown listener', () => {
+      const addSpy = vi.spyOn(window, 'addEventListener')
+      mountSideNav({ collapsible: false })
+      const keydownCalls = addSpy.mock.calls.filter(([type]) => type === 'keydown')
+      expect(keydownCalls.length).toBe(0)
+      addSpy.mockRestore()
+    })
+
+    it('exposes collapsed=false via the scoped bottom slot', () => {
+      const wrapper = mount(SideNavigationComponent, {
+        props: { projectTitle: 'WeFa', collapsible: false },
+        slots: {
+          bottom: `<template #default="{ collapsed }"><div data-test="slot-collapsed">{{ collapsed }}</div></template>`,
+        },
+        global: globalConfig,
+      })
+      expect(wrapper.get('[data-test="slot-collapsed"]').text()).toBe('false')
+    })
   })
 })

@@ -151,7 +151,9 @@ const {
   },
 } = defineProps<SideMenuContainerProps>()
 
-const menuItems = menuItemsFromRoute(levelRoute, depth).concat(makeEndSectionMenuItems(end))
+const menuItems = computed(() =>
+  menuItemsFromRoute(levelRoute, depth, route).concat(makeEndSectionMenuItems(end))
+)
 
 const widthStyle = computed(() => `min-width: calc(var(--spacing)*${width}) !important;`)
 </script>

@@ -129,5 +129,7 @@ const {
   },
 } = defineProps<NavBarContainerProps>()
 
-const menuItems = menuItemsFromRoute(levelRoute, depth).concat(makeEndSectionMenuItems(end))
+const menuItems = computed(() =>
+  menuItemsFromRoute(levelRoute, depth, route).concat(makeEndSectionMenuItems(end))
+)
 </script>
