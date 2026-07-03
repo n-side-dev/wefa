@@ -1,0 +1,15 @@
+Metadata-Version: 2.4
+Name: backend-for-frontend
+Version: 0.6.2
+Summary: Flask backend-for-frontend
+Requires-Python: <3.13,>=3.12
+Requires-Dist: authlib>=1.7.2
+Requires-Dist: cryptography>=49.0.0
+Requires-Dist: flask~=3.1.2
+Requires-Dist: flask-cors
+Requires-Dist: flask-session
+Requires-Dist: flask-smorest>=0.46.2
+Requires-Dist: pyyaml~=6.0
+Requires-Dist: python-dotenv~=1.2.1
+Requires-Dist: requests>=2.34.2
+Requires-Dist: urllib3>=2.7.0
