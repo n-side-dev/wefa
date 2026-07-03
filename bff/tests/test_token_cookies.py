@@ -62,10 +62,40 @@ def test_token_cookie_missing_component_returns_none(app, build_token_payload):
     cookie_map = _extract_cookie_map(response)
 
     names = token_cookie_names(settings)
-    missing_id = dict(cookie_map)
-    missing_id.pop(names["id_token"])
+    cookie_map_without_id_token = dict(cookie_map)
+    cookie_map_without_id_token.pop(names["id_token"])
 
-    assert load_token_from_cookies(missing_id, settings) is None
+    assert load_token_from_cookies(cookie_map_without_id_token, settings) is None
+
+
+def test_token_cookie_missing_access_token_returns_none(app, build_token_payload):
+    settings = app.extensions["bff_settings"]
+    response = app.response_class()
+    token_payload = build_token_payload()
+
+    set_token_cookies(response, token_payload, settings)
+    cookie_map = _extract_cookie_map(response)
+
+    names = token_cookie_names(settings)
+    missing_access = dict(cookie_map)
+    missing_access.pop(names["access_token"])
+
+    assert load_token_from_cookies(missing_access, settings) is None
+
+
+def test_token_cookie_missing_refresh_token_returns_none(app, build_token_payload):
+    settings = app.extensions["bff_settings"]
+    response = app.response_class()
+    token_payload = build_token_payload()
+
+    set_token_cookies(response, token_payload, settings)
+    cookie_map = _extract_cookie_map(response)
+
+    names = token_cookie_names(settings)
+    missing_refresh = dict(cookie_map)
+    missing_refresh.pop(names["refresh_token"])
+
+    assert load_token_from_cookies(missing_refresh, settings) is None
 
 
 def test_token_cookie_oversize_raises_error(app, build_token_payload):
