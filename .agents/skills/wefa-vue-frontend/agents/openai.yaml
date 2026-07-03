@@ -1,0 +1,4 @@
+interface:
+  display_name: "WeFa Vue Maintainer"
+  short_description: "Repo-only maintainer rules for the WeFa Vue library"
+  default_prompt: "Use $wefa-vue-frontend after $wefa-vue-cookbook when implementing or reviewing changes inside this repository's WeFa `vue/` workspace."

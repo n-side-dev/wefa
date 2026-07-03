@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "nside-wefa"
-version = "0.6.1"
+version = "0.6.2"
 description = "Django library with Legal Consent compliance utilities and reusable apps"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -27,7 +27,7 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 dependencies = [
-    "django>=6.0.5",
+    "django>=6.0.6",
     "django-auditlog>=3.4.1",
     "django-cors-headers>=4.9.0",
     "djangorestframework>=3.14.0",

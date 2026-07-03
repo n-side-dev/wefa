@@ -46,8 +46,8 @@ def test_token_cookie_tamper_returns_none(app, build_token_payload):
     names = token_cookie_names(settings)
     tampered = dict(cookie_map)
     original = tampered[names["access_token"]]
-    tampered[names["access_token"]] = original[:-1] + (
-        "A" if original[-1] != "A" else "B"
+    tampered[names["access_token"]] = (
+        ("A" if original[0] != "A" else "B") + original[1:]
     )
 
     assert load_token_from_cookies(tampered, settings) is None
