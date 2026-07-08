@@ -83,7 +83,7 @@
     "@tanstack/vue-query": "^5.100.14",
     "@vee-validate/zod": "^4.15.1",
     "@vueuse/core": "^14.2.1",
-    "axios": "^1.15.1",
+    "axios": "^1.18.1",
     "luxon": "^3.7.2",
     "marked": "^18.0.5",
     "pinia": "^3.0.4",
