@@ -116,7 +116,7 @@
     "@vitest/browser": "^4.1.7",
     "@vitest/browser-playwright": "^4.1.7",
     "@vitest/coverage-istanbul": "^4.1.7",
-    "@vitest/eslint-plugin": "^1.6.21",
+    "@vitest/eslint-plugin": "^1.6.23",
     "@vue/eslint-config-prettier": "^10.2.0",
     "@vue/eslint-config-typescript": "^14.7.0",
     "@vue/test-utils": "2.4.11",
