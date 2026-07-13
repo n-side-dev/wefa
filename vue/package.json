@@ -78,12 +78,12 @@
   "dependencies": {
     "@primeuix/themes": "^2.0.3",
     "@primevue/forms": "^4.5.5",
-    "@tailwindcss/cli": "^4.3.1",
+    "@tailwindcss/cli": "^4.3.2",
     "@tailwindcss/vite": "^4.2.2",
     "@tanstack/vue-query": "^5.100.14",
     "@vee-validate/zod": "^4.15.1",
     "@vueuse/core": "^14.2.1",
-    "axios": "^1.15.1",
+    "axios": "^1.18.1",
     "luxon": "^3.7.2",
     "marked": "^18.0.5",
     "pinia": "^3.0.4",
@@ -116,7 +116,7 @@
     "@vitest/browser": "^4.1.7",
     "@vitest/browser-playwright": "^4.1.7",
     "@vitest/coverage-istanbul": "^4.1.7",
-    "@vitest/eslint-plugin": "^1.6.20",
+    "@vitest/eslint-plugin": "^1.6.23",
     "@vue/eslint-config-prettier": "^10.2.0",
     "@vue/eslint-config-typescript": "^14.7.0",
     "@vue/test-utils": "2.4.11",
@@ -133,9 +133,9 @@
     "jiti": "^2.6.1",
     "jsdom": "^29.1.1",
     "knip": "^6.23.0",
-    "npm-run-all2": "^9.0.1",
+    "npm-run-all2": "^9.0.2",
     "playwright": "^1.59.1",
-    "postcss": "^8.5.10",
+    "postcss": "^8.5.16",
     "prettier": "3.8.3",
     "storybook": "^10.3.0",
     "tailwindcss": "^4.2.1",
@@ -145,7 +145,7 @@
     "vite": "^8.0.13",
     "vite-plugin-dts": "^4.5.4",
     "vitest": "^4.1.9",
-    "vue-tsc": "^3.3.5"
+    "vue-tsc": "^3.3.6"
   },
   "bundlesize": [
     {
