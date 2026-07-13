@@ -124,7 +124,7 @@
     "autoprefixer": "^10.5.2",
     "axios-mock-adapter": "^2.1.0",
     "eslint": "^10.2.1",
-    "eslint-plugin-jsdoc": "^62.9.0",
+    "eslint-plugin-jsdoc": "^63.0.11",
     "eslint-plugin-playwright": "^2.10.4",
     "eslint-plugin-security": "^4.0.1",
     "eslint-plugin-sonarjs": "^4.0.3",
