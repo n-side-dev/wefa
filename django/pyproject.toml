@@ -16,7 +16,7 @@ keywords = ["django", "gdpr", "compliance", "web", "api"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Framework :: Django",
-    "Framework :: Django :: 5.2",
+    "Framework :: Django :: 6.0",
     "Intended Audience :: Developers",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
@@ -27,7 +27,7 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 dependencies = [
-    "django>=6.0.6",
+    "django>=6.0.7",
     "django-auditlog>=3.4.1",
     "django-cors-headers>=4.9.0",
     "djangorestframework>=3.14.0",
