@@ -74,7 +74,7 @@ jobs:
           key: playwright-${{ runner.os }}-${{ hashFiles('vue/package-lock.json') }}
       - run: npm ci
       - name: Install Playwright (browsers and deps)
-        run: npx playwright install --with-deps
+        run: node node_modules/playwright/cli.js install --with-deps
       - name: Run unit tests with coverage
         run: npm run test:unit -- --coverage --reporter=dot --silent
       - name: Upload coverage artifact
@@ -96,7 +96,7 @@ jobs:
           key: playwright-${{ runner.os }}-${{ hashFiles('vue/package-lock.json') }}
       - run: npm ci
       - name: Install Playwright (browsers and deps)
-        run: npx playwright install --with-deps
+        run: node node_modules/playwright/cli.js install --with-deps
       - name: Run E2E tests
         run: npm run test:e2e -- --reporter=dot
 
