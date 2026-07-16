@@ -136,7 +136,7 @@
     "npm-run-all2": "^9.0.2",
     "playwright": "^1.61.1",
     "postcss": "^8.5.16",
-    "prettier": "3.8.3",
+    "prettier": "3.9.5",
     "storybook": "^10.3.0",
     "tailwindcss": "^4.2.1",
     "tidewave": "^0.6.0",
