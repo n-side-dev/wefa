@@ -47,7 +47,12 @@ INSTALLED_APPS = [
     "nside_wefa.legal_consent",
     "nside_wefa.locale",
     "nside_wefa.audit",
+    "nside_wefa.attachments",
     "drf_spectacular",
+    # Demo apps — illustrate how to consume the WeFa toolkit. Order them
+    # AFTER nside_wefa.* so any cross-app dependencies resolve cleanly.
+    "demo.profiles",
+    "demo.documents",
 ]
 
 NSIDE_WEFA = {
@@ -72,7 +77,26 @@ NSIDE_WEFA = {
         # Tamper-evidence is off by default; flip to True to use WefaLogEntry.
         "TAMPER_EVIDENT": False,
     },
+    "ATTACHMENTS": {
+        "STORAGE": "default",
+        "MAX_FILE_SIZE": 10 * 1024 * 1024,
+        "UPLOAD_PATH_PREFIX": "attachments/",
+        "HASH_ALGORITHM": "sha256",
+        "CONTENT_TYPE_SNIFF_BYTES": 2048,
+    },
 }
+
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
+
+MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_URL = "/media/"
 
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
