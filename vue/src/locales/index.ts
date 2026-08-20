@@ -181,8 +181,7 @@ export function createLibI18n(options: CreateLibI18nOptions = {}) {
     originalInstall(app, ...args)
 
     const primevue = app.config.globalProperties.$primevue as
-      | { config: { locale?: Record<string, unknown> } }
-      | undefined
+      { config: { locale?: Record<string, unknown> } } | undefined
     if (!primevue) {
       console.warn(
         '[wefa] createLibI18n: PrimeVue is not installed on this app. ' +
