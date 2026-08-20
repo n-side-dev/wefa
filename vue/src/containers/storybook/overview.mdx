@@ -20,7 +20,7 @@ In your router definition, if multiple routes/views should be grouped in a certa
 
 **If one of your route has children routes, you MUST use a Container Component on it.** Router depth tracking depends on it.
 
-Let's take the example of a settings panel which contains multiples views for password reset, api token and user preferences :
+Let's take the example of a settings panel which contains multiple views for password reset, api token and user preferences :
 
 ```ts
 /** router.ts*/
@@ -190,6 +190,9 @@ routes: [
 
 You can also have deeper hierarchy, with children of children. This is useful when one section owns a
 second local navigation level.
+
+`depth` indicates the container level in the nested route tree: use `depth: 1` for a top-level
+container, `depth: 2` for a container nested inside it, and so on.
 
 ```ts
 /** router.ts*/
