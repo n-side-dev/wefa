@@ -209,10 +209,7 @@ export const useGanttLinks = ({
 
       const points: Array<{ x: number; y: number }> = []
       const linkTypeKey = `${fromEndpoint}-${toEndpoint}` as
-        | 'start-start'
-        | 'end-end'
-        | 'start-end'
-        | 'end-start'
+        'start-start' | 'end-end' | 'start-end' | 'end-start'
 
       // From
       points.push({ x: fromX, y: from.y }, { x: fromOffsetX, y: from.y })
