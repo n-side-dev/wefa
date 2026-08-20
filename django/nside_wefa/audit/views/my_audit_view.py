@@ -26,7 +26,7 @@ ME_FILTERS = (
 class MyAuditEventListView(APIView):
     """List audit events the authenticated user is the actor of."""
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = (IsAuthenticated,)
 
     @extend_schema(
         operation_id="audit_me_list",

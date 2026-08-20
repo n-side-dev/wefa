@@ -1,5 +1,7 @@
 """Tests for the NSIDE_WEFA.AUDIT → AUDITLOG_* translation layer."""
 
+from typing import ClassVar
+
 from django.test import TestCase, override_settings
 
 from nside_wefa.audit.settings_translation import (
@@ -17,7 +19,7 @@ class _RestoreAuditlogSettings:
     exit so subsequent tests aren't affected.
     """
 
-    AUDITLOG_KEYS = [
+    AUDITLOG_KEYS: ClassVar[list[str]] = [
         "AUDITLOG_INCLUDE_TRACKING_MODELS",
         "AUDITLOG_INCLUDE_ALL_MODELS",
         "AUDITLOG_EXCLUDE_TRACKING_MODELS",

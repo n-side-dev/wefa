@@ -12,16 +12,17 @@ See also
 - Django system check framework: https://docs.djangoproject.com/en/stable/topics/checks/
 """
 
-from typing import Any
 from pathlib import Path
+from typing import Any
+
 from django.conf import settings
 from django.core.checks import Error, register
 
 from nside_wefa.common.apps import CommonConfig
 from nside_wefa.legal_consent.apps import LegalConsentConfig
 from nside_wefa.utils.checks import (
-    check_nside_wefa_settings,
     check_apps_dependencies_order,
+    check_nside_wefa_settings,
 )
 
 

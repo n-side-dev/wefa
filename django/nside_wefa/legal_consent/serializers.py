@@ -6,8 +6,10 @@ Serializers are used to convert model instances to JSON representations
 for clean API responses and OpenAPI schema generation.
 """
 
-from rest_framework import serializers
+from typing import Any, ClassVar
+
 from drf_spectacular.utils import extend_schema_field, extend_schema_serializer
+from rest_framework import serializers
 
 from nside_wefa.legal_consent.models.legal_consent import LegalConsent
 
@@ -33,9 +35,9 @@ class LegalConsentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = LegalConsent
-        fields = ["version", "accepted_at", "valid"]
-        read_only_fields = ["valid"]
-        extra_kwargs = {
+        fields: ClassVar[list[str]] = ["version", "accepted_at", "valid"]
+        read_only_fields: ClassVar[list[str]] = ["valid"]
+        extra_kwargs: ClassVar[dict[str, dict[str, Any]]] = {
             "version": {
                 "help_text": "Version of the legal documents the user consented to",
                 "allow_null": True,

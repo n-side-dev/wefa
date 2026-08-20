@@ -23,7 +23,8 @@ Available endpoints:
 """
 
 from django.urls import path
-from .views import LegalConsentView, TermsOfUseView, PrivacyNoticeView
+
+from .views import LegalConsentView, PrivacyNoticeView, TermsOfUseView
 
 app_name = "legal_consent"
 

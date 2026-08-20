@@ -1,6 +1,6 @@
 """Tests for the audit system checks."""
 
-from typing import Any, List
+from typing import Any
 
 from django.core.checks import Error
 from django.test import TestCase, override_settings
@@ -72,7 +72,7 @@ class DependencyOrderCheckTest(TestCase):
 class AuditSettingsCheckTest(TestCase):
     """Validates every key under ``NSIDE_WEFA.AUDIT``."""
 
-    def _run(self, audit_section: Any) -> List[Error]:
+    def _run(self, audit_section: Any) -> list[Error]:
         with override_settings(NSIDE_WEFA={"APP_NAME": "T", "AUDIT": audit_section}):
             return audit_settings_check(None)
 

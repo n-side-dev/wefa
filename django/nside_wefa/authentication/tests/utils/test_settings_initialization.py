@@ -1,4 +1,5 @@
 from unittest.mock import patch
+
 from django.test import TestCase, override_settings
 
 from nside_wefa.authentication.utils.settings_initialization import initialize_settings

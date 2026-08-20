@@ -1,6 +1,7 @@
+from unittest.mock import patch
+
 from django.core.checks import Error
 from django.test import TestCase, override_settings
-from unittest.mock import patch
 
 from nside_wefa.common.checks import common_settings_check
 
@@ -13,17 +14,17 @@ class CommonChecksTest(TestCase):
         from django.conf import settings
 
         # Mock settings to not have NSIDE_WEFA
-        with patch.object(settings, "NSIDE_WEFA", None):
-            with patch("django.conf.settings.NSIDE_WEFA", None, create=True):
-                # Also ensure getattr returns None for missing attribute
-                with patch("nside_wefa.common.checks.getattr", return_value=None):
-                    errors = common_settings_check(None)
+        # Also ensure getattr returns None for missing attribute
+        with (
+            patch.object(settings, "NSIDE_WEFA", None),
+            patch("django.conf.settings.NSIDE_WEFA", None, create=True),
+            patch("nside_wefa.common.checks.getattr", return_value=None),
+        ):
+            errors = common_settings_check(None)
 
-                    self.assertEqual(len(errors), 1)
-                    self.assertIsInstance(errors[0], Error)
-                    self.assertEqual(
-                        errors[0].msg, "NSIDE_WEFA is not defined in settings.py"
-                    )
+            self.assertEqual(len(errors), 1)
+            self.assertIsInstance(errors[0], Error)
+            self.assertEqual(errors[0].msg, "NSIDE_WEFA is not defined in settings.py")
 
     def test_common_settings_check_missing_app_name_key(self):
         """Test that missing APP_NAME key in NSIDE_WEFA raises an error."""

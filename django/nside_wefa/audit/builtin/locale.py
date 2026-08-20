@@ -40,11 +40,10 @@ def _snapshot_code(sender: Any, instance: Any, **kwargs: Any) -> None:
 
 
 def _on_locale_saved(sender: Any, instance: Any, created: bool, **kwargs: Any) -> None:
-    if created:
-        # New row with an empty code: not interesting.
-        if instance.code is None:
-            setattr(instance, _SNAPSHOT_ATTR, instance.code)
-            return
+    # New row with an empty code: not interesting.
+    if created and instance.code is None:
+        setattr(instance, _SNAPSHOT_ATTR, instance.code)
+        return
 
     previous = getattr(instance, _SNAPSHOT_ATTR, None)
     current = instance.code

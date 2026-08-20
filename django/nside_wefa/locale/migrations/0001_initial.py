@@ -1,3 +1,5 @@
+from typing import ClassVar
+
 import django.db.models.deletion
 from django.conf import settings
 from django.db import migrations, models
@@ -21,11 +23,11 @@ def reverse_create_user_locales(apps, schema_editor):
 class Migration(migrations.Migration):
     initial = True
 
-    dependencies = [
+    dependencies: ClassVar[list[tuple[str, str]]] = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
-    operations = [
+    operations: ClassVar[list[migrations.operations.base.Operation]] = [
         migrations.CreateModel(
             name="UserLocale",
             fields=[
