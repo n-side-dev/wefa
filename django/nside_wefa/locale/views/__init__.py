@@ -1,7 +1,7 @@
-from .user_locale_view import UserLocaleView
 from .available_locales_view import AvailableLocalesView
+from .user_locale_view import UserLocaleView
 
 __all__ = [
-    "UserLocaleView",
     "AvailableLocalesView",
+    "UserLocaleView",
 ]

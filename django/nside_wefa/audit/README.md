@@ -76,10 +76,12 @@ The recommended primary path. Call at the bottom of `models.py`:
 from django.db import models
 from nside_wefa.audit import register
 
+
 class Order(models.Model):
     status = models.CharField(max_length=32)
-    total  = models.DecimalField(max_digits=10, decimal_places=2)
+    total = models.DecimalField(max_digits=10, decimal_places=2)
     secret_token = models.CharField(max_length=64)
+
 
 register(
     Order,
@@ -93,10 +95,11 @@ register(
 ```python
 from nside_wefa.audit import audited
 
+
 @audited(include_fields=["status", "total"])
 class Order(models.Model):
     status = models.CharField(max_length=32)
-    total  = models.DecimalField(max_digits=10, decimal_places=2)
+    total = models.DecimalField(max_digits=10, decimal_places=2)
 ```
 
 ### Path C — `AuditAppConfigMixin`
@@ -107,10 +110,11 @@ Keep models clean by declaring registrations on your `AppConfig`:
 from django.apps import AppConfig
 from nside_wefa.audit import AuditAppConfigMixin
 
+
 class OrdersConfig(AuditAppConfigMixin, AppConfig):
     name = "orders"
     audited_models = {
-        "Order":    {"include_fields": ["status", "total"]},
+        "Order": {"include_fields": ["status", "total"]},
         "Customer": {"exclude_fields": ["last_login_ip"]},
     }
 ```

@@ -12,7 +12,7 @@ from django.urls import path
 from rest_framework.authtoken.views import obtain_auth_token
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from nside_wefa.authentication.constants import AUTH_TYPE_TOKEN, AUTH_TYPE_JWT
+from nside_wefa.authentication.constants import AUTH_TYPE_JWT, AUTH_TYPE_TOKEN
 from nside_wefa.authentication.utils.utils import get_authentication_types
 
 app_name = "authentication"

@@ -11,10 +11,10 @@ each app's ``checks.py`` so configuration mistakes surface at ``manage.py
 check`` time, not lazily at first-read time.
 """
 
-from typing import Any, Mapping
+from collections.abc import Mapping
+from typing import Any
 
 from django.conf import settings
-
 
 _SENTINEL: Any = object()
 

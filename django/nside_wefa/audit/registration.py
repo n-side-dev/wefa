@@ -16,7 +16,7 @@ and django-auditlog's ``register_from_settings``.
 """
 
 import logging
-from typing import Any, Dict, Set, Type
+from typing import Any, ClassVar
 
 from django.db import models
 
@@ -24,10 +24,10 @@ logger = logging.getLogger("nside_wefa.audit")
 
 # Set of model classes registered through one of the WeFa entry points.
 # Exposed for tests; not part of the public contract.
-_wefa_registered: Set[Type[models.Model]] = set()
+_wefa_registered: set[type[models.Model]] = set()
 
 
-def register(model: Type[models.Model], **kwargs: Any) -> Type[models.Model]:
+def register(model: type[models.Model], **kwargs: Any) -> type[models.Model]:
     """Register a model for auditing.
 
     Thin wrapper around :func:`auditlog.registry.auditlog.register` that
@@ -55,7 +55,7 @@ def audited(**kwargs: Any):
             ...
     """
 
-    def _decorator(cls: Type[models.Model]) -> Type[models.Model]:
+    def _decorator(cls: type[models.Model]) -> type[models.Model]:
         register(cls, **kwargs)
         return cls
 
@@ -82,7 +82,7 @@ class AuditAppConfigMixin:
     entry does not block the rest of the app from booting.
     """
 
-    audited_models: Dict[str, Dict[str, Any]] = {}
+    audited_models: ClassVar[dict[str, dict[str, Any]]] = {}
 
     def ready(self) -> None:  # type: ignore[override]
         # Cooperative super() call so the mixin composes with other mixins on

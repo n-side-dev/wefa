@@ -1,8 +1,8 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.request import Request
+from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework.permissions import AllowAny
-from drf_spectacular.utils import extend_schema, OpenApiResponse
+from rest_framework.request import Request
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from ..models.user_locale import _LocaleConfiguration
 from ..serializers import AvailableLocalesSerializer
@@ -17,7 +17,7 @@ class AvailableLocalesView(APIView):
     locale picker on a public landing page).
     """
 
-    permission_classes = [AllowAny]
+    permission_classes = (AllowAny,)
     serializer_class = AvailableLocalesSerializer
 
     @extend_schema(

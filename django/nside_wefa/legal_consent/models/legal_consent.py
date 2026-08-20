@@ -86,7 +86,7 @@ class LegalConsent(models.Model):
         configuration = _LegalConsentConfiguration()
 
         self.version = configuration.version
-        self.accepted_at = datetime.datetime.now(tz=datetime.timezone.utc)
+        self.accepted_at = datetime.datetime.now(tz=datetime.UTC)
         self.save()
 
     def is_valid(self) -> bool:
@@ -108,7 +108,7 @@ class LegalConsent(models.Model):
             days=configuration.expiry_limit
         )
         return (
-            expiry_date > datetime.datetime.now(tz=datetime.timezone.utc)
+            expiry_date > datetime.datetime.now(tz=datetime.UTC)
             and self.version == configuration.version
         )
 
