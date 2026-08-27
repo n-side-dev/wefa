@@ -5,11 +5,12 @@ chosen for paths A/B/C because the demo settings only declare ``auth.Group``
 under Path D — using a different model keeps the registries from interfering.
 """
 
-from django.contrib.auth.models import Group, Permission, User
-from django.test import TestCase
+from typing import Any, ClassVar
 
 from auditlog.models import LogEntry
 from auditlog.registry import auditlog as _auditlog_registry
+from django.contrib.auth.models import Group, Permission, User
+from django.test import TestCase
 
 from nside_wefa import audit
 from nside_wefa.audit.registration import (
@@ -83,7 +84,9 @@ class PathCAppConfigMixinTest(_RegistrationFixture, TestCase):
 
         class _StubAppConfig(AuditAppConfigMixin):
             label = "auth"
-            audited_models = {"Permission": {"include_fields": ["name"]}}
+            audited_models: ClassVar[dict[str, dict[str, Any]]] = {
+                "Permission": {"include_fields": ["name"]}
+            }
 
             def get_model(self, name: str):
                 seen.append(name)
@@ -100,7 +103,7 @@ class PathCAppConfigMixinTest(_RegistrationFixture, TestCase):
     def test_mixin_skips_unresolvable_models(self):
         class _StubAppConfig(AuditAppConfigMixin):
             label = "auth"
-            audited_models = {"NoSuchModel": {}}
+            audited_models: ClassVar[dict[str, dict[str, Any]]] = {"NoSuchModel": {}}
 
             def get_model(self, name: str):
                 raise LookupError(name)

@@ -13,7 +13,6 @@ a new submodule and add its name to :data:`KNOWN_SOURCES`.
 
 import importlib
 import logging
-from typing import Tuple
 
 from django.apps import apps as django_apps
 
@@ -22,7 +21,7 @@ from nside_wefa.common.settings import get_section
 logger = logging.getLogger("nside_wefa.audit")
 
 # Source name → (Django app label that must be installed, importable submodule).
-KNOWN_SOURCES: dict[str, Tuple[str, str]] = {
+KNOWN_SOURCES: dict[str, tuple[str, str]] = {
     "auth": ("auth", "nside_wefa.audit.builtin.auth"),
     "legal_consent": (
         "nside_wefa.legal_consent",

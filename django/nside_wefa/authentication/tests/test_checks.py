@@ -1,10 +1,11 @@
 from unittest.mock import patch
+
 from django.core.checks import Error
 from django.test import TestCase, override_settings
 
 from nside_wefa.authentication.checks import (
-    wefa_apps_dependencies_check,
     authentication_settings_check,
+    wefa_apps_dependencies_check,
 )
 
 
@@ -82,19 +83,19 @@ class AuthenticationSettingsChecksTest(TestCase):
         """Test that missing NSIDE_WEFA setting raises an error."""
         from django.conf import settings
 
-        with patch.object(settings, "NSIDE_WEFA", None):
-            with patch("django.conf.settings.NSIDE_WEFA", None, create=True):
-                with patch(
-                    "nside_wefa.authentication.checks.getattr", return_value=None
-                ):
-                    errors = authentication_settings_check(None)
+        with (
+            patch.object(settings, "NSIDE_WEFA", None),
+            patch("django.conf.settings.NSIDE_WEFA", None, create=True),
+            patch("nside_wefa.authentication.checks.getattr", return_value=None),
+        ):
+            errors = authentication_settings_check(None)
 
-                    self.assertEqual(len(errors), 1)
-                    self.assertIsInstance(errors[0], Error)
-                    self.assertEqual(
-                        errors[0].msg,
-                        "NSIDE_WEFA.AUTHENTICATION is not defined in settings.py",
-                    )
+            self.assertEqual(len(errors), 1)
+            self.assertIsInstance(errors[0], Error)
+            self.assertEqual(
+                errors[0].msg,
+                "NSIDE_WEFA.AUTHENTICATION is not defined in settings.py",
+            )
 
     def test_authentication_settings_check_missing_authentication_key(self):
         """Test that missing AUTHENTICATION key in NSIDE_WEFA raises an error."""

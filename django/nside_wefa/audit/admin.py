@@ -6,7 +6,7 @@ pattern referenced by catalog item L1: every shipped model is admin-visible,
 audit events specifically are read-only.
 """
 
-from typing import Any, Optional
+from typing import Any
 
 from auditlog.models import LogEntry
 from django.contrib import admin
@@ -66,17 +66,17 @@ class LogEntryAdmin(admin.ModelAdmin):
         "serialized_data",
     )
 
-    def has_add_permission(self, request: HttpRequest) -> bool:  # noqa: D401
+    def has_add_permission(self, request: HttpRequest) -> bool:
         return False
 
     def has_change_permission(
-        self, request: HttpRequest, obj: Optional[Any] = None
-    ) -> bool:  # noqa: D401
+        self, request: HttpRequest, obj: Any | None = None
+    ) -> bool:
         return False
 
     def has_delete_permission(
-        self, request: HttpRequest, obj: Optional[Any] = None
-    ) -> bool:  # noqa: D401
+        self, request: HttpRequest, obj: Any | None = None
+    ) -> bool:
         return False
 
     @admin.display(description="action")

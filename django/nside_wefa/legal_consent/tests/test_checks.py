@@ -1,5 +1,6 @@
 import tempfile
 from pathlib import Path
+
 from django.core.checks import Error
 from django.test import TestCase, override_settings
 
@@ -14,24 +15,25 @@ class LegalConsentChecksTest(TestCase):
 
     def test_legal_consent_settings_check_missing_setting(self):
         """Test that missing NSIDE_WEFA.LEGAL_CONSENT setting raises an error."""
-        from django.conf import settings
         from unittest.mock import patch
 
-        # Mock settings to not have NSIDE_WEFA
-        with patch.object(settings, "NSIDE_WEFA", None):
-            with patch("django.conf.settings.NSIDE_WEFA", None, create=True):
-                # Also ensure getattr returns None for missing attribute
-                with patch(
-                    "nside_wefa.legal_consent.checks.getattr", return_value=None
-                ):
-                    errors = legal_consent_settings_check(None)
+        from django.conf import settings
 
-                    self.assertEqual(len(errors), 1)
-                    self.assertIsInstance(errors[0], Error)
-                    self.assertEqual(
-                        errors[0].msg,
-                        "NSIDE_WEFA.LEGAL_CONSENT is not defined in settings.py",
-                    )
+        # Mock settings to not have NSIDE_WEFA
+        # Also ensure getattr returns None for missing attribute
+        with (
+            patch.object(settings, "NSIDE_WEFA", None),
+            patch("django.conf.settings.NSIDE_WEFA", None, create=True),
+            patch("nside_wefa.legal_consent.checks.getattr", return_value=None),
+        ):
+            errors = legal_consent_settings_check(None)
+
+            self.assertEqual(len(errors), 1)
+            self.assertIsInstance(errors[0], Error)
+            self.assertEqual(
+                errors[0].msg,
+                "NSIDE_WEFA.LEGAL_CONSENT is not defined in settings.py",
+            )
 
     def test_legal_consent_settings_check_missing_version_key(self):
         """Test that missing VERSION key in NSIDE_WEFA.LEGAL_CONSENT raises an error."""
@@ -216,10 +218,10 @@ class LegalConsentTemplatesFilesChecksTest(TestCase):
 
     def test_legal_templates_files_check_both_files_missing(self):
         """Test that missing both required files raises two errors."""
-        with tempfile.TemporaryDirectory() as temp_dir:
-            # Don't create any files
-
-            with override_settings(
+        # Don't create any files
+        with (
+            tempfile.TemporaryDirectory() as temp_dir,
+            override_settings(
                 NSIDE_WEFA={
                     "LEGAL_CONSENT": {
                         "VERSION": 1,
@@ -227,17 +229,16 @@ class LegalConsentTemplatesFilesChecksTest(TestCase):
                         "TEMPLATES": temp_dir,
                     }
                 }
-            ):
-                errors = legal_templates_files_check(None)
-                self.assertEqual(len(errors), 2)
-                self.assertIsInstance(errors[0], Error)
-                self.assertIsInstance(errors[1], Error)
+            ),
+        ):
+            errors = legal_templates_files_check(None)
+            self.assertEqual(len(errors), 2)
+            self.assertIsInstance(errors[0], Error)
+            self.assertIsInstance(errors[1], Error)
 
-                error_messages = [error.msg for error in errors]
-                self.assertTrue(
-                    any("privacy_notice.md" in msg for msg in error_messages)
-                )
-                self.assertTrue(any("terms_of_use.md" in msg for msg in error_messages))
+            error_messages = [error.msg for error in errors]
+            self.assertTrue(any("privacy_notice.md" in msg for msg in error_messages))
+            self.assertTrue(any("terms_of_use.md" in msg for msg in error_messages))
 
     def test_legal_templates_files_check_nonexistent_directory(self):
         """Test that non-existent TEMPLATES directory raises errors for both files."""

@@ -189,7 +189,5 @@ class LegalConsentSerializerTest(TestCase):
         self.assertIsInstance(accepted_at_str, str)
 
         # Should be able to parse the ISO string back to datetime
-        parsed_datetime = datetime.datetime.fromisoformat(
-            accepted_at_str.replace("Z", "+00:00")
-        )
+        parsed_datetime = datetime.datetime.fromisoformat(accepted_at_str)
         self.assertIsInstance(parsed_datetime, datetime.datetime)

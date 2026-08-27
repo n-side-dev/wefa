@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.db import IntegrityError
 from django.test import TestCase, override_settings
 
 from nside_wefa.locale.models import UserLocale
@@ -30,7 +31,7 @@ class UserLocaleModelTest(TestCase):
         )
 
     def test_user_locale_one_to_one(self):
-        with self.assertRaises(Exception):
+        with self.assertRaises(IntegrityError):
             UserLocale.objects.create(user=self.user)
 
     def test_user_locale_cascade_deletion(self):

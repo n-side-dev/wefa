@@ -24,7 +24,7 @@ from typing import Any
 
 from django.core.management.base import BaseCommand, CommandError
 
-from nside_wefa.audit.models import WefaLogEntry, ZERO_HASH, compute_event_hash
+from nside_wefa.audit.models import ZERO_HASH, WefaLogEntry, compute_event_hash
 from nside_wefa.common.settings import get_section
 
 
@@ -98,17 +98,16 @@ class Command(BaseCommand):
         for entry in queryset.iterator():
             is_anchor = checked == 0 and prev_hash is None
 
-            if is_anchor and options["strict_head"]:
-                if entry.prev_hash != ZERO_HASH:
-                    self.stderr.write(
-                        self.style.ERROR(
-                            f"--strict-head: anchor row id={entry.id} has "
-                            f"non-zero prev_hash ({entry.prev_hash!r}). "
-                            f"The chain origin appears to have been purged "
-                            f"or tampered with."
-                        )
+            if is_anchor and options["strict_head"] and entry.prev_hash != ZERO_HASH:
+                self.stderr.write(
+                    self.style.ERROR(
+                        f"--strict-head: anchor row id={entry.id} has "
+                        f"non-zero prev_hash ({entry.prev_hash!r}). "
+                        f"The chain origin appears to have been purged "
+                        f"or tampered with."
                     )
-                    sys.exit(1)
+                )
+                sys.exit(1)
 
             # Chain-link check skipped on the anchor row — its predecessor is
             # either outside the window (--from) or has been purged.

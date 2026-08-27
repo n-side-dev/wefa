@@ -14,7 +14,8 @@ class AuthenticationUrlsTest(TestCase):
         """Test the logic that generates URLs based on authentication types."""
         from django.urls import path
         from rest_framework.authtoken.views import obtain_auth_token
-        from nside_wefa.authentication.constants import AUTH_TYPE_TOKEN, AUTH_TYPE_JWT
+
+        from nside_wefa.authentication.constants import AUTH_TYPE_JWT, AUTH_TYPE_TOKEN
 
         # Simulate the URL generation logic
         authentication_types = ["TOKEN"]
@@ -59,7 +60,8 @@ class AuthenticationUrlsTest(TestCase):
         from django.urls import path
         from rest_framework.authtoken.views import obtain_auth_token
         from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-        from nside_wefa.authentication.constants import AUTH_TYPE_TOKEN, AUTH_TYPE_JWT
+
+        from nside_wefa.authentication.constants import AUTH_TYPE_JWT, AUTH_TYPE_TOKEN
 
         # Simulate the URL generation logic
         authentication_types = ["JWT"]
@@ -99,7 +101,8 @@ class AuthenticationUrlsTest(TestCase):
         from django.urls import path
         from rest_framework.authtoken.views import obtain_auth_token
         from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-        from nside_wefa.authentication.constants import AUTH_TYPE_TOKEN, AUTH_TYPE_JWT
+
+        from nside_wefa.authentication.constants import AUTH_TYPE_JWT, AUTH_TYPE_TOKEN
 
         # Simulate the URL generation logic
         authentication_types = ["TOKEN", "JWT"]
@@ -137,7 +140,8 @@ class AuthenticationUrlsTest(TestCase):
     def test_url_generation_logic_with_no_authentication_types(self):
         """Test the logic when no authentication types are specified."""
         from django.urls import path
-        from nside_wefa.authentication.constants import AUTH_TYPE_TOKEN, AUTH_TYPE_JWT
+
+        from nside_wefa.authentication.constants import AUTH_TYPE_JWT, AUTH_TYPE_TOKEN
 
         # Simulate the URL generation logic
         authentication_types = []
@@ -179,7 +183,8 @@ class AuthenticationUrlsTest(TestCase):
     def test_url_generation_logic_with_unknown_authentication_type(self):
         """Test the logic when unknown authentication types are specified."""
         from django.urls import path
-        from nside_wefa.authentication.constants import AUTH_TYPE_TOKEN, AUTH_TYPE_JWT
+
+        from nside_wefa.authentication.constants import AUTH_TYPE_JWT, AUTH_TYPE_TOKEN
 
         # Simulate the URL generation logic
         authentication_types = ["UNKNOWN_TYPE"]
@@ -224,7 +229,7 @@ class AuthenticationUrlsIntegrationTest(TestCase):
 
     def test_constants_are_properly_imported(self):
         """Test that authentication constants are properly imported in urls module."""
-        from nside_wefa.authentication.constants import AUTH_TYPE_TOKEN, AUTH_TYPE_JWT
+        from nside_wefa.authentication.constants import AUTH_TYPE_JWT, AUTH_TYPE_TOKEN
 
         # Test that the constants used in urls.py match the ones from constants.py
         self.assertEqual(AUTH_TYPE_TOKEN, "TOKEN")

@@ -14,7 +14,7 @@ Validates:
   unknown source name is an error.
 """
 
-from typing import Any, List
+from typing import Any
 
 from django.core.checks import Error, register
 
@@ -34,21 +34,21 @@ from .builtin import KNOWN_SOURCES
 
 
 @register()
-def wefa_apps_dependencies_check(app_configs, **kwargs) -> List[Error]:
+def wefa_apps_dependencies_check(app_configs, **kwargs) -> list[Error]:
     """Validate INSTALLED_APPS order.
 
     ``nside_wefa.common`` and ``auditlog`` are independent prerequisites of
     ``nside_wefa.audit`` — their relative order does not matter, but each
     must precede ``nside_wefa.audit``.
     """
-    errors: List[Error] = []
+    errors: list[Error] = []
     errors.extend(check_apps_dependencies_order([CommonConfig.name, AuditConfig.name]))
     errors.extend(check_apps_dependencies_order(["auditlog", AuditConfig.name]))
     return errors
 
 
 @register()
-def audit_settings_check(app_configs, **kwargs) -> List[Error]:
+def audit_settings_check(app_configs, **kwargs) -> list[Error]:
     """Validate the ``NSIDE_WEFA.AUDIT`` settings section.
 
     ``NSIDE_WEFA.AUDIT`` itself is optional — a missing or empty section is
@@ -93,16 +93,16 @@ def audit_settings_check(app_configs, **kwargs) -> List[Error]:
         ),
     }
 
-    errors: List[Error] = []
+    errors: list[Error] = []
     for key, validator in validators.items():
         if key in section:
             errors.extend(validator(section[key]))
     return errors
 
 
-def _validate_exclude_models(value: Any) -> List[Error]:
+def _validate_exclude_models(value: Any) -> list[Error]:
     """``EXCLUDE_MODELS`` must be a list of resolvable ``"app.Model"`` labels."""
-    errors: List[Error] = []
+    errors: list[Error] = []
     if not isinstance(value, list):
         return [
             Error(
@@ -120,7 +120,7 @@ def _validate_exclude_models(value: Any) -> List[Error]:
 def _validate_non_empty_string(setting_path: str):
     """Inline helper for plain non-empty string settings."""
 
-    def _validator(value: Any) -> List[Error]:
+    def _validator(value: Any) -> list[Error]:
         if not isinstance(value, str) or not value:
             return [
                 Error(

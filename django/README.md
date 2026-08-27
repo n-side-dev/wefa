@@ -71,7 +71,7 @@ Wraps `django-auditlog` to give every product an append-only audit store with fo
        "rest_framework",
        "rest_framework.authtoken",  # For token auth
        "rest_framework_simplejwt",  # For JWT auth
-       "auditlog",                  # Required by nside_wefa.audit
+       "auditlog",  # Required by nside_wefa.audit
        "nside_wefa.common",
        "nside_wefa.authentication",
        "nside_wefa.legal_consent",

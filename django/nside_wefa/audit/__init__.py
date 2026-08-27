@@ -39,12 +39,12 @@ def __getattr__(name: str):
 
 
 __all__ = [
-    "register",
-    "audited",
     "AuditAppConfigMixin",
-    "log",
-    "set_actor",
-    "Outcome",
-    "AuditWriteError",
     "AuditEventImmutableError",
+    "AuditWriteError",
+    "Outcome",
+    "audited",
+    "log",
+    "register",
+    "set_actor",
 ]
