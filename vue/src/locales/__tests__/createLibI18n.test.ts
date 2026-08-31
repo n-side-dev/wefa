@@ -83,14 +83,18 @@ describe('createLibI18n', () => {
     app.use(i18n)
 
     expect(getPrimeLocale(app)?.accept).toBe('Confirm')
-    expect((getPrimeLocale(app)?.aria as Record<string, unknown>).close).toBe('Dismiss')
+    expect((getPrimeLocale(app)?.aria as Record<string, unknown> | undefined)?.close).toBe(
+      'Dismiss'
+    )
 
     i18n.global.locale.value = 'fr'
     await nextTick()
     // Per-locale override wins over `*`; `aria.close` from `*` still applied;
     // non-overridden keys come from the French bundle.
     expect(getPrimeLocale(app)?.accept).toBe('Valider')
-    expect((getPrimeLocale(app)?.aria as Record<string, unknown>).close).toBe('Dismiss')
+    expect((getPrimeLocale(app)?.aria as Record<string, unknown> | undefined)?.close).toBe(
+      'Dismiss'
+    )
     expect(getPrimeLocale(app)?.reject).toBe(primeLocalesAll.fr.reject)
   })
 

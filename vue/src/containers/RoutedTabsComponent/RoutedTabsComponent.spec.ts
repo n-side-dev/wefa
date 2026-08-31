@@ -11,14 +11,12 @@ vi.mock('@/locales', () => ({
 import RoutedTabsComponent from './RoutedTabsComponent.vue'
 
 // Mock ResizeObserver for test environment
-/* eslint-disable @typescript-eslint/no-unused-vars */
 global.ResizeObserver = class ResizeObserver {
   constructor(_callback: ResizeObserverCallback) {}
   observe(_target: Element): void {}
   unobserve(_target: Element): void {}
   disconnect(): void {}
 }
-/* eslint-enable @typescript-eslint/no-unused-vars */
 
 // Mock routes for testing
 const routes = [

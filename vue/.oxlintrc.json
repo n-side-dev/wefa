@@ -1,0 +1,14 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "unicorn", "oxc"],
+  "categories": {
+    "correctness": "error"
+  },
+  "ignorePatterns": ["**/dist/**", "**/dist-ssr/**", "**/coverage/**", "**/openapi/**"],
+  "overrides": [
+    {
+      "files": ["src/**/__tests__/**/*", "src/**/*.{test,spec}.{js,ts,jsx,tsx}"],
+      "plugins": ["typescript", "unicorn", "oxc", "vitest"]
+    }
+  ]
+}
