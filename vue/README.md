@@ -166,7 +166,7 @@ From the `vue/` directory:
 | `npm run preview` | Serve the built demo application |
 | `npm run storybook` | Launch Storybook for interactive documentation |
 | `npm run build-storybook` | Build the static Storybook site |
-| `npm run lint` / `npm run lint-check` | Auto-fix or check ESLint rules |
+| `npm run lint` / `npm run lint-check` | Auto-fix or check lint rules (oxlint first, then ESLint) |
 | `npm run format` / `npm run format-check` | Run Prettier in write/check mode |
 | `npm run test:package-types` | Build the package, pack it, and verify published type declarations |
 

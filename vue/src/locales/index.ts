@@ -153,7 +153,7 @@ export function createLibI18n(options: CreateLibI18nOptions = {}) {
   ])
   for (const locale of locales) {
     let merged: Record<string, LocaleMessageValue> = {
-      ...(defaultMessages[locale] ?? {}),
+      ...defaultMessages[locale],
     }
     merged = deepMerge(merged, projectMessages[locale])
     merged = deepMerge(merged, explicitMessages?.[locale])

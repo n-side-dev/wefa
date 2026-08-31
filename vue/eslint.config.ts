@@ -10,6 +10,7 @@ import sonarjs from 'eslint-plugin-sonarjs'
 import jsdoc from 'eslint-plugin-jsdoc'
 import pluginPlaywright from 'eslint-plugin-playwright'
 import skipFormatting from '@vue/eslint-config-prettier/skip-formatting'
+import oxlint from 'eslint-plugin-oxlint'
 
 // To allow more languages other than `ts` in `.vue` files, uncomment the following lines:
 // import { configureVueProject } from '@vue/eslint-config-typescript'
@@ -72,5 +73,8 @@ export default defineConfigWithVueTs(
       'security/detect-object-injection': 'off',
       'vue/one-component-per-file': 'off',
     },
-  }
+  },
+  // Disable ESLint rules already covered by oxlint (run first via `npm run lint-check`).
+  // Must stay last so the oxlint-covered rules are not re-enabled by earlier configs.
+  ...oxlint.buildFromOxlintConfigFile('./.oxlintrc.json')
 )

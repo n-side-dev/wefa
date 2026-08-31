@@ -81,12 +81,7 @@ describe('network/typedApiClient', () => {
     })
 
     it('queryFn should throw when callable returns an AxiosError-like object', async () => {
-      /**
-       *
-       * @param _
-       */
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      function getError(_: any) {
+      function getError() {
         return { isAxiosError: true, message: 'boom' }
       }
 
@@ -128,12 +123,7 @@ describe('network/typedApiClient', () => {
       expect(result).toEqual({ ok: true, options: { k: 9 } })
 
       // Error case
-      /**
-       *
-       * @param _
-       */
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      function postErr(_: any) {
+      function postErr() {
         return { isAxiosError: true, message: 'nope' }
       }
       typedMutation(postErr as any)

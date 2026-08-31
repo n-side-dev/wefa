@@ -84,7 +84,7 @@ To work with `pnpm` or `yarn`, delete `package-lock.json` and run the equivalent
 | `npm run preview` | Preview the built demo (requires `npm run build:demo`) |
 | `npm run storybook` | Run Storybook locally |
 | `npm run build-storybook` | Generate the static Storybook site |
-| `npm run lint` / `npm run lint-check` | Fix or check ESLint issues |
+| `npm run lint` / `npm run lint-check` | Fix or check lint issues (oxlint first, then ESLint) |
 | `npm run format` / `npm run format-check` | Apply or verify Prettier formatting |
 | `npm run test:unit` | Execute Vitest unit tests once |
 | `npm run test:unit:watch` | Run unit tests in watch mode |
