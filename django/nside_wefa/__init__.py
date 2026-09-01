@@ -2,7 +2,7 @@
 nside-demo: Django library with utilities and reusable apps.
 
 This package provides Django applications and utilities for web development,
-with a focus on Legal Consent compliance, data protection, authentication.
+with a focus on Legal Consent compliance, data protection, and authentication.
 """
 
 __version__ = "0.6.2"
