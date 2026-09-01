@@ -233,8 +233,7 @@ describe('GanttChartComponent', () => {
     await wrapper.find('span').trigger('click')
 
     const selected = wrapper.emitted('activitySelect')?.[0]?.[0] as
-      | GanttChartActivityInteractionPayload
-      | undefined
+      GanttChartActivityInteractionPayload | undefined
     expect(selected?.activity.id).toBe('bar-1')
     expect(selected?.rowData?.id).toBe(1)
     expect(selected?.rowKey).toBe(1)
@@ -300,8 +299,7 @@ describe('GanttChartComponent', () => {
     await nextTick()
 
     const payload = activityHover.mock.calls[0]?.[3] as
-      | GanttChartActivityInteractionPayload
-      | undefined
+      GanttChartActivityInteractionPayload | undefined
     expect(payload?.activity.id).toBe('bar-1')
     expect(payload?.rowData?.id).toBe(1)
     expect(payload?.rowIndex).toBe(0)
