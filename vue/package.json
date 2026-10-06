@@ -85,15 +85,15 @@
     "@vueuse/core": "^14.2.1",
     "axios": "^1.18.1",
     "luxon": "^3.7.2",
-    "marked": "^18.0.10",
+    "marked": "^18.0.14",
     "pinia": "^3.0.4",
     "plotly.js-dist-min": "^3.7.0",
     "primeicons": "^7.0.0",
     "primelocale": "^2.4.0",
     "primevue": "^4.5.5",
     "tailwindcss-primeui": "^0.6.1",
-    "vue": "^3.5.41",
-    "vue-i18n": "^11.4.9",
+    "vue": "^3.5.43",
+    "vue-i18n": "^11.4.13",
     "vue-router": "^5.0.7"
   },
   "devDependencies": {
@@ -109,10 +109,10 @@
     "@tsconfig/node22": "^22.0.6",
     "@types/eslint-plugin-security": "^3.0.1",
     "@types/jsdom": "^28.0.3",
-    "@types/luxon": "^3.7.5",
+    "@types/luxon": "^3.7.6",
     "@types/node": "^25.8.0",
     "@types/plotly.js-dist-min": "^2.3.4",
-    "@vitejs/plugin-vue": "^6.0.8",
+    "@vitejs/plugin-vue": "^6.0.9",
     "@vitest/browser": "^4.1.11",
     "@vitest/browser-playwright": "^4.1.7",
     "@vitest/coverage-istanbul": "^4.1.7",
@@ -136,7 +136,7 @@
     "npm-run-all2": "^9.0.3",
     "playwright": "^1.61.1",
     "postcss": "^8.5.17",
-    "prettier": "3.9.6",
+    "prettier": "3.9.9",
     "storybook": "^10.5.10",
     "tailwindcss": "^4.3.2",
     "tidewave": "^0.6.0",
@@ -145,7 +145,7 @@
     "vite": "^8.0.13",
     "vite-plugin-dts": "^4.5.4",
     "vitest": "^4.1.9",
-    "vue-tsc": "^3.3.11"
+    "vue-tsc": "^3.3.12"
   },
   "bundlesize": [
     {
