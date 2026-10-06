@@ -80,7 +80,7 @@
     "@primevue/forms": "^4.5.5",
     "@tailwindcss/cli": "^4.3.3",
     "@tailwindcss/vite": "^4.3.3",
-    "@tanstack/vue-query": "^5.101.4",
+    "@tanstack/vue-query": "^5.102.8",
     "@vee-validate/zod": "^4.15.1",
     "@vueuse/core": "^14.2.1",
     "axios": "^1.18.1",
