@@ -36,6 +36,15 @@ export const DAY_CELL_WIDTH_PX = 40
 export const WEEK_CELL_WIDTH_PX = 40
 // Default row height before mini stacking expands it.
 export const BASE_ROW_HEIGHT_PX = 30
+/**
+ * Resolve a pixel dimension, falling back for non-finite or non-positive values.
+ * @param value Requested dimension in pixels.
+ * @param fallback Default dimension in pixels.
+ * @returns A finite positive pixel dimension.
+ */
+export const resolveGanttDimension = (value: number, fallback: number): number =>
+  Number.isFinite(value) && value > 0 ? value : fallback
+
 // Vertical padding to keep bar activities off row edges.
 export const BAR_VERTICAL_PADDING_PX = 4
 // Height of mini activities (stacked lanes).
@@ -107,13 +116,18 @@ export const getBarSpacingOffsets = <T extends GanttChartActivityLike>(activitie
 export const getRowHeight = <T extends GanttChartActivityLike>(
   activities: T[],
   stackMiniActivities: boolean,
-  viewMode: GanttChartViewMode = 'day'
+  viewMode: GanttChartViewMode = 'day',
+  baseRowHeightPx: number = BASE_ROW_HEIGHT_PX
 ) => {
   const { laneCount } = computeMiniLanes(activities, stackMiniActivities, viewMode)
   const extraHeight = Math.max(0, laneCount - 1) * (MINI_HEIGHT_PX + MINI_GAP_PX)
   const barSpacingOffsets = getBarSpacingOffsets(activities)
 
-  return BASE_ROW_HEIGHT_PX + extraHeight + barSpacingOffsets.topPx
+  return (
+    resolveGanttDimension(baseRowHeightPx, BASE_ROW_HEIGHT_PX) +
+    extraHeight +
+    barSpacingOffsets.topPx
+  )
 }
 
 // Generates week columns covering the specified date range.

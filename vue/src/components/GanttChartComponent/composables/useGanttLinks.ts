@@ -131,6 +131,8 @@ export const useGanttLinks = ({
             resolvedBarHeightPx / 2
         }
 
+        y += activity.linkOffsetYPx ?? 0
+
         positions.set(activity.id, { startX, endX, y, visualType: activity.visualType })
       }
     }
