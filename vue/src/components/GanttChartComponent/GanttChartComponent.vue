@@ -135,7 +135,16 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, ref, useId, useSlots, useTemplateRef } from 'vue'
+import {
+  computed,
+  nextTick,
+  onBeforeUnmount,
+  ref,
+  useId,
+  useSlots,
+  useTemplateRef,
+  watch,
+} from 'vue'
 import { useResizeObserver, useVirtualList } from '@vueuse/core'
 
 import GanttChartGrid from '@/components/GanttChartComponent/GanttChartGrid.vue'
@@ -616,6 +625,9 @@ const { list, containerProps, wrapperProps } = useVirtualList(
     itemHeight: (index) => rowHeights.value.at(index) ?? resolvedBaseRowHeightPx.value,
   }
 )
+// useVirtualList only recalculates its rendered range on scroll, resize, or source changes,
+// so row height changes (base height, view mode, mini stacking) must trigger it explicitly.
+watch(rowHeights, () => containerProps.onScroll(), { flush: 'post' })
 
 const { virtualOffsetPx, linkLayers } = useGanttLinks({
   list,
