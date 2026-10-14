@@ -154,6 +154,7 @@
     }
   ],
   "overrides": {
-    "minimatch": "10.2.3"
+    "minimatch": "10.2.3",
+    "@parcel/watcher": "^2.6.0"
   }
 }
