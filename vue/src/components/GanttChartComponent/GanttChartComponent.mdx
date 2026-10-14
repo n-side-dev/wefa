@@ -7,6 +7,18 @@ import * as GanttChartStories from './GanttChartComponent.stories'
 
 A flexible, virtualized Gantt chart that supports daily and weekly views, layered activity types, and translation-ready labels.
 
+## Cell sizing
+
+Use `baseRowHeightPx` (default 30), `dayColumnWidthPx` (default 40), and
+`weekColumnWidthPx` (default 40) to configure geometry in pixels. Dimensions must
+be finite and positive; invalid values fall back to the corresponding default.
+The row height adds mini stacking and the largest bar top offset to the base height.
+Changing these props updates headers, shading, bars, highlights, pointer coordinates,
+links, and virtualized row geometry together. `leftHeaderWidthPx` independently
+controls the sticky label column. Header heights and mini lane sizes remain unchanged.
+
+<Canvas of={GanttChartStories.CustomSizing} />
+
 ## Overview
 
 The GanttChart component renders a calendar grid with month and week headers, and a virtualized list of rows. Activities can be rendered as stripes, primary bars, or compact stacked minis. Weekly view collapses the grid to week columns and expands month headers across overlapping weeks.
@@ -325,3 +337,10 @@ export type GanttChartActivityInteractionPayload = {
 
 - `headerLabel`, `row.header`, `row.label`, and `activity.label` are treated as translation keys.
 - Week labels use the key `gantt_chart.week` by default.
+
+### Dependency link alignment
+
+Set an activity's `linkOffsetYPx` to adjust both incoming and outgoing dependency
+endpoints from the chart's calculated activity center. Positive values move down,
+negative values move up, and omission means zero adjustment. This changes arrow
+geometry only; it does not change bars, row heights, or transitions.
