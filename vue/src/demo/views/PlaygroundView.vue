@@ -39,8 +39,9 @@ import { useI18nLib } from '@/locales'
 
 const { t } = useI18nLib()
 
-const startDate = new Date(2026, 0, 1)
-const endDate = new Date(2026, 1, 28)
+const currentYear = new Date().getFullYear()
+const startDate = new Date(currentYear, 0, 1)
+const endDate = new Date(currentYear, 1, 28)
 const okLinkClass = '[stroke-dasharray:2,5]'
 const linkCases = [
   { type: 'start-start', fromIndex: 2, toIndex: 0, color: 'green', class: okLinkClass },
@@ -188,7 +189,7 @@ const links = computed<GanttChartLinkData[]>(() => {
     )
     if (from?.id && to?.id) {
       linkPairs.push({
-        id: linkCase.type,
+        id: `${linkCase.fromIndex}-${linkCase.toIndex}-${linkCase.type}`,
         fromId: from.id,
         toId: to.id,
         type: linkCase.type,
