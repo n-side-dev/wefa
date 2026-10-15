@@ -19,6 +19,8 @@ export type GanttChartActivityData = {
   fillStyle?: Record<string, string>
   fillSegments?: GanttChartActivityFillSegment[]
   barOffsetTopPx?: number
+  /** Signed vertical adjustment of dependency endpoints from the calculated center; positive moves down. */
+  linkOffsetYPx?: number
 }
 
 export type GanttChartRowData = {
