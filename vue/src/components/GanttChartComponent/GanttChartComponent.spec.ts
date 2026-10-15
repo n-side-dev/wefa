@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
-import { h, nextTick } from 'vue'
+import { h, nextTick, ref } from 'vue'
+import { useGanttLinks } from './composables/useGanttLinks'
 import GanttChartComponent from './GanttChartComponent.vue'
 import GanttChartRowGrid from './GanttChartRowGrid.vue'
 import {
@@ -9,6 +10,7 @@ import {
   MINI_GAP_PX,
   MINI_HEIGHT_PX,
   getWeekColumns,
+  getRowHeight,
 } from './ganttChartLayout'
 import type {
   GanttChartActivityInteractionPayload,
@@ -82,6 +84,76 @@ const baseRows: GanttChartRowData[] = [
 ]
 
 describe('GanttChartComponent', () => {
+  it('applies explicit link offsets without changing row geometry', () => {
+    const rows = ref(
+      baseRows.map((row, index) => ({
+        ...row,
+        activities: row.activities.map((activity) => ({
+          ...activity,
+          linkOffsetYPx: index ? -10 : 3,
+        })),
+      }))
+    )
+    const { visibleActivityPositions, linkLayers } = useGanttLinks({
+      list: ref(rows.value.map((data, index) => ({ index, data }))),
+      rowHeights: ref([52, 52]),
+      rowOffsets: ref([0, 52]),
+      dateRange: ref([new Date(2026, 0, 1)]),
+      viewMode: ref('day'),
+      columnWidthPx: ref(56),
+      weekColumns: ref([]),
+      links: ref([{ fromId: 'bar-1', toId: 'bar-2' }]),
+      svgIdPrefix: 'offset-test',
+      stackMiniActivities: ref(true),
+    })
+    expect(visibleActivityPositions.value.get('bar-1')?.y).toBe(29)
+    expect(visibleActivityPositions.value.get('bar-2')?.y).toBe(68)
+    expect(linkLayers.value.base[0]?.path).toMatch(/^M [\d.]+ 29 /)
+    expect(linkLayers.value.base[0]?.path).toMatch(/ 68$/)
+  })
+
+  it('uses custom dimensions consistently and reacts to view and sizing changes', async () => {
+    const wrapper = mount(GanttChartComponent, {
+      props: {
+        startDate: new Date(2026, 0, 1),
+        endDate: new Date(2026, 0, 7),
+        rows: baseRows,
+        baseRowHeightPx: 42,
+        dayColumnWidthPx: 56,
+        weekColumnWidthPx: 72,
+      },
+      global: { directives: { tooltip: () => {} } },
+    })
+    const row = wrapper.findComponent(GanttChartRowGrid)
+    expect(row.props('columnWidthPx')).toBe(56)
+    expect(row.attributes('style')).toContain('height: 42px')
+    const bar = row.find('.z-20')
+    expect(bar.attributes('style')).toContain('left: 112px')
+    expect(bar.attributes('style')).toContain('width: 168px')
+    expect(wrapper.html()).toContain('width: 392px')
+    await wrapper.setProps({ viewMode: 'week' })
+    expect(row.props('columnWidthPx')).toBe(72)
+    expect(bar.attributes('style')).toContain('width: 144px')
+    await wrapper.setProps({ baseRowHeightPx: 50, weekColumnWidthPx: 80 })
+    expect(row.attributes('style')).toContain('height: 50px')
+    expect(row.props('columnWidthPx')).toBe(80)
+    await wrapper.setProps({ baseRowHeightPx: 0, weekColumnWidthPx: Infinity })
+    expect(row.attributes('style')).toContain('height: 30px')
+    expect(row.props('columnWidthPx')).toBe(40)
+  })
+
+  it('adds mini stacking and bar offsets to a custom base height', () => {
+    const startDate = new Date(2026, 0, 1)
+    const endDate = new Date(2026, 0, 3)
+    const activities = [
+      { startDate, endDate, visualType: 'mini' as const },
+      { startDate, endDate, visualType: 'mini' as const },
+      { startDate, endDate, visualType: 'bar' as const, barOffsetTopPx: 10 },
+    ]
+    expect(getRowHeight(activities, true, 'day', 42)).toBe(42 + MINI_HEIGHT_PX + MINI_GAP_PX + 10)
+    expect(getRowHeight(activities, false, 'day', 42)).toBe(52)
+  })
+
   it('renders top-left header label and row headers', () => {
     const wrapper = mount(GanttChartComponent, {
       props: {

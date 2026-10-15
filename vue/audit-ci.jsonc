@@ -1,0 +1,13 @@
+{
+  "$schema": "https://github.com/IBM/audit-ci/raw/main/docs/schema.json",
+  // Fail on high and critical advisories, matching the former `npm audit --audit-level high`.
+  "high": true,
+  // Advisories ignored while no patched release is available upstream.
+  // TODO: revisit periodically — remove each id once a fixed version is published
+  // AND reachable through our direct deps' version constraints.
+  "allowlist": [
+    // braces <=3.0.3 stack-exhaustion DoS. 3.0.3 is the latest release (2026-10).
+    // Dev-only: @vue/eslint-config-typescript -> fast-glob -> micromatch -> braces.
+    "GHSA-vfj7-8cjw-p6xm"
+  ]
+}

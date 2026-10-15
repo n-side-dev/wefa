@@ -36,6 +36,7 @@
         <div ref="gantt-header" class="w-full">
           <GanttChartHeaderGrid
             :date-range="dateRange"
+            :column-width-px="columnWidthPx"
             :view-mode="viewMode"
             :hovered-column-index="highlightHoveredColumn ? hoveredColumnIndex : undefined"
             :hover-highlight-class="hoverHighlightClass"
@@ -98,6 +99,7 @@
           v-for="(item, idx) in list"
           :key="item.data.id ?? `grid-${idx}`"
           :date-range="dateRange"
+          :column-width-px="columnWidthPx"
           :activities="item.data.activities"
           :row-data="item.data"
           :row-index="item.index"
@@ -133,7 +135,16 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, ref, useId, useSlots, useTemplateRef } from 'vue'
+import {
+  computed,
+  nextTick,
+  onBeforeUnmount,
+  ref,
+  useId,
+  useSlots,
+  useTemplateRef,
+  watch,
+} from 'vue'
 import { useResizeObserver, useVirtualList } from '@vueuse/core'
 
 import GanttChartGrid from '@/components/GanttChartComponent/GanttChartGrid.vue'
@@ -152,6 +163,7 @@ import {
   DAY_CELL_WIDTH_PX,
   WEEK_CELL_WIDTH_PX,
   getRowHeight,
+  resolveGanttDimension,
   getWeekColumns,
 } from '@/components/GanttChartComponent/ganttChartLayout'
 import type {
@@ -235,6 +247,12 @@ interface GanttChartComponentProps {
   highlightSelectedInteraction?: boolean
   /** Class applied to selected row/column/cell background highlights. */
   selectedHighlightClass?: string
+  /** Base row height in pixels before mini stacking and bar top offsets. Must be finite and positive. */
+  baseRowHeightPx?: number
+  /** Day column width in pixels. Must be finite and positive. */
+  dayColumnWidthPx?: number
+  /** Week column width in pixels. Must be finite and positive. */
+  weekColumnWidthPx?: number
   /** Width of the sticky row-label column in pixels. */
   leftHeaderWidthPx?: number
 }
@@ -265,6 +283,9 @@ const {
   linkHighlightClass = 'opacity-100 [stroke-width:3]',
   highlightSelectedInteraction = true,
   selectedHighlightClass = 'bg-primary-100/80',
+  baseRowHeightPx = BASE_ROW_HEIGHT_PX,
+  dayColumnWidthPx = DAY_CELL_WIDTH_PX,
+  weekColumnWidthPx = WEEK_CELL_WIDTH_PX,
   leftHeaderWidthPx = 320,
 } = defineProps<GanttChartComponentProps>()
 
@@ -552,7 +573,14 @@ const buildDateRange = (startDate?: Date, endDate?: Date) => {
 const viewMode = computed(() => viewModeProp)
 const dateRange = computed(() => buildDateRange(startDate, endDate))
 const isWeekView = computed(() => viewMode.value === 'week')
-const columnWidthPx = computed(() => (isWeekView.value ? WEEK_CELL_WIDTH_PX : DAY_CELL_WIDTH_PX))
+const resolvedBaseRowHeightPx = computed(() =>
+  resolveGanttDimension(baseRowHeightPx, BASE_ROW_HEIGHT_PX)
+)
+const columnWidthPx = computed(() =>
+  isWeekView.value
+    ? resolveGanttDimension(weekColumnWidthPx, WEEK_CELL_WIDTH_PX)
+    : resolveGanttDimension(dayColumnWidthPx, DAY_CELL_WIDTH_PX)
+)
 const weekColumns = computed(() => {
   if (dateRange.value.length === 0) {
     return []
@@ -561,7 +589,9 @@ const weekColumns = computed(() => {
   return getWeekColumns(dateRange.value[0]!, dateRange.value[dateRange.value.length - 1]!)
 })
 const rowHeights = computed(() =>
-  rows.map((row) => getRowHeight(row.activities, stackMiniActivities, viewMode.value))
+  rows.map((row) =>
+    getRowHeight(row.activities, stackMiniActivities, viewMode.value, resolvedBaseRowHeightPx.value)
+  )
 )
 // Accumulate row offsets so links can be drawn in a single SVG overlay.
 const rowOffsets = computed(() => {
@@ -570,7 +600,7 @@ const rowOffsets = computed(() => {
 
   rows.forEach((row, index) => {
     offsets[index] = current
-    current += rowHeights.value[index] ?? BASE_ROW_HEIGHT_PX
+    current += rowHeights.value[index] ?? resolvedBaseRowHeightPx.value
   })
 
   return offsets
@@ -592,9 +622,12 @@ const gridWidthPx = computed(() => {
 const { list, containerProps, wrapperProps } = useVirtualList(
   computed(() => rows),
   {
-    itemHeight: (index) => rowHeights.value.at(index) ?? BASE_ROW_HEIGHT_PX,
+    itemHeight: (index) => rowHeights.value.at(index) ?? resolvedBaseRowHeightPx.value,
   }
 )
+// useVirtualList only recalculates its rendered range on scroll, resize, or source changes,
+// so row height changes (base height, view mode, mini stacking) must trigger it explicitly.
+watch(rowHeights, () => containerProps.onScroll(), { flush: 'post' })
 
 const { virtualOffsetPx, linkLayers } = useGanttLinks({
   list,
