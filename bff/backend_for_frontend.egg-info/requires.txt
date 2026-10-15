@@ -1,0 +1,10 @@
+authlib>=1.7.2
+cryptography>=49.0.0
+flask~=3.1.2
+flask-cors
+flask-session
+flask-smorest>=0.46.2
+pyyaml~=6.0
+python-dotenv~=1.2.1
+requests>=2.34.2
+urllib3>=2.7.0
