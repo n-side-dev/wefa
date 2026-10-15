@@ -155,6 +155,9 @@
   ],
   "overrides": {
     "minimatch": "10.2.3",
-    "@parcel/watcher": "^2.6.0"
+    "@parcel/watcher": "^2.6.0",
+    "@hey-api/json-schema-ref-parser": {
+      "js-yaml": "^4.3.2"
+    }
   }
 }

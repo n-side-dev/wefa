@@ -5,11 +5,20 @@ export type AuthToken = string | undefined
 export interface Auth {
   /**
    * Which part of the request do we use to send the auth?
+   *
    * @default 'header'
    */
   in?: 'header' | 'query' | 'cookie'
   /**
+   * A unique identifier for the security scheme.
+   *
+   * Defined only when there are multiple security schemes whose `Auth`
+   * shape would otherwise be identical.
+   */
+  key?: string
+  /**
    * Header or query parameter name.
+   *
    * @default 'Authorization'
    */
   name?: string

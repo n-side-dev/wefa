@@ -7,6 +7,7 @@ export type ServerSentEventsOptions<TData = unknown> = Omit<RequestInit, 'method
     /**
      * Fetch API implementation. You can use this option to provide a custom
      * fetch instance.
+     *
      * @default globalThis.fetch
      */
     fetch?: typeof fetch
@@ -18,6 +19,7 @@ export type ServerSentEventsOptions<TData = unknown> = Omit<RequestInit, 'method
      * Callback invoked when a network or parsing error occurs during streaming.
      *
      * This option applies only if the endpoint returns a stream of events.
+     *
      * @param error The error that occurred.
      */
     onSseError?: (error: unknown) => void
@@ -25,6 +27,7 @@ export type ServerSentEventsOptions<TData = unknown> = Omit<RequestInit, 'method
      * Callback invoked when an event is streamed from the server.
      *
      * This option applies only if the endpoint returns a stream of events.
+     *
      * @param event Event streamed from the server.
      * @returns Nothing (void).
      */
@@ -34,6 +37,7 @@ export type ServerSentEventsOptions<TData = unknown> = Omit<RequestInit, 'method
      * Default retry delay in milliseconds.
      *
      * This option applies only if the endpoint returns a stream of events.
+     *
      * @default 3000
      */
     sseDefaultRetryDelay?: number
@@ -47,6 +51,7 @@ export type ServerSentEventsOptions<TData = unknown> = Omit<RequestInit, 'method
      * Applies only when exponential backoff is used.
      *
      * This option applies only if the endpoint returns a stream of events.
+     *
      * @default 30000
      */
     sseMaxRetryDelay?: number
@@ -74,7 +79,7 @@ export type ServerSentEventsResult<TData = unknown, TReturn = void, TNext = unkn
   >
 }
 
-export const createSseClient = <TData = unknown>({
+export function createSseClient<TData = unknown>({
   onRequest,
   onSseError,
   onSseEvent,
@@ -86,7 +91,7 @@ export const createSseClient = <TData = unknown>({
   sseSleepFn,
   url,
   ...options
-}: ServerSentEventsOptions): ServerSentEventsResult<TData> => {
+}: ServerSentEventsOptions): ServerSentEventsResult<TData> {
   let lastEventId: string | undefined
 
   const sleep = sseSleepFn ?? ((ms: number) => new Promise((resolve) => setTimeout(resolve, ms)))
@@ -150,6 +155,7 @@ export const createSseClient = <TData = unknown>({
             const { done, value } = await reader.read()
             if (done) break
             buffer += value
+            buffer = buffer.replace(/\r\n?/g, '\n') // normalize line endings
 
             const chunks = buffer.split('\n\n')
             buffer = chunks.pop() ?? ''
