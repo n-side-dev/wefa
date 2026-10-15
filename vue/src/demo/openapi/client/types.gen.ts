@@ -18,6 +18,7 @@ export interface Config<T extends ClientOptions = ClientOptions>
   /**
    * Axios implementation. You can use this option to provide either an
    * `AxiosStatic` or an `AxiosInstance`.
+   *
    * @default axios
    */
   axios?: AxiosStatic | AxiosInstance
@@ -39,6 +40,7 @@ export interface Config<T extends ClientOptions = ClientOptions>
       >
   /**
    * Throw an error instead of returning it in the response?
+   *
    * @default false
    */
   throwOnError?: T['throwOnError']
@@ -55,6 +57,7 @@ export interface RequestOptions<
     }>,
     Pick<
       ServerSentEventsOptions<TData>,
+      | 'onRequest'
       | 'onSseError'
       | 'onSseEvent'
       | 'sseDefaultRetryDelay'
@@ -101,9 +104,14 @@ type MethodFn = <TData = unknown, TError = unknown, ThrowOnError extends boolean
   options: Omit<RequestOptions<TData, ThrowOnError>, 'method'>
 ) => RequestResult<TData, TError, ThrowOnError>
 
-type SseFn = <TData = unknown, TError = unknown, ThrowOnError extends boolean = false>(
-  options: Omit<RequestOptions<TData, ThrowOnError>, 'method'>
-) => Promise<ServerSentEventsResult<TData, TError>>
+type SseFn = <
+  TData = unknown,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _TError = unknown,
+  ThrowOnError extends boolean = false,
+>(
+  options: Omit<RequestOptions<never, ThrowOnError>, 'method'>
+) => Promise<ServerSentEventsResult<TData>>
 
 type RequestFn = <TData = unknown, TError = unknown, ThrowOnError extends boolean = false>(
   options: Omit<RequestOptions<TData, ThrowOnError>, 'method'> &
@@ -112,13 +120,16 @@ type RequestFn = <TData = unknown, TError = unknown, ThrowOnError extends boolea
 
 type BuildUrlFn = <
   TData extends {
-    body?: unknown
     path?: Record<string, unknown>
     query?: Record<string, unknown>
     url: string
   },
 >(
-  options: Pick<TData, 'url'> & Omit<Options<TData>, 'axios'>
+  options: TData &
+    Pick<
+      RequestOptions<unknown, boolean>,
+      'axios' | 'baseURL' | 'paramsSerializer' | 'querySerializer'
+    >
 ) => string
 
 export type Client = CoreClient<RequestFn, Config, MethodFn, BuildUrlFn, SseFn> & {
@@ -152,19 +163,4 @@ export type Options<
   ThrowOnError extends boolean = boolean,
   TResponse = unknown,
 > = OmitKeys<RequestOptions<TResponse, ThrowOnError>, 'body' | 'path' | 'query' | 'url'> &
-  Omit<TData, 'url'>
-
-export type OptionsLegacyParser<
-  TData = unknown,
-  ThrowOnError extends boolean = boolean,
-> = TData extends { body?: any }
-  ? TData extends { headers?: any }
-    ? OmitKeys<RequestOptions<unknown, ThrowOnError>, 'body' | 'headers' | 'url'> & TData
-    : OmitKeys<RequestOptions<unknown, ThrowOnError>, 'body' | 'url'> &
-        TData &
-        Pick<RequestOptions<unknown, ThrowOnError>, 'headers'>
-  : TData extends { headers?: any }
-    ? OmitKeys<RequestOptions<unknown, ThrowOnError>, 'headers' | 'url'> &
-        TData &
-        Pick<RequestOptions<unknown, ThrowOnError>, 'body'>
-    : OmitKeys<RequestOptions<unknown, ThrowOnError>, 'url'> & TData
+  ([TData] extends [never] ? unknown : Omit<TData, 'url'>)

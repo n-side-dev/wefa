@@ -11,11 +11,10 @@ import { getUrl } from '../core/utils.gen'
 import type { Client, ClientOptions, Config, RequestOptions } from './types.gen'
 
 export const createQuerySerializer = <T = unknown>({
-  allowReserved,
-  array,
-  object,
-}: QuerySerializerOptions = {}) => {
-  const querySerializer = (queryParams: T) => {
+  parameters = {},
+  ...args
+}: QuerySerializerOptions = {}): ((queryParams: T) => string) => {
+  const querySerializer = (queryParams: T): string => {
     const search: string[] = []
     if (queryParams && typeof queryParams === 'object') {
       for (const name in queryParams) {
@@ -25,29 +24,31 @@ export const createQuerySerializer = <T = unknown>({
           continue
         }
 
+        const options = parameters[name] || args
+
         if (Array.isArray(value)) {
           const serializedArray = serializeArrayParam({
-            allowReserved,
+            allowReserved: options.allowReserved,
             explode: true,
             name,
             style: 'form',
             value,
-            ...array,
+            ...options.array,
           })
           if (serializedArray) search.push(serializedArray)
         } else if (typeof value === 'object') {
           const serializedObject = serializeObjectParam({
-            allowReserved,
+            allowReserved: options.allowReserved,
             explode: true,
             name,
             style: 'deepObject',
             value: value as Record<string, unknown>,
-            ...object,
+            ...options.object,
           })
           if (serializedObject) search.push(serializedObject)
         } else {
           const serializedPrimitive = serializePrimitiveParam({
-            allowReserved,
+            allowReserved: options.allowReserved,
             name,
             value: value as string,
           })
@@ -82,14 +83,12 @@ const checkForExistence = (
   return false
 }
 
-export const setAuthParams = async ({
-  security,
-  ...options
-}: Pick<Required<RequestOptions>, 'security'> &
-  Pick<RequestOptions, 'auth' | 'query'> & {
+export async function setAuthParams(
+  options: Pick<RequestOptions, 'auth' | 'query' | 'security'> & {
     headers: Record<any, unknown>
-  }) => {
-  for (const auth of security) {
+  }
+): Promise<void> {
+  for (const auth of options.security ?? []) {
     if (checkForExistence(options, auth.name)) {
       continue
     }
@@ -125,9 +124,14 @@ export const setAuthParams = async ({
   }
 }
 
-export const buildUrl: Client['buildUrl'] = (options) =>
-  getUrl({
-    baseUrl: options.baseURL as string,
+export const buildUrl: Client['buildUrl'] = (options) => {
+  const instanceBaseUrl = options.axios?.defaults?.baseURL
+
+  const baseUrl =
+    options.baseURL && typeof options.baseURL === 'string' ? options.baseURL : instanceBaseUrl
+
+  return getUrl({
+    baseUrl: baseUrl as string,
     path: options.path,
     // let `paramsSerializer()` handle query params if it exists
     query: !options.paramsSerializer ? options.query : undefined,
@@ -137,6 +141,7 @@ export const buildUrl: Client['buildUrl'] = (options) =>
         : createQuerySerializer(options.querySerializer),
     url: options.url,
   })
+}
 
 export const mergeConfigs = (a: Config, b: Config): Config => {
   const config = { ...a, ...b }
@@ -185,7 +190,7 @@ export const mergeHeaders = (
           mergedHeaders[key] = [...(mergedHeaders[key] ?? []), v as string]
         }
       } else if (value !== undefined) {
-        // assume object headers are meant to be JSON stringified, i.e. their
+        // assume object headers are meant to be JSON stringified, i.e., their
         // content value in OpenAPI specification is 'application/json'
         mergedHeaders[key] = typeof value === 'object' ? JSON.stringify(value) : (value as string)
       }
