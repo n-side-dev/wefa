@@ -4,10 +4,7 @@
       <!-- Months header -->
       <div class="flex flex-row w-full">
         <template v-if="isWeekView">
-          <div
-            class="relative h-10"
-            :style="{ width: `${weekColumns.length * WEEK_CELL_WIDTH_PX}px` }"
-          >
+          <div class="relative h-10" :style="{ width: `${weekColumns.length * columnWidthPx}px` }">
             <div
               v-for="month in monthSpans"
               :key="`${month.year}-${month.month}`"
@@ -25,7 +22,7 @@
             v-for="month in months"
             :key="`${month.year}-${month.month}`"
             class="flex-none box-border border-b border-r border-surface-200 bg-surface-50 text-surface-900 text-xs font-semibold uppercase tracking-wide h-10 flex items-center justify-center text-center leading-tight px-2 break-words"
-            :style="{ width: `${month.days.length * DAY_CELL_WIDTH_PX}px` }"
+            :style="{ width: `${month.days.length * columnWidthPx}px` }"
             :title="`${month.label} (${month.days.length} days)`"
             :aria-label="`Month ${month.label}`"
           >
@@ -53,7 +50,7 @@
             v-for="week in weeks"
             :key="`${week.weekYear}-W${week.weekNumber}`"
             class="flex-none box-border border-b border-r border-surface-200 bg-surface-0 text-surface-600 text-[11px] font-semibold h-9 flex items-center justify-center text-center leading-tight px-1"
-            :style="{ width: `${week.days.length * DAY_CELL_WIDTH_PX}px` }"
+            :style="{ width: `${week.days.length * columnWidthPx}px` }"
             :title="`${t('gantt_chart.week')} ${week.weekNumber} (${week.days.length} days)`"
             :aria-label="`${t('gantt_chart.week')} ${week.weekNumber}`"
           >
@@ -68,7 +65,7 @@
           :key="date.toISOString()"
           class="flex-none box-border border-b border-r border-surface-200 text-center py-2 text-xs text-surface-700 select-none"
           :class="columnHeaderClass(index)"
-          :style="{ width: `${DAY_CELL_WIDTH_PX}px` }"
+          :style="{ width: `${columnWidthPx}px` }"
           :title="date.toDateString()"
         >
           {{ date.getDate() }}
@@ -83,8 +80,6 @@ import { computed } from 'vue'
 import { DateTime } from 'luxon'
 import { useI18nLib } from '@/locales'
 import {
-  DAY_CELL_WIDTH_PX,
-  WEEK_CELL_WIDTH_PX,
   getMonthSpansForWeeks,
   getWeekColumns,
   type GanttChartViewMode,
@@ -93,6 +88,7 @@ import {
 
 export interface GanttChartHeaderGridProps {
   dateRange: Date[]
+  columnWidthPx?: number
   viewMode?: GanttChartViewMode
   hoveredColumnIndex?: number
   hoverHighlightClass?: string
@@ -102,6 +98,7 @@ export interface GanttChartHeaderGridProps {
 
 const {
   dateRange,
+  columnWidthPx = 40,
   viewMode = 'day',
   hoveredColumnIndex = undefined,
   hoverHighlightClass = 'bg-primary-50/60',
@@ -111,7 +108,6 @@ const {
 const { t } = useI18nLib()
 
 const isWeekView = computed(() => viewMode === 'week')
-const columnWidthPx = computed(() => (isWeekView.value ? WEEK_CELL_WIDTH_PX : DAY_CELL_WIDTH_PX))
 const weekColumns = computed(() => {
   if (dateRange.length === 0) {
     return []
@@ -182,7 +178,7 @@ const columnHeaderClass = (index: number) => {
 }
 
 const monthSpanStyle = (month: MonthSpan) => ({
-  left: `${month.startIndex * WEEK_CELL_WIDTH_PX}px`,
-  width: `${(month.endIndex - month.startIndex + 1) * WEEK_CELL_WIDTH_PX}px`,
+  left: `${month.startIndex * columnWidthPx}px`,
+  width: `${(month.endIndex - month.startIndex + 1) * columnWidthPx}px`,
 })
 </script>

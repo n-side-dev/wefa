@@ -138,11 +138,9 @@ import { useI18nLib } from '@/locales'
 import {
   BAR_VERTICAL_PADDING_PX,
   BASE_ROW_HEIGHT_PX,
-  DAY_CELL_WIDTH_PX,
   MINI_GAP_PX,
   MINI_HEIGHT_PX,
   STRIPE_SIZE_PX,
-  WEEK_CELL_WIDTH_PX,
   computeMiniLanes,
   getBarSpacingOffsets,
   getActivitySpanPx,
@@ -160,6 +158,7 @@ import type {
 
 export interface GanttChartRowGridProps {
   dateRange: Date[]
+  columnWidthPx?: number
   viewMode?: GanttChartViewMode
   activities?: GanttChartActivityData[]
   activityColorClass?: string
@@ -200,6 +199,7 @@ const defaultTooltip = (activity: GanttChartActivityData) => {
 
 const {
   dateRange,
+  columnWidthPx = 40,
   viewMode = 'day',
   activities = [],
   activityColorClass = 'bg-emerald-400/80',
@@ -258,7 +258,6 @@ const resolvedBarHeightPx = computed(() =>
 )
 
 // Pixel width for each column (day or week).
-const columnWidthPx = computed(() => (isWeekView.value ? WEEK_CELL_WIDTH_PX : DAY_CELL_WIDTH_PX))
 // Week column boundaries used for weekly view layout.
 const weekColumns = computed(() => {
   if (dateRange.length === 0) {
@@ -270,15 +269,15 @@ const weekColumns = computed(() => {
 // Total grid width in pixels.
 const lineWidth = computed(() => {
   const count = isWeekView.value ? weekColumns.value.length : dateRange.length
-  return `${count * columnWidthPx.value}px`
+  return `${count * columnWidthPx}px`
 })
 const highlightedCellStyle = computed(() => ({
-  left: `${(highlightedCellColumnIndex ?? 0) * columnWidthPx.value}px`,
-  width: `${columnWidthPx.value}px`,
+  left: `${(highlightedCellColumnIndex ?? 0) * columnWidthPx}px`,
+  width: `${columnWidthPx}px`,
 }))
 const selectedCellStyle = computed(() => ({
-  left: `${(selectedCellColumnIndex ?? 0) * columnWidthPx.value}px`,
-  width: `${columnWidthPx.value}px`,
+  left: `${(selectedCellColumnIndex ?? 0) * columnWidthPx}px`,
+  width: `${columnWidthPx}px`,
 }))
 
 // Weekend shading pattern (disabled in weekly view).
@@ -293,8 +292,8 @@ const weekPattern = computed(() => {
   const stops = Array.from({ length: WEEK_DAYS }, (_, index) => {
     const day = base.plus({ days: index })
     const color = day.isWeekend ? 'rgb(248 250 252)' : 'transparent'
-    const start = index * DAY_CELL_WIDTH_PX
-    const end = (index + 1) * DAY_CELL_WIDTH_PX
+    const start = index * columnWidthPx
+    const end = (index + 1) * columnWidthPx
     return `${color} ${start}px ${end}px`
   })
 
@@ -310,8 +309,8 @@ const gridStyle = computed(() => {
   const offsetDays = firstDate
     ? Math.floor(DateTime.fromJSDate(firstDate).diff(weekStart, 'days').days)
     : 0
-  const offsetPx = offsetDays * DAY_CELL_WIDTH_PX
-  const columnWidth = columnWidthPx.value
+  const offsetPx = offsetDays * columnWidthPx
+  const columnWidth = columnWidthPx
   const gridLines = `repeating-linear-gradient(90deg, transparent 0, transparent ${
     columnWidth - 1
   }px, rgb(226 232 240) ${columnWidth - 1}px, rgb(226 232 240) ${columnWidth}px)`
@@ -324,7 +323,7 @@ const gridStyle = computed(() => {
 
   if (weekPattern.value) {
     baseStyle.backgroundImage = `${gridLines}, ${weekPattern.value}`
-    baseStyle.backgroundSize = `${columnWidth}px 100%, ${DAY_CELL_WIDTH_PX * WEEK_DAYS}px 100%`
+    baseStyle.backgroundSize = `${columnWidth}px 100%, ${columnWidthPx * WEEK_DAYS}px 100%`
     baseStyle.backgroundPosition = `0 0, -${offsetPx}px 0`
     baseStyle.backgroundRepeat = 'repeat-x, repeat-x'
   }
@@ -335,13 +334,7 @@ const gridStyle = computed(() => {
 // Computes the CSS position and size for an activity bar/stripe/mini.
 const activityPositionStyle = (activity: GanttChartActivityData) => {
   // Weekly view is inclusive of partial weeks: any overlap fills the whole week column.
-  const span = getActivitySpanPx(
-    activity,
-    dateRange,
-    viewMode,
-    columnWidthPx.value,
-    weekColumns.value
-  )
+  const span = getActivitySpanPx(activity, dateRange, viewMode, columnWidthPx, weekColumns.value)
 
   return {
     left: `${span.left}px`,
@@ -379,14 +372,14 @@ const fillSegmentStyle = (
     activity,
     dateRange,
     viewMode,
-    columnWidthPx.value,
+    columnWidthPx,
     weekColumns.value
   )
   const segmentSpan = getActivitySpanPx(
     { startDate: segment.startDate, endDate: segment.endDate },
     dateRange,
     viewMode,
-    columnWidthPx.value,
+    columnWidthPx,
     weekColumns.value
   )
   const left = Math.max(0, segmentSpan.left - activitySpan.left)
@@ -420,7 +413,7 @@ const interactionPayload = (
   event: PointerEvent | MouseEvent
 ): GanttChartActivityInteractionPayload | undefined => {
   const rect = gridElement.value?.getBoundingClientRect()
-  if (!rect || columnWidthPx.value <= 0) {
+  if (!rect || columnWidthPx <= 0) {
     return undefined
   }
 
@@ -429,7 +422,7 @@ const interactionPayload = (
     return undefined
   }
 
-  const rawColumnIndex = Math.floor((event.clientX - rect.left) / columnWidthPx.value)
+  const rawColumnIndex = Math.floor((event.clientX - rect.left) / columnWidthPx)
   const columnIndex = Math.min(Math.max(rawColumnIndex, 0), columnCount - 1)
   const activityElement =
     event.currentTarget instanceof HTMLElement ? event.currentTarget : undefined
@@ -438,7 +431,7 @@ const interactionPayload = (
     columnIndex,
     viewMode,
     // The popover is anchored to the hovered column center and the activity vertical center.
-    anchorClientX: rect.left + columnIndex * columnWidthPx.value + columnWidthPx.value / 2,
+    anchorClientX: rect.left + columnIndex * columnWidthPx + columnWidthPx / 2,
     anchorClientY: activityRect ? activityRect.top + activityRect.height / 2 : event.clientY,
   }
 

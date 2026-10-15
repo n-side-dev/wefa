@@ -136,6 +136,9 @@ const meta: Meta<typeof GanttChartComponent> = {
     showWeekendShading: true,
     stackMiniActivities: true,
     leftHeaderWidthPx: 320,
+    baseRowHeightPx: 30,
+    dayColumnWidthPx: 40,
+    weekColumnWidthPx: 40,
   },
   parameters: {
     layout: 'fullscreen',
@@ -366,4 +369,9 @@ export const ToggleViewMode: Story = {
       </div>
     `,
   }),
+}
+
+/** Larger cells demonstrate configurable geometry with the existing activities and links. */
+export const CustomSizing: Story = {
+  args: { baseRowHeightPx: 42, dayColumnWidthPx: 56, weekColumnWidthPx: 72 },
 }
