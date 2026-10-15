@@ -1,8 +1,8 @@
 from django.http import HttpResponse
+from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework.permissions import AllowAny
-from rest_framework.views import APIView
 from rest_framework.request import Request
-from drf_spectacular.utils import extend_schema, OpenApiResponse
+from rest_framework.views import APIView
 
 from nside_wefa.legal_consent.views.utils import get_document_content
 
@@ -19,7 +19,7 @@ class TermsOfUseView(APIView):
         GET: Returns the Terms of Use document as plain text
     """
 
-    permission_classes = [AllowAny]
+    permission_classes = (AllowAny,)
 
     @extend_schema(
         operation_id="legal_consent_terms_of_use",

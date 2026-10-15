@@ -7,7 +7,7 @@ that matter to operators and end users alike. The
 used only by the staff detail endpoint when tamper-evidence is enabled.
 """
 
-from typing import Any, Optional
+from typing import Any, ClassVar
 
 from auditlog.models import LogEntry
 from drf_spectacular.utils import extend_schema_field, extend_schema_serializer
@@ -43,7 +43,7 @@ class AuditEventSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = LogEntry
-        fields = [
+        fields: ClassVar[list[str]] = [
             "id",
             "timestamp",
             "action",
@@ -65,17 +65,17 @@ class AuditEventSerializer(serializers.ModelSerializer):
         return (obj.additional_data or {}).get("action") or obj.get_action_display()
 
     @extend_schema_field(serializers.CharField(allow_null=True))
-    def get_actor(self, obj: LogEntry) -> Optional[str]:
+    def get_actor(self, obj: LogEntry) -> str | None:
         if obj.actor is not None:
             return str(obj.actor)
         return obj.actor_email or None
 
     @extend_schema_field(serializers.CharField(allow_null=True))
-    def get_target(self, obj: LogEntry) -> Optional[str]:
+    def get_target(self, obj: LogEntry) -> str | None:
         return obj.object_repr or None
 
     @extend_schema_field(serializers.CharField(allow_null=True))
-    def get_target_type(self, obj: LogEntry) -> Optional[str]:
+    def get_target_type(self, obj: LogEntry) -> str | None:
         if obj.content_type_id is None or obj.content_type is None:
             return None
         return f"{obj.content_type.app_label}.{obj.content_type.model}"

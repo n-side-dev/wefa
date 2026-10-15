@@ -50,7 +50,7 @@ class AuditEventListView(APIView):
     Supports the filters listed in :data:`LIST_FILTERS`.
     """
 
-    permission_classes = [IsAdminUser]
+    permission_classes = (IsAdminUser,)
 
     @extend_schema(
         operation_id="audit_events_list",
@@ -85,7 +85,7 @@ class AuditEventListView(APIView):
 class AuditEventDetailView(APIView):
     """``GET /audit/events/<id>/`` — single audit event (staff only)."""
 
-    permission_classes = [IsAdminUser]
+    permission_classes = (IsAdminUser,)
 
     @extend_schema(
         operation_id="audit_events_detail",

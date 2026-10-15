@@ -1,6 +1,7 @@
 import importlib
-from django.contrib.auth.models import User
+
 from django.apps import apps
+from django.contrib.auth.models import User
 from django.db import connection
 from django.test import TransactionTestCase
 

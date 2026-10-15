@@ -1,5 +1,6 @@
-from django.conf import settings
 from pathlib import Path
+
+from django.conf import settings
 
 """
 Utilities for serving Legal Consent markdown documents.

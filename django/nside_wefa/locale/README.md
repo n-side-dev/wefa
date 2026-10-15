@@ -29,8 +29,8 @@ before the user authenticates.
    ```python
    INSTALLED_APPS = [
        # ... other apps
-       'nside_wefa.common',
-       'nside_wefa.locale',
+       "nside_wefa.common",
+       "nside_wefa.locale",
    ]
    ```
 
@@ -47,7 +47,7 @@ before the user authenticates.
 
    urlpatterns = [
        # ... other URL patterns
-       path('locale/', include('nside_wefa.locale.urls')),
+       path("locale/", include("nside_wefa.locale.urls")),
    ]
    ```
 

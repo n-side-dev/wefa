@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import os
 import sys
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 
 # -- Path setup --------------------------------------------------------------
@@ -22,7 +22,7 @@ sys.path.insert(0, str(ROOT))
 # -- Project information -----------------------------------------------------
 project = "N-SIDE WeFa"
 organization = "N-SIDE"
-current_year = datetime.now().year
+current_year = datetime.now(tz=UTC).year
 copyright = f"{current_year}, {organization}"
 
 # -- Django setup ------------------------------------------------------------
@@ -32,7 +32,7 @@ try:
     import django  # type: ignore
 
     django.setup()
-except Exception as exc:  # pragma: no cover - docs build environment only
+except Exception as exc:  # noqa: BLE001 - pragma: no cover; docs must build even if Django setup fails
     # Don't fail import-time; Sphinx will still build non-autodoc pages.
     # The CI sets DJANGO_SETTINGS_MODULE and has Django installed.
     print(f"[sphinx conf] Warning: Django setup failed: {exc}")

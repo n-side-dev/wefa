@@ -6,7 +6,8 @@ purpose — when catalog item F3 (filtering preset) lands, swap this for the
 shared filterset.
 """
 
-from typing import Any, Iterable, Optional, Tuple
+from collections.abc import Iterable
+from typing import Any
 
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import QuerySet
@@ -15,7 +16,7 @@ from django.utils.dateparse import parse_datetime
 
 def apply_filters(
     queryset: QuerySet, query_params: Any, allowed: Iterable[str]
-) -> Tuple[QuerySet, Optional[str]]:
+) -> tuple[QuerySet, str | None]:
     """Apply audit-event filters to ``queryset``.
 
     Returns ``(queryset, error_message)``. ``error_message`` is non-None when

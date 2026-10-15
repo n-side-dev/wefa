@@ -19,7 +19,7 @@ returns ``None``. Set the flag to ``True`` in tests to surface regressions.
 
 import enum
 import logging
-from typing import Any, Dict, Optional
+from typing import Any
 
 from auditlog import get_logentry_model
 from auditlog.context import set_actor as _auditlog_set_actor
@@ -63,11 +63,11 @@ def log(
     action: str,
     *,
     actor: Any = _UNSET,
-    target: Optional[models.Model] = None,
-    changes: Optional[Dict[str, Any]] = None,
-    metadata: Optional[Dict[str, Any]] = None,
+    target: models.Model | None = None,
+    changes: dict[str, Any] | None = None,
+    metadata: dict[str, Any] | None = None,
     outcome: Outcome = Outcome.SUCCESS,
-) -> Optional[AbstractLogEntry]:
+) -> AbstractLogEntry | None:
     """Write an audit event and return the resulting log entry.
 
     Returns an instance of whichever model auditlog has been told to use —
@@ -98,7 +98,7 @@ def log(
     redacted_changes = _redact(changes, redact_fields) if changes else None
     redacted_metadata = _redact(metadata, redact_fields) if metadata else {}
 
-    additional_data: Dict[str, Any] = {
+    additional_data: dict[str, Any] = {
         "outcome": outcome.value,
         "action": action,
     }
@@ -110,7 +110,7 @@ def log(
     # base, so it's safe to read off the active class.
     log_model = get_logentry_model()
 
-    create_kwargs: Dict[str, Any] = {
+    create_kwargs: dict[str, Any] = {
         "action": log_model.Action.UPDATE,
         "additional_data": additional_data,
     }
@@ -149,7 +149,7 @@ def log(
 
     try:
         return log_model.objects.create(**create_kwargs)
-    except Exception as exc:  # noqa: BLE001 — by design; see RAISE_ON_FAILURE
+    except Exception as exc:
         if raise_on_failure:
             raise AuditWriteError(
                 f"Failed to write audit event {action!r}: {exc}"
@@ -182,7 +182,7 @@ def _resolve_actor(actor: Any) -> Any:
     return actor
 
 
-def _redact(payload: Dict[str, Any], redact_fields: list) -> Dict[str, Any]:
+def _redact(payload: dict[str, Any], redact_fields: list) -> dict[str, Any]:
     """Return a shallow copy of ``payload`` with sensitive values masked.
 
     Keys are matched case-insensitively. Nested dicts are walked recursively
@@ -192,7 +192,7 @@ def _redact(payload: Dict[str, Any], redact_fields: list) -> Dict[str, Any]:
     if not isinstance(payload, dict):
         return payload
     redact_lower = {f.lower() for f in redact_fields}
-    out: Dict[str, Any] = {}
+    out: dict[str, Any] = {}
     for key, value in payload.items():
         if isinstance(key, str) and key.lower() in redact_lower:
             out[key] = "[REDACTED]"

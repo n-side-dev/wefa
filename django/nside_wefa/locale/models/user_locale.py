@@ -6,7 +6,7 @@ preferred locale code and provides a signal to automatically create a row on
 user creation.
 """
 
-from typing import Any, List, TypedDict, cast
+from typing import Any, TypedDict, cast
 
 from django.conf import settings
 from django.db import models
@@ -14,7 +14,7 @@ from django.db.models import signals
 
 
 class _LocaleSettingsDict(TypedDict):
-    AVAILABLE: List[str]
+    AVAILABLE: list[str]
     DEFAULT: str
 
 

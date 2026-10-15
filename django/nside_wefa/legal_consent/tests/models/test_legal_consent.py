@@ -3,6 +3,7 @@ from datetime import timedelta
 from unittest.mock import patch
 
 from django.contrib.auth.models import User
+from django.db import IntegrityError
 from django.test import TestCase, override_settings
 from django.utils import timezone
 
@@ -48,7 +49,7 @@ class LegalConsentModelTest(TestCase):
         self.assertEqual(self.user.legalconsent, legal_consent)
 
         # Verify only one agreement can exist per user
-        with self.assertRaises(Exception):
+        with self.assertRaises(IntegrityError):
             LegalConsent.objects.create(user=self.user)
 
     def test_legal_consent_cascade_deletion(self):
@@ -312,9 +313,7 @@ class LegalConsentRenewTest(TestCase):
         with patch(
             "nside_wefa.legal_consent.models.legal_consent.datetime"
         ) as mock_datetime:
-            mock_now = datetime.datetime(
-                2025, 9, 12, 16, 32, tzinfo=datetime.timezone.utc
-            )
+            mock_now = datetime.datetime(2025, 9, 12, 16, 32, tzinfo=datetime.UTC)
             mock_datetime.datetime.now.return_value = mock_now
             mock_datetime.timezone = datetime.timezone
             mock_datetime.timedelta = datetime.timedelta
@@ -342,9 +341,7 @@ class LegalConsentRenewTest(TestCase):
         with patch(
             "nside_wefa.legal_consent.models.legal_consent.datetime"
         ) as mock_datetime:
-            mock_now = datetime.datetime(
-                2025, 9, 12, 16, 32, tzinfo=datetime.timezone.utc
-            )
+            mock_now = datetime.datetime(2025, 9, 12, 16, 32, tzinfo=datetime.UTC)
             mock_datetime.datetime.now.return_value = mock_now
             mock_datetime.timezone = datetime.timezone
             mock_datetime.timedelta = datetime.timedelta
@@ -364,9 +361,7 @@ class LegalConsentRenewTest(TestCase):
         with patch(
             "nside_wefa.legal_consent.models.legal_consent.datetime"
         ) as mock_datetime:
-            mock_now = datetime.datetime(
-                2025, 9, 12, 16, 32, tzinfo=datetime.timezone.utc
-            )
+            mock_now = datetime.datetime(2025, 9, 12, 16, 32, tzinfo=datetime.UTC)
             mock_datetime.datetime.now.return_value = mock_now
             mock_datetime.timezone = datetime.timezone
             mock_datetime.timedelta = datetime.timedelta
@@ -428,9 +423,7 @@ class LegalConsentRenewTest(TestCase):
         with patch(
             "nside_wefa.legal_consent.models.legal_consent.datetime"
         ) as mock_datetime:
-            mock_now = datetime.datetime(
-                2025, 9, 12, 16, 32, 15, tzinfo=datetime.timezone.utc
-            )
+            mock_now = datetime.datetime(2025, 9, 12, 16, 32, 15, tzinfo=datetime.UTC)
             mock_datetime.datetime.now.return_value = mock_now
             mock_datetime.timezone = datetime.timezone
             mock_datetime.timedelta = datetime.timedelta
@@ -441,7 +434,7 @@ class LegalConsentRenewTest(TestCase):
         self.agreement.refresh_from_db()
         if self.agreement.accepted_at is not None:
             self.assertIsNotNone(self.agreement.accepted_at.tzinfo)
-            self.assertEqual(self.agreement.accepted_at.tzinfo, datetime.timezone.utc)
+            self.assertEqual(self.agreement.accepted_at.tzinfo, datetime.UTC)
 
         # Verify accepted_at was set to the current time
         self.assertEqual(self.agreement.accepted_at, mock_now)

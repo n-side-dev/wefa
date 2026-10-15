@@ -76,30 +76,30 @@ To test the library in a separate Django project:
    ```python
    # settings.py
    INSTALLED_APPS = [
-       'django.contrib.admin',
-       'django.contrib.auth',
-       'django.contrib.contenttypes',
-       'django.contrib.sessions',
-       'django.contrib.messages',
-       'django.contrib.staticfiles',
-       'rest_framework',
-       'rest_framework.authtoken',          # Required for Token authentication
-       'rest_framework_simplejwt',          # Required for JWT authentication
-       'nside_wefa.common',                 # Must come before other nside_wefa apps
-       'nside_wefa.authentication',         # Add the Authentication app
-       'nside_wefa.legal_consent',          # Add the LegalConsent app
+       "django.contrib.admin",
+       "django.contrib.auth",
+       "django.contrib.contenttypes",
+       "django.contrib.sessions",
+       "django.contrib.messages",
+       "django.contrib.staticfiles",
+       "rest_framework",
+       "rest_framework.authtoken",  # Required for Token authentication
+       "rest_framework_simplejwt",  # Required for JWT authentication
+       "nside_wefa.common",  # Must come before other nside_wefa apps
+       "nside_wefa.authentication",  # Add the Authentication app
+       "nside_wefa.legal_consent",  # Add the LegalConsent app
    ]
-   
+
    # Configuration
    NSIDE_WEFA = {
-       'APP_NAME': 'My App',
-       'AUTHENTICATION': {
-         'TYPES': ['TOKEN', 'JWT'],
+       "APP_NAME": "My App",
+       "AUTHENTICATION": {
+           "TYPES": ["TOKEN", "JWT"],
        },
-       'LEGAL_CONSENT': {
-         'VERSION': 1,
-         'EXPIRY_LIMIT': 365,
-       }
+       "LEGAL_CONSENT": {
+           "VERSION": 1,
+           "EXPIRY_LIMIT": 365,
+       },
    }
    ```
 
@@ -214,6 +214,7 @@ from typing import Optional
 from django.contrib.auth.models import User
 from nside_wefa.legal_consent.models import LegalConsent
 
+
 def create_user_agreement(user: User, version: Optional[int] = None) -> LegalConsent:
     """Create a legal consent for the given user."""
     # Implementation here
@@ -300,6 +301,7 @@ Create an `apps.py` file:
 
 ```python
 from django.apps import AppConfig
+
 
 class YourLibraryConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"

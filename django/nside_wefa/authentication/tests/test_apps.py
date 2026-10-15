@@ -1,6 +1,7 @@
 from unittest.mock import patch
-from django.test import TestCase
+
 from django.apps import apps
+from django.test import TestCase
 
 from nside_wefa.authentication.apps import AuthenticationConfig
 

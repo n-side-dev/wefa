@@ -1,34 +1,32 @@
 """Tests for the tamper-evident WefaLogEntry hash chain."""
 
+from auditlog.models import LogEntry
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 
-from auditlog.models import LogEntry
-
 from nside_wefa.audit.models import (
     HASH_LENGTH,
-    WefaLogEntry,
     ZERO_HASH,
+    WefaLogEntry,
     compute_event_hash,
 )
 
 
 def _make_entry(**overrides):
     """Helper that creates a minimal WefaLogEntry."""
-    kwargs = dict(
-        action=LogEntry.Action.UPDATE,
-        content_type=ContentType.objects.get_for_model(LogEntry),
-        object_pk="0",
-        object_repr="test",
-        additional_data={},
-    )
+    kwargs = {
+        "action": LogEntry.Action.UPDATE,
+        "content_type": ContentType.objects.get_for_model(LogEntry),
+        "object_pk": "0",
+        "object_repr": "test",
+        "additional_data": {},
+    }
     kwargs.update(overrides)
     return WefaLogEntry.objects.create(**kwargs)
 
 
 class HashChainTest(TestCase):
     def test_first_event_uses_zero_prev_hash(self):
-        WefaLogEntry.objects.all().__class__  # touch the model
         entry = _make_entry(additional_data={"action": "first"})
         self.assertEqual(entry.prev_hash, ZERO_HASH)
         self.assertEqual(len(entry.hash), HASH_LENGTH)

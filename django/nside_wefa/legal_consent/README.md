@@ -23,8 +23,8 @@ The Legal Consent app automatically creates and manages consent records for user
 ```python
 INSTALLED_APPS = [
     # ... other apps
-    'nside_wefa.common',
-    'nside_wefa.legal_consent',
+    "nside_wefa.common",
+    "nside_wefa.legal_consent",
 ]
 ```
 
@@ -42,7 +42,7 @@ from django.urls import path, include
 
 urlpatterns = [
     # ... other URL patterns
-    path('legal-consent/', include('nside_wefa.legal_consent.urls')),
+    path("legal-consent/", include("nside_wefa.legal_consent.urls")),
     # ... other URL patterns
 ]
 ```
@@ -125,9 +125,9 @@ Configure the Legal Consent app in your Django settings:
 NSIDE_WEFA = {
     "APP_NAME": "Your Application Name",  # Used in template variables
     "LEGAL_CONSENT": {
-        "VERSION": 1,                     # Current legal documents version
-        "EXPIRY_LIMIT": 365,             # Agreement expiry in days
-        "TEMPLATES": "/path/to/templates", # Optional: Custom template directory
+        "VERSION": 1,  # Current legal documents version
+        "EXPIRY_LIMIT": 365,  # Agreement expiry in days
+        "TEMPLATES": "/path/to/templates",  # Optional: Custom template directory
     },
 }
 ```
@@ -175,7 +175,7 @@ from django.contrib.auth.models import User
 from nside_wefa.legal_consent.models.legal_consent import LegalConsent
 
 # Get user's legal consent
-user = User.objects.get(username='example_user')
+user = User.objects.get(username="example_user")
 legal_consent = user.legalconsent
 
 # Update legal consent version

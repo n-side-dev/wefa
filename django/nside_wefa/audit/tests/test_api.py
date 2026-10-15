@@ -8,7 +8,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase, override_settings
 
 from nside_wefa import audit
-from nside_wefa.audit.api import _redact, AuditWriteError, Outcome
+from nside_wefa.audit.api import AuditWriteError, Outcome, _redact
 
 
 class LogTargetResolutionTest(TestCase):
@@ -110,11 +110,13 @@ class FailureHandlingTest(TestCase):
         self.user = User.objects.create_user(username="u")
 
     def test_default_returns_none_and_warns(self):
-        with mock.patch.object(
-            LogEntry.objects, "create", side_effect=RuntimeError("boom")
+        with (
+            mock.patch.object(
+                LogEntry.objects, "create", side_effect=RuntimeError("boom")
+            ),
+            self.assertLogs("nside_wefa.audit", level="WARNING") as logs,
         ):
-            with self.assertLogs("nside_wefa.audit", level="WARNING") as logs:
-                result = audit.log("demo.fail", actor=self.user)
+            result = audit.log("demo.fail", actor=self.user)
         self.assertIsNone(result)
         self.assertTrue(any("failed to persist" in msg for msg in logs.output))
 
@@ -125,11 +127,13 @@ class FailureHandlingTest(TestCase):
         }
     )
     def test_raise_on_failure_reraises_as_audit_write_error(self):
-        with mock.patch.object(
-            LogEntry.objects, "create", side_effect=RuntimeError("boom")
+        with (
+            mock.patch.object(
+                LogEntry.objects, "create", side_effect=RuntimeError("boom")
+            ),
+            self.assertRaises(AuditWriteError),
         ):
-            with self.assertRaises(AuditWriteError):
-                audit.log("demo.fail", actor=self.user)
+            audit.log("demo.fail", actor=self.user)
 
 
 class SetActorReExportTest(TestCase):

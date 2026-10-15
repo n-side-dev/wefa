@@ -11,8 +11,9 @@ Operators of regulated deployments are still encouraged to ``REVOKE UPDATE,
 DELETE`` at the database level; this is documented in the README.
 """
 
+from collections.abc import Iterator
 from contextlib import contextmanager
-from typing import Any, Iterator
+from typing import Any
 
 from django.db.models.signals import pre_delete, pre_save
 

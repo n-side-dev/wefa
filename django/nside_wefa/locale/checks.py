@@ -13,14 +13,15 @@ See also
 """
 
 from typing import Any
+
 from django.conf import settings
 from django.core.checks import Error, register
 
 from nside_wefa.common.apps import CommonConfig
 from nside_wefa.locale.apps import LocaleConfig
 from nside_wefa.utils.checks import (
-    check_nside_wefa_settings,
     check_apps_dependencies_order,
+    check_nside_wefa_settings,
 )
 
 

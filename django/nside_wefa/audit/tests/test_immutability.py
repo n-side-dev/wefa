@@ -6,7 +6,7 @@ from django.db import transaction
 from django.test import TestCase
 
 from nside_wefa import audit
-from nside_wefa.audit.immutability import allow_purge, AuditEventImmutableError
+from nside_wefa.audit.immutability import AuditEventImmutableError, allow_purge
 
 
 class LogEntryImmutabilityTest(TestCase):

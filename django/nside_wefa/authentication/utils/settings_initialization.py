@@ -6,11 +6,11 @@ startup and configures REST framework's default authentication and permission
 classes accordingly.
 """
 
-from django.conf import settings
-
-from nside_wefa.authentication.constants import AUTH_TYPE_TOKEN, AUTH_TYPE_JWT
 import logging
 
+from django.conf import settings
+
+from nside_wefa.authentication.constants import AUTH_TYPE_JWT, AUTH_TYPE_TOKEN
 from nside_wefa.authentication.utils.utils import get_authentication_types
 
 logger = logging.getLogger(__name__)

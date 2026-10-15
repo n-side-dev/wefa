@@ -6,10 +6,10 @@ Serializers are used to convert model instances to JSON representations
 for clean API responses and OpenAPI schema generation.
 """
 
-from typing import Any
+from typing import Any, ClassVar
 
-from rest_framework import serializers
 from drf_spectacular.utils import extend_schema_serializer
+from rest_framework import serializers
 
 from nside_wefa.locale.models.user_locale import UserLocale, _LocaleConfiguration
 
@@ -27,8 +27,8 @@ class UserLocaleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserLocale
-        fields = ["code"]
-        extra_kwargs = {
+        fields: ClassVar[list[str]] = ["code"]
+        extra_kwargs: ClassVar[dict[str, dict[str, Any]]] = {
             "code": {
                 "help_text": "Preferred locale code for the authenticated user. "
                 "Must be one of the codes listed in NSIDE_WEFA.LOCALE.AVAILABLE.",

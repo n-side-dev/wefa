@@ -7,7 +7,8 @@ worker.
 
 import csv
 import json
-from typing import Any, Iterable
+from collections.abc import Iterable
+from typing import Any
 
 from auditlog import get_logentry_model
 from auditlog.models import AbstractLogEntry

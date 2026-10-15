@@ -14,8 +14,9 @@ See also
 - Django system check framework: https://docs.djangoproject.com/en/stable/topics/checks/
 """
 
+from collections.abc import Callable
 from importlib import import_module
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any
 
 from django.apps import apps as django_apps
 from django.conf import settings
@@ -24,9 +25,9 @@ from django.core.checks import Error
 
 def check_nside_wefa_settings(
     section_name: str,
-    required_keys: List[str],
-    custom_validators: Optional[Dict[str, Callable[[Any], List[Error]]]] = None,
-) -> List[Error]:
+    required_keys: list[str],
+    custom_validators: dict[str, Callable[[Any], list[Error]]] | None = None,
+) -> list[Error]:
     """Validate a subsection of the ``NSIDE_WEFA`` settings.
 
     This function checks that the top-level ``NSIDE_WEFA`` dictionary contains
@@ -46,7 +47,7 @@ def check_nside_wefa_settings(
     :return: A list of configuration errors. Empty if everything is correctly configured.
     :rtype: list[django.core.checks.Error]
     """
-    errors: List[Error] = []
+    errors: list[Error] = []
 
     # Get NSIDE_WEFA settings
     nside_wefa_settings: Any = getattr(settings, "NSIDE_WEFA", None)
@@ -136,10 +137,10 @@ def check_apps_dependencies_order(dependencies: list[str]) -> list[Error]:
 # ---------------------------------------------------------------------------
 
 
-def validate_bool(setting_path: str) -> Callable[[Any], List[Error]]:
+def validate_bool(setting_path: str) -> Callable[[Any], list[Error]]:
     """Return a validator that ensures the value is a boolean."""
 
-    def _validator(value: Any) -> List[Error]:
+    def _validator(value: Any) -> list[Error]:
         if not isinstance(value, bool):
             return [
                 Error(
@@ -153,10 +154,10 @@ def validate_bool(setting_path: str) -> Callable[[Any], List[Error]]:
 
 def validate_optional_positive_int(
     setting_path: str,
-) -> Callable[[Any], List[Error]]:
+) -> Callable[[Any], list[Error]]:
     """Return a validator that accepts ``None`` or a positive integer."""
 
-    def _validator(value: Any) -> List[Error]:
+    def _validator(value: Any) -> list[Error]:
         if value is None:
             return []
         if isinstance(value, bool) or not isinstance(value, int):
@@ -179,16 +180,16 @@ def validate_optional_positive_int(
 
 
 def validate_string_list(
-    setting_path: str, allowed: Optional[List[str]] = None
-) -> Callable[[Any], List[Error]]:
+    setting_path: str, allowed: list[str] | None = None
+) -> Callable[[Any], list[Error]]:
     """Return a validator that ensures the value is a list of non-empty strings.
 
     When ``allowed`` is provided, every entry must additionally be one of the
     allowed values.
     """
 
-    def _validator(value: Any) -> List[Error]:
-        errors: List[Error] = []
+    def _validator(value: Any) -> list[Error]:
+        errors: list[Error] = []
         if not isinstance(value, list):
             return [
                 Error(
@@ -219,10 +220,10 @@ def validate_string_list(
 
 def validate_dotted_path_callable(
     setting_path: str,
-) -> Callable[[Any], List[Error]]:
+) -> Callable[[Any], list[Error]]:
     """Return a validator that resolves the value as a dotted-path callable."""
 
-    def _validator(value: Any) -> List[Error]:
+    def _validator(value: Any) -> list[Error]:
         if not isinstance(value, str) or "." not in value:
             return [
                 Error(
@@ -258,7 +259,7 @@ def validate_dotted_path_callable(
     return _validator
 
 
-def validate_model_label(label: Any) -> Optional[Error]:
+def validate_model_label(label: Any) -> Error | None:
     """Resolve an ``"app_label.ModelName"`` string via the Django app registry.
 
     Returns ``None`` on success, an :class:`~django.core.checks.Error` instance
@@ -284,7 +285,7 @@ def validate_model_label(label: Any) -> Optional[Error]:
 
 def validate_model_label_dict(
     setting_path: str,
-) -> Callable[[Any], List[Error]]:
+) -> Callable[[Any], list[Error]]:
     """Return a validator that ensures the value is a ``{label: dict}`` mapping.
 
     Each key must be a resolvable ``"app_label.ModelName"`` string. Each value
@@ -292,8 +293,8 @@ def validate_model_label_dict(
     that know which keys make sense for them.
     """
 
-    def _validator(value: Any) -> List[Error]:
-        errors: List[Error] = []
+    def _validator(value: Any) -> list[Error]:
+        errors: list[Error] = []
         if not isinstance(value, dict):
             return [
                 Error(

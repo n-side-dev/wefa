@@ -1,8 +1,8 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.request import Request
+from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework.permissions import IsAuthenticated
-from drf_spectacular.utils import extend_schema, OpenApiResponse
+from rest_framework.request import Request
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from ..models import LegalConsent
 from ..serializers import LegalConsentSerializer
@@ -23,7 +23,7 @@ class LegalConsentView(APIView):
         Required. Users must be authenticated to access any endpoint.
     """
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = (IsAuthenticated,)
     serializer_class = LegalConsentSerializer
 
     @extend_schema(

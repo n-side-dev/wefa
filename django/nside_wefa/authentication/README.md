@@ -22,11 +22,11 @@ The Authentication app simplifies Django REST Framework authentication setup by 
 ```python
 INSTALLED_APPS = [
     # ... other apps
-    'rest_framework',
-    'rest_framework.authtoken',          # Required for Token authentication
-    'rest_framework_simplejwt',          # Required for JWT authentication
-    'nside_wefa.common',                 # Must come before authentication
-    'nside_wefa.authentication',
+    "rest_framework",
+    "rest_framework.authtoken",  # Required for Token authentication
+    "rest_framework_simplejwt",  # Required for JWT authentication
+    "nside_wefa.common",  # Must come before authentication
+    "nside_wefa.authentication",
 ]
 ```
 
@@ -43,7 +43,7 @@ from django.urls import path, include
 
 urlpatterns = [
     # ... other URL patterns
-    path('auth/', include('nside_wefa.authentication.urls')),
+    path("auth/", include("nside_wefa.authentication.urls")),
     # ... other URL patterns
 ]
 ```
@@ -127,13 +127,13 @@ The app updates `settings.REST_FRAMEWORK` with:
 
 ```python
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
+    "DEFAULT_AUTHENTICATION_CLASSES": [
         # Dynamically added based on AUTHENTICATION.TYPES:
         # 'rest_framework.authentication.TokenAuthentication',  # if "TOKEN" enabled
         # 'rest_framework_simplejwt.authentication.JWTAuthentication',  # if "JWT" enabled
     ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
     ],
 }
 ```
@@ -162,7 +162,7 @@ urlpatterns += [
     path("token-auth/", obtain_auth_token, name="api-auth"),
 ]
 
-# If JWT authentication is enabled  
+# If JWT authentication is enabled
 urlpatterns += [
     path("token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
@@ -177,17 +177,17 @@ urlpatterns += [
 ```python
 import requests
 
-response = requests.post('http://your-domain/auth/token-auth/', {
-    'username': 'your_username',
-    'password': 'your_password'
-})
-token = response.json()['token']
+response = requests.post(
+    "http://your-domain/auth/token-auth/",
+    {"username": "your_username", "password": "your_password"},
+)
+token = response.json()["token"]
 ```
 
 2. **Use the token in API requests:**
 ```python
-headers = {'Authorization': f'Token {token}'}
-response = requests.get('http://your-domain/api/protected-endpoint/', headers=headers)
+headers = {"Authorization": f"Token {token}"}
+response = requests.get("http://your-domain/api/protected-endpoint/", headers=headers)
 ```
 
 ### Using JWT Authentication
@@ -196,27 +196,27 @@ response = requests.get('http://your-domain/api/protected-endpoint/', headers=he
 ```python
 import requests
 
-response = requests.post('http://your-domain/auth/token/', {
-    'username': 'your_username',
-    'password': 'your_password'
-})
+response = requests.post(
+    "http://your-domain/auth/token/",
+    {"username": "your_username", "password": "your_password"},
+)
 tokens = response.json()
-access_token = tokens['access']
-refresh_token = tokens['refresh']
+access_token = tokens["access"]
+refresh_token = tokens["refresh"]
 ```
 
 2. **Use the access token:**
 ```python
-headers = {'Authorization': f'Bearer {access_token}'}
-response = requests.get('http://your-domain/api/protected-endpoint/', headers=headers)
+headers = {"Authorization": f"Bearer {access_token}"}
+response = requests.get("http://your-domain/api/protected-endpoint/", headers=headers)
 ```
 
 3. **Refresh the token:**
 ```python
-refresh_response = requests.post('http://your-domain/auth/token/refresh/', {
-    'refresh': refresh_token
-})
-new_access_token = refresh_response.json()['access']
+refresh_response = requests.post(
+    "http://your-domain/auth/token/refresh/", {"refresh": refresh_token}
+)
+new_access_token = refresh_response.json()["access"]
 ```
 
 ## Testing

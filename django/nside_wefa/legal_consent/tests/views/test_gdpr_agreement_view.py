@@ -5,8 +5,8 @@ from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
-from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
+from rest_framework.test import APIClient, APITestCase
 
 from nside_wefa.legal_consent.models import LegalConsent
 
@@ -215,8 +215,6 @@ class LegalConsentViewDifferentConfigTest(APITestCase):
 
         # Allow for small time difference in test execution
         time_diff = abs(
-            (
-                accepted_at - datetime.datetime.now(tz=datetime.timezone.utc)
-            ).total_seconds()
+            (accepted_at - datetime.datetime.now(tz=datetime.UTC)).total_seconds()
         )
         self.assertLess(time_diff, 5)  # Within 5 seconds
