@@ -667,7 +667,7 @@ wheels = [
 
 [[package]]
 name = "nside-wefa"
-version = "0.7.0"
+version = "0.7.1"
 source = { editable = "." }
 dependencies = [
     { name = "django" },
