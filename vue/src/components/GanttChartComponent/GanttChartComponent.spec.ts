@@ -96,6 +96,7 @@ describe('GanttChartComponent', () => {
     )
     const { visibleActivityPositions, linkLayers } = useGanttLinks({
       list: ref(rows.value.map((data, index) => ({ index, data }))),
+      rows,
       rowHeights: ref([52, 52]),
       rowOffsets: ref([0, 52]),
       dateRange: ref([new Date(2026, 0, 1)]),
@@ -110,6 +111,48 @@ describe('GanttChartComponent', () => {
     expect(visibleActivityPositions.value.get('bar-2')?.y).toBe(68)
     expect(linkLayers.value.base[0]?.path).toMatch(/^M [\d.]+ 29 /)
     expect(linkLayers.value.base[0]?.path).toMatch(/ 68$/)
+  })
+
+  it('routes links across the viewport when both endpoint rows are virtualized out', () => {
+    const rows = ref([baseRows[0]!, { id: 'middle', activities: [] }, baseRows[1]!])
+    const list = ref([{ index: 1, data: rows.value[1]! }])
+    const { linkLayers } = useGanttLinks({
+      list,
+      rows,
+      rowHeights: ref([30, 30, 30]),
+      rowOffsets: ref([0, 30, 60]),
+      dateRange: ref([new Date(2026, 0, 3)]),
+      viewMode: ref('day'),
+      columnWidthPx: ref(40),
+      weekColumns: ref([]),
+      links: ref([{ id: 'crossing', fromId: 'bar-1', toId: 'bar-2', type: 'start-start' }]),
+      svgIdPrefix: 'virtual',
+      stackMiniActivities: ref(true),
+    })
+    expect(linkLayers.value.base).toHaveLength(1)
+    expect(linkLayers.value.base[0]!.path).toMatch(/^M 0 -15 /)
+    expect(linkLayers.value.base[0]!.path).toMatch(/ 45$/)
+    list.value = [{ index: 2, data: rows.value[2]! }]
+    expect(linkLayers.value.base[0]!.path).toMatch(/^M 0 -45 /)
+  })
+
+  it('keeps blank margins aligned with the overlay and leaves dates unchanged', async () => {
+    const wrapper = mount(GanttChartComponent, {
+      props: {
+        startDate: new Date(2026, 0, 3),
+        endDate: new Date(2026, 0, 7),
+        rows: baseRows,
+        links: [{ fromId: 'bar-1', toId: 'bar-2', type: 'start-start' }],
+        gridMarginLeftPx: 24,
+        gridMarginRightPx: 12,
+      },
+      global: { directives: { tooltip: () => {} } },
+    })
+    expect(wrapper.html()).toContain('padding-left: 24px; padding-right: 12px')
+    expect(wrapper.find('svg').attributes('viewBox')).toBe('-24 0 236 60')
+    expect(wrapper.find('[data-link-id]').attributes('d')).toMatch(/^M 0 /)
+    await wrapper.setProps({ gridMarginLeftPx: -1, gridMarginRightPx: Infinity })
+    expect(wrapper.find('svg').attributes('viewBox')).toBe('0 0 200 60')
   })
 
   it('uses custom dimensions consistently and reacts to view and sizing changes', async () => {

@@ -54,6 +54,7 @@ const targetEndpointX = (
 // Composable for computing and managing Gantt chart links between activities.
 export const useGanttLinks = ({
   list,
+  rows,
   rowHeights,
   rowOffsets,
   dateRange,
@@ -65,6 +66,7 @@ export const useGanttLinks = ({
   stackMiniActivities,
 }: {
   list: Ref<GanttListItem[]>
+  rows: Ref<GanttChartRowData[]>
   rowHeights: Ref<number[]>
   rowOffsets: Ref<number[]>
   dateRange: Ref<Date[]>
@@ -85,13 +87,16 @@ export const useGanttLinks = ({
     return rowOffsets.value[firstVisibleIndex] ?? 0
   })
 
-  // Computes the positions of visible activities in the Gantt chart.
+  // Resolve linked activities even when their rows are outside the virtualized list.
   const visibleActivityPositions = computed(() => {
     const positions = new Map<string | number, GanttActivityPosition>()
 
-    for (const item of list.value) {
-      const rowIndex = item.index
-      const row = item.data
+    const linkedIds = new Set(links.value.flatMap((link) => [link.fromId, link.toId]))
+
+    for (const [rowIndex, row] of rows.value.entries()) {
+      if (!row.activities.some((activity) => activity.id != null && linkedIds.has(activity.id))) {
+        continue
+      }
       const rowHeight = rowHeights.value[rowIndex] ?? BASE_ROW_HEIGHT_PX
       const rowTop = (rowOffsets.value[rowIndex] ?? 0) - virtualOffsetPx.value
       const miniLayout = computeMiniLanes(row.activities, stackMiniActivities.value, viewMode.value)
@@ -102,7 +107,7 @@ export const useGanttLinks = ({
       )
 
       for (const activity of row.activities) {
-        if (activity.id === undefined || activity.id === null) {
+        if (activity.id === undefined || activity.id === null || !linkedIds.has(activity.id)) {
           continue
         }
 

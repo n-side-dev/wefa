@@ -6,7 +6,7 @@
           <slot name="header-left" />
         </div>
         <div ref="headerScroller" class="flex-1 overflow-x-hidden overflow-y-hidden">
-          <div class="min-w-fit">
+          <div class="min-w-fit" :style="gridPadding">
             <slot name="header-right" />
           </div>
         </div>
@@ -27,7 +27,9 @@
           >
             <div class="min-w-fit relative">
               <slot name="overlay" />
-              <slot name="body-right" />
+              <div :style="gridPadding">
+                <slot name="body-right" />
+              </div>
             </div>
           </div>
         </div>
@@ -41,7 +43,7 @@
 // including the header and body sections, as well as the left and right parts.
 // It manages the scrolling synchronization between the header and body sections.
 // And it handles the hidden parts when scrolling.
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 export interface GanttChartGridProps {
   cardStyle: Record<string, string>
@@ -49,9 +51,15 @@ export interface GanttChartGridProps {
   containerProps: Record<string, unknown>
   wrapperProps: Record<string, unknown>
   leftHeaderWidthPx: number
+  gridMarginLeftPx: number
+  gridMarginRightPx: number
 }
 
-defineProps<GanttChartGridProps>()
+const props = defineProps<GanttChartGridProps>()
+const gridPadding = computed(() => ({
+  paddingLeft: `${props.gridMarginLeftPx}px`,
+  paddingRight: `${props.gridMarginRightPx}px`,
+}))
 
 const headerScroller = ref<HTMLElement | null>(null)
 const bodyScroller = ref<HTMLElement | null>(null)

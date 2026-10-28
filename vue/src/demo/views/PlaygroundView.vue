@@ -40,7 +40,7 @@ import { useI18nLib } from '@/locales'
 const { t } = useI18nLib()
 
 const startDate = new Date(2026, 0, 1)
-const endDate = new Date(2026, 1, 28)
+const endDate = new Date(2026, 3, 30)
 const okLinkClass = '[stroke-dasharray:2,5]'
 const linkCases = [
   { type: 'start-start', fromIndex: 2, toIndex: 0, color: 'green', class: okLinkClass },
@@ -69,6 +69,7 @@ const linkCases = [
   { type: 'start-end', fromIndex: 15, toIndex: 13, color: 'green', class: okLinkClass },
   { type: 'start-end', fromIndex: 15, toIndex: 14, color: 'green', class: okLinkClass },
   { type: 'end-start', fromIndex: 11, toIndex: 14, color: 'red' },
+  { type: 'start-start', fromIndex: 0, toIndex: 59, color: 'purple' },
   { type: 'start-start', fromIndex: 16, toIndex: 17, color: 'blue' },
   { type: 'end-end', fromIndex: 17, toIndex: 16, color: 'blue' },
   //{ type: 'start-start', fromIndex: 10, toIndex: 11, color: 'rgb(37 99 235)' },
@@ -86,8 +87,10 @@ const linkCases = [
 const optimizedOnlyStartOffsets = [3, 12, 9, 6, 15, 3, 12, 9, 6, 15, 3, 9, 13, 6, 10, 16, 8, 8]
 
 const rows = computed<GanttChartRowData[]>(() =>
-  Array.from({ length: 30 }, (_, index) => {
-    const startDay = optimizedOnlyStartOffsets[index] ?? (index * 3) % 28
+  Array.from({ length: 60 }, (_, index) => {
+    // The last target retains its original offset and moves 60 days later.
+    const startDay =
+      index === 59 ? ((29 * 3) % 28) + 60 : (optimizedOnlyStartOffsets[index] ?? (index * 3) % 28)
     const baseDate = new Date(2026, 0, 1 + startDay)
     const optimizedActivity: GanttChartActivityData = {
       id: `optimized-${index}`,

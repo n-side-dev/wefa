@@ -373,5 +373,11 @@ export const ToggleViewMode: Story = {
 
 /** Larger cells demonstrate configurable geometry with the existing activities and links. */
 export const CustomSizing: Story = {
-  args: { baseRowHeightPx: 42, dayColumnWidthPx: 56, weekColumnWidthPx: 72 },
+  args: {
+    baseRowHeightPx: 42,
+    dayColumnWidthPx: 56,
+    weekColumnWidthPx: 72,
+    gridMarginLeftPx: 28,
+    gridMarginRightPx: 28,
+  },
 }
