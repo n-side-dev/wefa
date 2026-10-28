@@ -7,6 +7,10 @@ import * as GanttChartStories from './GanttChartComponent.stories'
 
 A flexible, virtualized Gantt chart that supports daily and weekly views, layered activity types, and translation-ready labels.
 
+## Blank grid margins
+
+`gridMarginLeftPx` and `gridMarginRightPx` add blank scrollable space around the date grid, including the dependency overlay. Both default to 0 and accept finite non-negative pixels. They do not change the date range.
+
 ## Cell sizing
 
 Use `baseRowHeightPx` (default 30), `dayColumnWidthPx` (default 40), and

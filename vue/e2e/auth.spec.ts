@@ -20,7 +20,7 @@ test.describe('auth flow', () => {
     const textboxes = page.getByRole('textbox')
     await textboxes.nth(0).fill('demo')
     await textboxes.nth(1).fill('demo')
-    await page.getByRole('button', { name: 'Sign in' }).click()
+    await page.locator('form').getByRole('button', { name: 'Sign in' }).click()
     await expect(page).toHaveURL(/\/home/)
     // Token is persisted under the expected localStorage key.
     const stored = await page.evaluate(() => localStorage.getItem('authenticationToken'))
@@ -34,7 +34,7 @@ test.describe('auth flow', () => {
     const textboxes = page.getByRole('textbox')
     await textboxes.nth(0).fill('demo')
     await textboxes.nth(1).fill('wrong-password')
-    await page.getByRole('button', { name: 'Sign in' }).click()
+    await page.locator('form').getByRole('button', { name: 'Sign in' }).click()
     await expect(page).toHaveURL(/\/login/)
     await expect(page.getByText('Sign in failed')).toBeVisible()
   })

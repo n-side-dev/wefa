@@ -23,6 +23,8 @@
       :container-props="containerProps"
       :wrapper-props="wrapperProps"
       :left-header-width-px="leftHeaderWidthPx"
+      :grid-margin-left-px="resolvedGridMarginLeftPx"
+      :grid-margin-right-px="resolvedGridMarginRightPx"
     >
       <template #header-left>
         <div class="w-full">
@@ -57,6 +59,7 @@
           :link-highlight-class="linkHighlightClass"
           :svg-id-prefix="svgIdPrefix"
           :grid-width-px="gridWidthPx"
+          :grid-margin-left-px="resolvedGridMarginLeftPx"
           :virtual-height-px="virtualHeightPx"
           :left-header-width-px="0"
           @link-pointer-enter="handleLinkPointerEnter"
@@ -255,6 +258,9 @@ interface GanttChartComponentProps {
   weekColumnWidthPx?: number
   /** Width of the sticky row-label column in pixels. */
   leftHeaderWidthPx?: number
+  /** Blank space before and after the date grid, in pixels. Invalid values fall back to zero. */
+  gridMarginLeftPx?: number
+  gridMarginRightPx?: number
 }
 
 const {
@@ -287,6 +293,8 @@ const {
   dayColumnWidthPx = DAY_CELL_WIDTH_PX,
   weekColumnWidthPx = WEEK_CELL_WIDTH_PX,
   leftHeaderWidthPx = 320,
+  gridMarginLeftPx = 0,
+  gridMarginRightPx = 0,
 } = defineProps<GanttChartComponentProps>()
 
 const emit = defineEmits<{
@@ -615,9 +623,14 @@ const totalHeightPx = computed(() => {
   const lastHeight = rowHeights.value[lastIndex] ?? 0
   return lastOffset + lastHeight
 })
+const resolveMargin = (value: number) => (Number.isFinite(value) && value >= 0 ? value : 0)
+const resolvedGridMarginLeftPx = computed(() => resolveMargin(gridMarginLeftPx))
+const resolvedGridMarginRightPx = computed(() => resolveMargin(gridMarginRightPx))
 const gridWidthPx = computed(() => {
   const count = isWeekView.value ? weekColumns.value.length : dateRange.value.length
-  return count * columnWidthPx.value
+  return (
+    count * columnWidthPx.value + resolvedGridMarginLeftPx.value + resolvedGridMarginRightPx.value
+  )
 })
 const { list, containerProps, wrapperProps } = useVirtualList(
   computed(() => rows),
@@ -631,6 +644,7 @@ watch(rowHeights, () => containerProps.onScroll(), { flush: 'post' })
 
 const { virtualOffsetPx, linkLayers } = useGanttLinks({
   list,
+  rows: computed(() => rows),
   rowHeights,
   rowOffsets,
   dateRange,

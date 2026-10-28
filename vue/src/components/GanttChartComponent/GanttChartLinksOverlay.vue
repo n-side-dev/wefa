@@ -5,12 +5,12 @@
     :style="{ left: `${leftHeaderWidthPx}px` }"
     :width="gridWidthPx"
     :height="virtualHeightPx"
-    :viewBox="`0 0 ${gridWidthPx} ${virtualHeightPx}`"
+    :viewBox="`${-gridMarginLeftPx} 0 ${gridWidthPx} ${virtualHeightPx}`"
   >
     <defs>
       <!-- Clip to the virtualized viewport so paths don't bleed outside. -->
       <clipPath :id="baseClipPathId">
-        <rect x="0" y="0" :width="gridWidthPx" :height="virtualHeightPx" />
+        <rect :x="-gridMarginLeftPx" y="0" :width="gridWidthPx" :height="virtualHeightPx" />
       </clipPath>
       <!-- Each link gets its own marker so color matches the stroke. -->
       <marker
@@ -53,12 +53,12 @@
     :style="{ left: `${leftHeaderWidthPx}px`, zIndex: 25 }"
     :width="gridWidthPx"
     :height="virtualHeightPx"
-    :viewBox="`0 0 ${gridWidthPx} ${virtualHeightPx}`"
+    :viewBox="`${-gridMarginLeftPx} 0 ${gridWidthPx} ${virtualHeightPx}`"
   >
     <defs>
       <!-- Clip to the virtualized viewport so paths don't bleed outside. -->
       <clipPath :id="miniClipPathId">
-        <rect x="0" y="0" :width="gridWidthPx" :height="virtualHeightPx" />
+        <rect :x="-gridMarginLeftPx" y="0" :width="gridWidthPx" :height="virtualHeightPx" />
       </clipPath>
       <!-- Each link gets its own marker so color matches the stroke. -->
       <marker
@@ -109,6 +109,7 @@ export interface GanttChartLinksOverlayProps {
   linkHighlightClass?: string
   svgIdPrefix: string
   gridWidthPx: number
+  gridMarginLeftPx: number
   virtualHeightPx: number
   leftHeaderWidthPx: number
 }
@@ -116,6 +117,7 @@ export interface GanttChartLinksOverlayProps {
 const {
   linkLayers,
   gridWidthPx,
+  gridMarginLeftPx,
   virtualHeightPx,
   leftHeaderWidthPx,
   highlightedLinkMarkerIds = [],
