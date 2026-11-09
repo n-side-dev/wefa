@@ -63,7 +63,7 @@ jobs:
 
   unit-tests:
     name: Unit Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup-node
@@ -71,7 +71,7 @@ jobs:
         uses: actions/cache@v6
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('vue/package-lock.json') }}
+          key: playwright-ubuntu-24.04-${{ runner.arch }}-${{ hashFiles('vue/package-lock.json') }}
       - run: npm ci
       - name: Install Playwright (browsers and deps)
         run: node node_modules/playwright/cli.js install --with-deps
@@ -85,7 +85,7 @@ jobs:
 
   e2e-tests:
     name: E2E Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup-node
@@ -93,7 +93,7 @@ jobs:
         uses: actions/cache@v6
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('vue/package-lock.json') }}
+          key: playwright-ubuntu-24.04-${{ runner.arch }}-${{ hashFiles('vue/package-lock.json') }}
       - run: npm ci
       - name: Install Playwright (browsers and deps)
         run: node node_modules/playwright/cli.js install --with-deps
