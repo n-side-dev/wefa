@@ -109,6 +109,7 @@
           :row-height-px="rowHeights[item.index]"
           :view-mode="viewMode"
           :show-weekend-shading="showWeekendShading"
+          :shaded-dates="shadedDates"
           :stack-mini-activities="stackMiniActivities"
           :activity-tooltip="activityTooltip"
           :activity-hover="handleActivityHover"
@@ -214,6 +215,8 @@ interface GanttChartComponentProps {
   viewMode?: 'day' | 'week'
   /** Enables weekend background shading in day view. */
   showWeekendShading?: boolean
+  /** Additional date-only (YYYY-MM-DD) columns shaded like weekends in day view. */
+  shadedDates?: string[]
   /** Stacks overlapping mini activities into separate vertical lanes. */
   stackMiniActivities?: boolean
   /** Returns PrimeVue tooltip text for an activity when no popover slot is used. */
@@ -271,6 +274,7 @@ const {
   headerLabel = 'gantt_chart.header',
   viewMode: viewModeProp = 'day',
   showWeekendShading = true,
+  shadedDates = [],
   stackMiniActivities = true,
   activityTooltip = undefined,
   activityClick = undefined,

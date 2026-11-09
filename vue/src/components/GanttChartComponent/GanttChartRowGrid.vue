@@ -164,6 +164,7 @@ export interface GanttChartRowGridProps {
   activityColorClass?: string
   stripeColor?: string
   showWeekendShading?: boolean
+  shadedDates?: string[]
   stackMiniActivities?: boolean
   rowHeightPx?: number
   rowIndex?: number
@@ -205,6 +206,7 @@ const {
   activityColorClass = 'bg-emerald-400/80',
   stripeColor = 'rgba(59, 130, 246, 0.2)',
   showWeekendShading = true,
+  shadedDates = [],
   stackMiniActivities = true,
   rowHeightPx = undefined,
   rowIndex = undefined,
@@ -300,7 +302,24 @@ const weekPattern = computed(() => {
   return `linear-gradient(90deg, ${stops.join(', ')})`
 })
 
-// Grid background style with optional weekend shading.
+// Additional dates are an irregular, non-repeating layer below grid lines and activities.
+const shadedDatePattern = computed(() => {
+  if (isWeekView.value || shadedDates.length === 0) return ''
+  const dates = new Set(shadedDates)
+  const stops = dateRange.flatMap((date, index) =>
+    dates.has(DateTime.fromJSDate(date).toISODate() ?? '')
+      ? [
+          `transparent ${index * columnWidthPx}px`,
+          `rgb(248 250 252) ${index * columnWidthPx}px`,
+          `rgb(248 250 252) ${(index + 1) * columnWidthPx}px`,
+          `transparent ${(index + 1) * columnWidthPx}px`,
+        ]
+      : []
+  )
+  return stops.length ? `linear-gradient(90deg, ${stops.join(', ')})` : ''
+})
+
+// Grid background style with optional weekend and additional date shading.
 const gridStyle = computed(() => {
   const firstDate = dateRange[0]
   const weekStart = firstDate
@@ -326,6 +345,13 @@ const gridStyle = computed(() => {
     baseStyle.backgroundSize = `${columnWidth}px 100%, ${columnWidthPx * WEEK_DAYS}px 100%`
     baseStyle.backgroundPosition = `0 0, -${offsetPx}px 0`
     baseStyle.backgroundRepeat = 'repeat-x, repeat-x'
+  }
+
+  if (shadedDatePattern.value) {
+    baseStyle.backgroundImage += `, ${shadedDatePattern.value}`
+    baseStyle.backgroundSize += `, ${lineWidth.value} 100%`
+    baseStyle.backgroundPosition = `${baseStyle.backgroundPosition ?? '0 0'}, 0 0`
+    baseStyle.backgroundRepeat += ', no-repeat'
   }
 
   return baseStyle
