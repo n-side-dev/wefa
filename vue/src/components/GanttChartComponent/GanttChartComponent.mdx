@@ -348,3 +348,11 @@ Set an activity's `linkOffsetYPx` to adjust both incoming and outgoing dependenc
 endpoints from the chart's calculated activity center. Positive values move down,
 negative values move up, and omission means zero adjustment. This changes arrow
 geometry only; it does not change bars, row heights, or transitions.
+
+### Additional shaded dates
+
+Pass `shadedDates` as date-only strings (`YYYY-MM-DD`) to shade selected day columns using the weekend colour. Dates are matched to the chart's displayed local calendar dates. Duplicates and dates outside the visible range have no effect. This layer is non-interactive and remains behind activities, selection and dependency links. It works independently of `showWeekendShading`. Like weekend shading, it is disabled in weekly view because a weekly column contains multiple dates. The component does not calculate public holidays; the application supplies its calendar.
+
+```vue
+<GanttChartComponent :shaded-dates="['2026-12-25', '2026-12-28']" />
+```

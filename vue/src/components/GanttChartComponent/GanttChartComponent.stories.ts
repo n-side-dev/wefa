@@ -134,6 +134,7 @@ const meta: Meta<typeof GanttChartComponent> = {
     headerLabel: 'gantt_chart.header',
     viewMode: 'day',
     showWeekendShading: true,
+    shadedDates: ['2026-01-01'],
     stackMiniActivities: true,
     leftHeaderWidthPx: 320,
     baseRowHeightPx: 30,

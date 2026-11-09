@@ -84,6 +84,40 @@ const baseRows: GanttChartRowData[] = [
 ]
 
 describe('GanttChartComponent', () => {
+  it('keeps weekend shading enabled by default and forwards optional shaded dates', async () => {
+    const wrapper = mount(GanttChartComponent, {
+      props: {
+        startDate: new Date(2026, 0, 1),
+        endDate: new Date(2026, 0, 8),
+        rows: baseRows,
+      },
+    })
+    const row = wrapper.findComponent(GanttChartRowGrid)
+    expect(row.props('showWeekendShading')).toBe(true)
+    expect(row.props('shadedDates')).toEqual([])
+    await wrapper.setProps({ shadedDates: ['2026-01-02'] })
+    expect(row.props('shadedDates')).toEqual(['2026-01-02'])
+  })
+
+  it('shades only supplied visible day columns without intercepting interactions', async () => {
+    const wrapper = mount(GanttChartRowGrid, {
+      props: {
+        dateRange: [new Date(2026, 0, 1), new Date(2026, 0, 2), new Date(2026, 0, 3)],
+        columnWidthPx: 40,
+        activities: [],
+        showWeekendShading: false,
+        shadedDates: ['2026-01-02', '2026-01-02', '2027-01-01'],
+      },
+    })
+    expect(wrapper.get('.box-border').attributes('style')).toContain('rgb(248, 250, 252) 40px')
+    expect(wrapper.get('.box-border').attributes('style')).toContain('rgb(248, 250, 252) 80px')
+    expect(wrapper.findAll('.cursor-pointer')).toHaveLength(0)
+    await wrapper.setProps({ shadedDates: [] })
+    expect(wrapper.get('.box-border').attributes('style')).not.toContain('rgb(248, 250, 252)')
+    await wrapper.setProps({ shadedDates: ['2026-01-02'], viewMode: 'week' })
+    expect(wrapper.get('.box-border').attributes('style')).not.toContain('rgb(248, 250, 252)')
+  })
+
   it('applies explicit link offsets without changing row geometry', () => {
     const rows = ref(
       baseRows.map((row, index) => ({
